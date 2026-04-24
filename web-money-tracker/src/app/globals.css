@@ -1,20 +1,21 @@
 @import "tailwindcss";
 
-:root {
+:root,
+.dark
+{
     /*brand core*/
-    --color-brand-primary: #aa0000;
-    --color-brand-secondary: rgba(82, 183, 136, 0.10);
-    --color-brand-accent: #52B788;
-    --color-brand-accent-muted: #74C69D;
+    --color-brand-red: #aa0000;
+    --color-brand-dark-green: rgba(82, 183, 136, 0.10);
+    --color-brand-green: #52B788;
+    --color-brand-accent-green: #74C69D;
     --color-brand-gold: #C9A84C;
     --color-brand-gold-light: #d3bd7f;
 
     /*Surface*/
-    --color-bg-base: #0D1F17;
-    --color-bg-raised: #12291E;
+    --color-bg-base: #1f1f2a;
+    --color-bg-secondary: #1c2430;
     --color-bg-overlay: #183525;
     --color-bg-subtle: #1E3D2C;
-    --color-bg-muted: #243F31;
 
     /*Border/Divider*/
     --color-border-subtle: rgba(82, 183, 136, 0.10);
@@ -42,46 +43,39 @@
     --font-display: 'DM Serif Display', Georgia, serif;
     --font-body: 'Instrument Sans', sans-serif;
     --font-mono: "DM Mono", "Fira Code", monospace; 
+    --color-text-primary: #FFFFFF;
+    --color-text-secondary: #bbbbbb;
 
     color-scheme: dark;
 }
 
-@media (prefers-color-scheme: light) {
-    :root {
-        /*brand core*/
-         --color-brand-primary: #aa0000;
-        --color-brand-secondary: rgba(82, 183, 136, 0.10);
-        --color-brand-accent: #52B788;
-        --color-brand-accent-muted: #74C69D;
-        --color-brand-gold: #C9A84C;
-        --color-brand-gold-light: #d3bd7f;
-        
-        --color-bg-base: #F4F9F6;
-        --color-bg-secondary: #F3F3F3;
-        --color-bg-raised: #FFFFFF;
-        --color-bg-overlay: #ECFAF3;
-        --color-bg-subtle: #E8F5EE;            
-        --color-bg-muted: #D6EDE3;
-        
-        --color-text-primary: #0D1F17;
-        --color-text-secondary: #2D5C43;
-        
-        --color-border-subtle: rgba(26, 60, 46, 0.08);
-        --color-border-default: rgba(26, 60, 46, 0.16);
-        --color-border-strong: rgba(26, 60, 46, 0.32);
-        
-        --color-income-bg: #DFF5EB;
-        --color-expense-bg: #FDECEA;
-        --color-saving-bg: #FDF6E3;
-        --color-neutral-bg: #E3F3F9;
-        
-        --shadow-sm: 0 1px 3px rgba(13, 31, 23, 0.08), 0 1px 2px rgba(13, 31, 23, 0.05);
-        --shadow-md: 0 4px 12px rgba(13, 31, 23, 0.10), 0 2px 6px rgba(13, 31, 23, 0.07);
-        --shadow-lg: 0 12px 32px rgba(13, 31, 23, 0.14), 0 4px 12px rgba(13, 31, 23, 0.09);
-        --shadow-glow: 0 0 20px rgba(45, 106, 79, 0.14);
+.light {
+    /*brand core*/
+    --color-brand-primary: #aa0000;
+    --color-brand-secondary: rgba(82, 183, 136, 0.10);
+    --color-brand-accent: #52B788;
+    --color-brand-accent-muted: #74C69D;
+    --color-brand-gold: #C9A84C;
+    --color-brand-gold-light: #d3bd7f;
 
-        color-scheme: light;
-    }
+    --color-bg-base: #F4F9F6;
+    --color-bg-secondary: #dcdcdc;
+    --color-bg-overlay: #ECFAF3;
+    --color-bg-subtle: #E8F5EE;
+
+    --color-text-primary: #0D1F17;
+    --color-text-secondary: #2D5C43;
+
+    --color-border-subtle: rgba(26, 60, 46, 0.08);
+    --color-border-default: rgba(26, 60, 46, 0.16);
+    --color-border-strong: rgba(26, 60, 46, 0.32);
+
+    --shadow-sm: 0 1px 3px rgba(13, 31, 23, 0.08), 0 1px 2px rgba(13, 31, 23, 0.05);
+    --shadow-md: 0 4px 12px rgba(13, 31, 23, 0.10), 0 2px 6px rgba(13, 31, 23, 0.07);
+    --shadow-lg: 0 12px 32px rgba(13, 31, 23, 0.14), 0 4px 12px rgba(13, 31, 23, 0.09);
+    --shadow-glow: 0 0 20px rgba(45, 106, 79, 0.14);
+
+    color-scheme: light;
 }
 
 html, body {
@@ -96,7 +90,5 @@ html, body {
 }
 *, *::before, *::after{
     box-sizing: border-box;
-    margin: 0;
-    padding: 0;
 }
 

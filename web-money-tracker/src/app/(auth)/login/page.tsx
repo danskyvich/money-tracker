@@ -1,42 +1,41 @@
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import { Lock, MailIcon } from "lucide-react";
 
-export default function LoginPage({children}: {children: React.ReactNode}) {
+export default function LoginPage() {
     return (
-      <div className="flex flex-1 flex-row w-full">
+      <div className="flex flex-col items-center justify-center w-full h-full">
+        {/**Card */}
+        <div className="gap-10 items-center justify-center p-6 border border-[var(--color-border-default)] rounded-2xl w-125 shadow-[var(--shadow-sm)]">
 
-        {/**Left side */}
-        <div className="flex flex-1 flex-col items-center justify-center bg-(--color-bg-base)">
-          {/**Form here */}
-          <form className='flex gap-5 flex-col'>
-            {/**Input */}
-            <div className="flex flex-col h-fit gap-5">
-              <Input
-                placeholder="Enter your email here..."
-                label="Email"
-                id="email"
-                type="email"
-              />
-              <Input
-                placeholder="Enter your password here..."
-                label="Password"
-                id="password"
-                type="password"
-              />
-            </div>
+          {/**Header */}
+          <header>
 
-            {/**Buttons */}
-            <div className='flex flex-col h-fit'>
-                <Button
-                    className=''
-                    variant='primary'
-                    text="Log in"
-                />
+          </header>
+          <form>
+            <Input
+              placeholder="sample@email.com"
+              label="Email"
+              id="email"
+              type="email"
+              icon={<MailIcon size={18}/>}
+            />
+            <Input
+              placeholder="min. 3 characters"
+              label="Password"
+              id="password"
+              type="password"
+              icon={<Lock size={18}/>}
+            />
+
+            <div className="gap-2 px-6">
+              <Button 
+              text="Log in" 
+              type="button"
+              />
             </div>
           </form>
         </div>
-
-        <div className="flex flex-4 flex-col bg-(--color-bg-secondary)"></div>
       </div>
     );
 }
