@@ -14,7 +14,6 @@
     /*Surface*/
     --color-bg-base: #1f1f2a;
     --color-bg-secondary: #1c2430;
-    --color-bg-overlay: #183525;
     --color-bg-subtle: #1E3D2C;
 
     /*Border/Divider*/
@@ -23,7 +22,7 @@
     --color-border-strong: rgba(82, 183, 136, 0.40);
     --color-border-focus: #52B788;
 
-    /*Status*/
+    /*Status (applicable for both themes)*/
     --color-success: #52B788;
     --color-success-bg: #1A3A2A;
     --color-warning: #C9A84C;
@@ -51,20 +50,20 @@
 
 .light {
     /*brand core*/
-    --color-brand-primary: #aa0000;
-    --color-brand-secondary: rgba(82, 183, 136, 0.10);
-    --color-brand-accent: #52B788;
-    --color-brand-accent-muted: #74C69D;
+    --color-brand-red: #aa0000;
+    --color-brand-dark-green: rgba(82, 183, 136, 0.10);
+    --color-brand-green: #52B788;
+    --color-brand-accent-green: #74C69D;
     --color-brand-gold: #C9A84C;
     --color-brand-gold-light: #d3bd7f;
 
     --color-bg-base: #F4F9F6;
-    --color-bg-secondary: #dcdcdc;
-    --color-bg-overlay: #ECFAF3;
+    --color-bg-secondary: #f1f1f1;
     --color-bg-subtle: #E8F5EE;
 
     --color-text-primary: #0D1F17;
     --color-text-secondary: #2D5C43;
+    --color-text-tertiary: #609679;
 
     --color-border-subtle: rgba(26, 60, 46, 0.08);
     --color-border-default: rgba(26, 60, 46, 0.16);
@@ -76,6 +75,10 @@
     --shadow-glow: 0 0 20px rgba(45, 106, 79, 0.14);
 
     color-scheme: light;
+}
+
+@theme {
+    --background-image-brand-gradient: linear-gradient(to right, #2A7B9B, #EDDD53);
 }
 
 html, body {
@@ -91,4 +94,3 @@ html, body {
 *, *::before, *::after{
     box-sizing: border-box;
 }
-
