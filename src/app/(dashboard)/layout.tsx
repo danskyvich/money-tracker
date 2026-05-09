@@ -5,7 +5,7 @@ export default function DashboardLayout({children}: {children: React.ReactNode})
     return (
       <div className="flex h-full w-full">
         <Sidebar />
-        <div className="flex flex-col">
+        <div className="flex flex-col w-auto h-full">
             <AvatarBar/>
             {children}
         </div>
