@@ -12,9 +12,9 @@
     --color-brand-gold-light: #d3bd7f;
 
     /*Surface*/
-    --color-bg-base: #1f1f2a;
-    --color-bg-secondary: #1c2430;
-    --color-bg-subtle: #1E3D2C;
+    --color-bg-base: #13131d;
+    --color-bg-secondary: #13111f;
+    --color-bg-subtle: #17162d;
 
     /*Border/Divider*/
     --color-border-subtle: rgba(82, 183, 136, 0.10);
@@ -58,8 +58,8 @@
     --color-brand-gold-light: #d3bd7f;
 
     --color-bg-base: #F4F9F6;
-    --color-bg-secondary: #f1f1f1;
-    --color-bg-subtle: #E8F5EE;
+    --color-bg-secondary: #f6f6f6;
+    --color-bg-subtle: #ebebeb;
 
     --color-text-primary: #0D1F17;
     --color-text-secondary: #2D5C43;

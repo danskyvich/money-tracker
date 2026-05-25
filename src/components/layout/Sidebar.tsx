@@ -2,10 +2,9 @@
 
 import { useState } from "react";
 import { SidebarItem } from "./SidebarItem";
-import { ArrowDownUpIcon, ArrowLeftCircle, ArrowLeftCircleIcon, BarChart, LayoutDashboardIcon, PiggyBank, Repeat, Settings, Wallet2Icon } from "lucide-react";
+import { ArrowDownUpIcon, ArrowLeftCircle, BarChart, LayoutDashboardIcon, PiggyBank, Repeat, Settings, Wallet2Icon } from "lucide-react";
 
 export default function Sidebar() {
-    const [currentAmount, setCurrentAmount] = useState();
     const time = "today"
 
     const OverviewItems = [
@@ -21,23 +20,16 @@ export default function Sidebar() {
     ];
 
     return (
-      <div className="flex flex-col border-r-2 border-[var(--color-border-subtle)] w-[12.5%] h-full duration-300">
+      <div className="flex flex-col border-r-2 border-[var(--color-bg-base)] w-[12.5%] h-full duration-300 bg-[var(--color-bg-subtle)] hidden 2xl:lg:block min-w-10 transition-all duration-100">
         {/**Header */}
         <header className="flex my-5 items-center justify-center">
-          <p className="font-bold text-3xl mt-5">
+          <p className="font-bold text-3xl mt-5 md:text-[1.2rem]">
             Money{" "}
             <span className="bg-brand-gradient bg-clip-text text-transparent">
               Tracker
             </span>
           </p>
         </header>
-
-        {/**Session */}
-        <div className="flex my-2 mx-5 px-5 py-2 rounded-xl border border-[var(--color-border-default)] shadow-[var(--shadow-sm)] bg-linear-to-r from-teal-700 to-teal-900">
-          <p className="text-[var(--color-text-secondary)] text-white font-light text-[0.85rem]">
-            Last session: <span className="font-normal">{time}</span>
-          </p>
-        </div>
 
         {/**Sidebar list */}
         <div className="flex flex-col gap-1 mx-5 mt-5">
@@ -51,7 +43,7 @@ export default function Sidebar() {
 
         {/**Others */}
         <div className="flex flex-col gap-1 mx-5 mt-3">
-          <p className="text-[var(--color-text-secondary)] mt-4 text-[0.9rem] font-light">
+          <p className="text-[var(--color-)] mt-4 text-[0.9rem] font-light">
             Others
           </p>
           {OthersItems.map((otherItem) => (
@@ -64,15 +56,6 @@ export default function Sidebar() {
         </div>
 
         <div className="flex flex-1 h-auto w-full" />
-        <div className="flex flex-0  gap-3 items-center justify-center py-2 shover:cursor-pointer border-t-[0.5] border-[var(--color-border-default)] hover:cursor-pointer">
-          <ArrowLeftCircle
-            size={20}
-            className="text-[var(--color-text-secondary)]"
-          />
-          <p className="font-normal text-[0.9rem] text-[var(--color-text-secondary)]">
-            Collapse sidebar
-          </p>
-        </div>
       </div>
     );
 }

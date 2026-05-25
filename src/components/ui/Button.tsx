@@ -15,7 +15,7 @@ type Variant = keyof typeof variants;
 
 interface ButtonProps<T extends SVGElement = SVGSVGElement> extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
-  text: string;
+  text?: string;
   icon?: React.ReactElement<React.SVGProps<T>>;
   className?: string;
   link: string

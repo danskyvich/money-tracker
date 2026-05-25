@@ -1,14 +1,14 @@
 "use client"
 
+import { useForm } from "react-hook-form";
 import Button from "../../../components/ui/Button";
 import Card from "../../../components/ui/Card";
 import Input from "../../../components/ui/Input";
 import { LoginFormData, loginSchema } from "../../../lib/schemas/LoginSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Lock, MailIcon } from "lucide-react";
+import { EyeClosed, EyeIcon, Lock, MailIcon } from "lucide-react";
 import Link from "next/link";
-import { useEffect } from "react";
-import {useForm} from "react-hook-form";
+import { useEffect, useState } from "react";
 
 export const GoogleIcon = (
   props: React.SVGProps<SVGSVGElement>,
@@ -37,6 +37,7 @@ export const FacebookIcon = (
 );
 
 export default function LoginPage() {
+  const [showPassword, setShowPassword] = useState(false)
 
   useEffect(() => {
     document.title = "Sign in to Money Tracker"
@@ -51,98 +52,60 @@ export default function LoginPage() {
   });
     return (
       <div className="flex flex-col items-center justify-center w-full">
-        <Card
-          header={
-            <div className="flex flex-col items-center justify-center">
-              <p className="text-[var(--color-text-primary)] font-extrabold text-5xl mt-10 mb-2">
-                Money{" "}
-                <span className="bg-brand-gradient bg-clip-text text-transparent">
-                  Tracker
-                </span>
-              </p>
-              <p className="font-mono text-center my-3 mx-10 text-[var(--color-text-secondary)]">
-                An average money tracker app for an average man.
-              </p>
-            </div>
-          }
-          content={
-            <>
-              <form className="w-full">
-                <Input
-                  placeholder="sample@email.com"
-                  label="Email"
-                  id="email"
-                  type="email"
-                  icon={<MailIcon size={18} />}
-                  register={register}
-                  name={"username"}
-                  error={errors.username}
-                  className=""
-                />
-                <Input
-                  placeholder="min. 3 characters"
-                  label="Password"
-                  id="password"
-                  type="password"
-                  icon={<Lock size={18} />}
-                  register={register}
-                  name={"password"}
-                  error={errors.password}
-                  className=""
-                />
+        {/* Card */}
+        <div className="flex w-fit h-fit flex-col rounded-2xl bg-(--color-bg-subtle) px-15 py-20 shadow-2xl">
+          {/* Header */}
+          <header className="text-center">
+            <p className="font-bold text-5xl">
+              Money{" "}
+              <span className="bg-brand-gradient bg-clip-text text-transparent">
+                Tracker
+              </span>
+            </p>
+            <p className="font-mono font-light my-3 text-(--color-text-secondary)">
+              An average money tracker app for an average man
+            </p>
+          </header>
 
-                <div className="gap-2 px-6">
-                  <Button
-                    text="Log in"
-                    type="button"
-                    icon={<></>}
-                    className=""
-                    link="/overview"
-                  >
-                  </Button>
-                </div>
-              </form>
+          {/* Main */}
+          <form className="my-5">
+            <Input
+              register={register}
+              label="Email"
+              placeholder="Enter your email address"
+              id="email"
+              icon={<MailIcon size={13} />}
+              type="email"
+              name="username"
+            />
+            <Input
+              register={register}
+              label="Password"
+              placeholder="Enter your password"
+              id="password"
+              icon={<Lock size={13} />}
+              type={showPassword ? "text" : "password"}
+              name="password"
+              leadingIcon={
+                showPassword ? <EyeClosed size={19} onClick={() => setShowPassword(false)}/>
+                :
+                <EyeIcon size={19} onClick={() => setShowPassword(true)}/>
+              }
+            />
+            <Button link="/overview" text="Log in" className="mt-4" />
+          </form>
 
-              <div className="relative my-5 block px-6 w-full">
-                <hr className="border-[var(--color-border-strong)]" />
-                <span className="text-[var(--color-border-strong)] text-[0.9rem] absolute pt-0 px-3.75 top-[50%] left-[50%] translate-[-50%] bg-[var(--color-bg-secondary)]">
-                  or
-                </span>
-              </div>
+          <div className="relative flex text-center items-center ">
+            <hr className="flex-1 border border-(--color-border-subtle)" />
+            <span className="px-3 text-sm text-(--color-text-secondary) bg-(--color-bg-subtle)">
+              or
+            </span>
+            <hr className="flex-1 border border-(--color-border-subtle)" />
+          </div>
 
-              <div className="flex flex-col px-6 gap-5 w-full">
-                <Button
-                  variant="secondary"
-                  text="Sign in using Google"
-                  icon={<GoogleIcon width={20} height={20} />}
-                  className=""
-                  link=""
-                />
-                <Button
-                  variant="secondary"
-                  text="Sign in using Facebook"
-                  icon={<FacebookIcon width={20} height={20} />}
-                  className=""
-                  link=""
-                />
-              </div>
-            </>
-          }
-          footer={
-            <div className="flex items-center font-light justify-center mt-5 text-[0.85rem]">
-              <p className="text-[var(--color-text-secondary)]">
-                No account?{" "}
-                <Link
-                  className="hover:cursor-pointer hover:underline duration-200 font-semibold"
-                  href="/register/"
-                >
-                  Create a new account
-                </Link>{" "}
-                instead
-              </p>
-            </div>
-          }
-        />
+          {/* Register */}
+          <Button text="Sign up" link="/register" variant="secondary" className="mt-4"/>
+        </div>
       </div>
     );
 }

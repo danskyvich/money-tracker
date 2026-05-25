@@ -1,27 +1,29 @@
 interface CardProps {
-    header: React.ReactNode,
-    content: React.ReactNode,
-    footer: React.ReactNode,
+    header?: React.ReactNode,
+    subheader?: React.ReactNode
+    children?: React.ReactNode,
+    footer?: React.ReactNode,
+    classname?: string,
 }
 
-export default function Card({header, content, footer}: CardProps){
-    return (
-      //Card
-      <div className="flex flex-col bg-[var(--color-bg-secondary)] items-center justify-center p-6 border border-[var(--color-border-default)] rounded-2xl w-125 shadow-[var(--shadow-sm)]">
-        {/**Header */}
-        <header className="flex flex-col w-full">
-          {header}
-        </header>
+export default function Card({header, subheader, children, footer, classname}: CardProps){
+    return(
+      <div className={`flex flex-col w-full h-full border-(--color-border-default) border rounded-xl p-6 ${classname}`}>
+        {header && (
+          <div className="flex flex-col w-full h-fit font-normal font-semibold text-xl">
+            <p>{header}</p>
+            <p className="font-mono text-sm font-light my-1 text-(--color-text-secondary)">{subheader}</p>
+          </div>
+        )}
 
-        {/**Content */}
-        <div className="flex flex-col w-full">
-          {content}
-        </div>
+        {children && 
+          <div className="flex flex-col w-full h-auto">
+            {children}
+          </div>  
+        }
 
-        {/**Footer */}
-        <footer className="flex flex-col w-full">
-          {footer}
-        </footer>
+        {}
+        <hr className="border border-(--color-border-subtle) my-2"/>
       </div>
-    );
+    )
 }

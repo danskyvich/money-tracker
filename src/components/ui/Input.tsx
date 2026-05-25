@@ -1,15 +1,16 @@
 import React from "react";
 import { UseFormRegister, FieldError, Path, FieldValues} from "react-hook-form";
 interface InputProps<T extends FieldValues> extends React.InputHTMLAttributes<HTMLInputElement> {
-  placeholder: string;
-  label: string;
+  placeholder?: string;
+  label?: string;
   id: string;
-  type: string;
+  type?: string;
   icon: React.ReactNode;
+  leadingIcon?: React.ReactNode;
   register: UseFormRegister<T>,
   name: Path<T>;
   error?: FieldError;
-  className: string;
+  className?: string;
 }
 
 export default function Input<T extends FieldValues>({
@@ -18,6 +19,7 @@ export default function Input<T extends FieldValues>({
   id,
   type = "text",
   icon,
+  leadingIcon,
   error,
   register,
   name,
@@ -46,6 +48,11 @@ export default function Input<T extends FieldValues>({
           type={type}
           {...register(name)}
         />
+        {leadingIcon && (
+          <div className="absolute right-3 text-gray-400 hover:cursor-pointer">
+            {leadingIcon}
+          </div>
+        )}
       </div>
       {error && (
         <p
