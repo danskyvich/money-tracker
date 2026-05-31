@@ -2,9 +2,9 @@
 
 import { useEffect } from "react"
 
-export default function Settings() {
+export default function CashFlow() {
     useEffect(() => {
-        document.title = 'Settings'
+        document.title = 'Your cashflow'
     })
 
     return(

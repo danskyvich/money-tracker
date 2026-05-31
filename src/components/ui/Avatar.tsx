@@ -1,6 +1,8 @@
 import Link from "next/link";
+import { useState } from "react";
 
 export default function Avatar({initials}:{initials: string}) {
+
     return (
       <Link
         href="/profile"

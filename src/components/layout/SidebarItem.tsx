@@ -1,10 +1,25 @@
-export const SidebarItem = ({icon, label, path}: {icon: React.ReactNode, label: string, path: string}) => {
+import Link from "next/link"
+
+interface SidebarItemProps {
+  icon: React.ReactNode,
+  label: string,
+  className?: string,
+  path: string,
+  isActive: boolean,
+}
+
+export const SidebarItem = ({icon, label, className, path, isActive}: SidebarItemProps) => {
   return (
-    <div 
-      className={`flex w-full h-fit gap-auto items-center py-2 px-5 gap-3 rounded-2xl hover:cursor-pointer hover:bg-[var(--color-border-subtle)]`}
-      >
-        <div className="flex">{icon}</div>
-        <p className="flex font-mono text-[0.9rem] ">{label}</p>
-    </div>
+    <Link
+      href={path}
+      className={`flex gap-3 px-2 py-3 font-mono text-sm hover:bg-[var(--color-border-subtle)] hover:cursor-pointer rounded-2xl ${className} ${
+        isActive
+          ? "rounded-2xl border-2 border-[var(--color-border-strong)] hover:bg-transparent"
+          : ""
+      }`}
+    >
+      {icon}
+      <p>{label}</p>
+    </Link>
   );
 }

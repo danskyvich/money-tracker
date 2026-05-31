@@ -1,19 +1,26 @@
+'use client'
 import { Bell } from "lucide-react";
-import Image from "next/image";
-import Avatar from "../ui/Avatar";
 import Link from "next/link";
+import Avatar from "../ui/Avatar";
+import { useRef, useState } from "react";
+import NotificationItem from "./NotificationItem";
+import { NotificationTypes } from "@/lib/mocks/mockNotifs";
 
 export default function AvatarBar({}:{}) {
+  const notifRef = useRef<HTMLDialogElement>(null)
+
     return (
-      <div className="flex w-full p-5">
-        {/**Bar */}
-        <div className="flex w-full rounded-xl items-center justify-center gap-5 px-5 py-2 ">
-          <div className="flex flex-auto w-auto" />
-          <Link href="/notifications" className="">
-            <Bell size={20} />
-          </Link>
-          <Avatar initials="DP" />
-        </div>
+      <div className="relative flex w-full rounded-xl items-center justify-center gap-5 px-10 py-4">
+        <div className="flex flex-auto w-auto" />
+
+        {/* Notifications */}
+        <Bell
+          size={20}
+          className="hover:cursor-pointer"
+        />
+
+        <Avatar initials="DP" />
+
       </div>
     );
 }
