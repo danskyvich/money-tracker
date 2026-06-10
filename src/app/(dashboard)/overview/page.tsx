@@ -169,7 +169,7 @@ export default function Overview() {
                   <p className="text-3xl font-mono text-primary">3,145.00</p>
                 </>
 
-                <Small status="increasing" className="text-[0.9rem]">
+                <Small status="decreasing" className="text-[0.9rem]">
                   <ArrowUp size={13} />
                   <p>17%</p>
                 </Small>

@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "tailwindcss/preflight";
 
 @theme {
     --background-image-brand-gradient: linear-gradient(to right, #2A7B9B, #EDDD53);
@@ -30,7 +29,7 @@ body {
     --color-brand-red: #aa0000;
     --color-brand-dark-green: rgba(82, 183, 136, 0.10);
     --color-brand-green: #52B788;
-    --color-brand-accent-green: #74C69D;
+    --color-brand-green-accent: #74C69D;
     --color-brand-gold: #C9A84C;
     --color-brand-gold-light: #d3bd7f;
 

@@ -10,23 +10,16 @@ export default function Profile() {
     })
     return (
       <div className="flex w-full h-full gap-5">
+        <div className="flex flex-1 flex-col w-full h-full">
 
-        {/* Left side */}
-        <div className="flex flex-col w-full h-full gap-5">
-          <Card classname="flex w-full h-fit" />
-            <p>
-            </p>
-          <Card classname="flex w-full h-fit" />
         </div>
 
-        {/* Right side */}
-        <div className="flex flex-col w-full h-full">
-          <Card
-
-          >
-
-          </Card>
-        </div>
+        <Card
+          header="Profile"
+          subheader="View your personal information"
+          className="flex flex-3 w-full"
+        >
+        </Card>
       </div>
     );
 }

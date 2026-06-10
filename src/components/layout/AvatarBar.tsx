@@ -1,26 +1,31 @@
 'use client'
-import { Bell } from "lucide-react";
+import { Bell, Moon, Settings, Sun } from "lucide-react";
 import Link from "next/link";
-import Avatar from "../ui/Avatar";
-import { useRef, useState } from "react";
-import NotificationItem from "./NotificationItem";
-import { NotificationTypes } from "@/lib/mocks/mockNotifs";
+import ThemeSwitcher from "./ThemeSwitcher";
+import { usePathname } from "next/navigation";
 
 export default function AvatarBar({}:{}) {
-  const notifRef = useRef<HTMLDialogElement>(null)
+  const currentUrl = usePathname();
 
     return (
-      <div className="relative flex w-full rounded-xl items-center justify-center gap-5 px-10 py-4">
+      <div className="relative flex w-full rounded-xl items-center justify-center gap-5 0 py-4">
         <div className="flex flex-auto w-auto" />
 
-        {/* Notifications */}
-        <Bell
-          size={20}
-          className="hover:cursor-pointer"
-        />
+        <div className="flex border-(--color-border-default) border rounded-xl shadow-sm">
+          <div className="flex w-full h-full py-3 pl-3 pr-2 rounded-l-xl transition-all duration-200">
+            <Link href="./notifications/">
+              <Bell size={20} className={`${currentUrl === "/notifications" ? "text-(--color-brand-green)" : null}`}/>
+            </Link>
+          </div>
 
-        <Avatar initials="DP" />
+          <div className="flex w-full h-full py-3 pr-3 pl-2 rounded-r-xl transition-all duration-200">
+            <Link href="./settings/">
+              <Settings size={20} className={`${currentUrl === "/settings" ? "text-(--color-brand-green)" : null}`}/>
+            </Link>
+          </div>
+        </div>
 
+        <ThemeSwitcher/>
       </div>
     );
 }
