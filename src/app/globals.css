@@ -1,4 +1,27 @@
 @import "tailwindcss";
+@import "tailwindcss/preflight";
+
+@theme {
+    --background-image-brand-gradient: linear-gradient(to right, #2A7B9B, #EDDD53);
+}
+
+html,
+body {
+    font-size: 16px;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: var(--color-bg-base);
+    line-height: 1.6;
+    min-height: 100dvh;
+    height: 100%;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
 
 :root,
 .dark
@@ -75,22 +98,4 @@
     --shadow-glow: 0 0 20px rgba(45, 106, 79, 0.14);
 
     color-scheme: light;
-}
-
-@theme {
-    --background-image-brand-gradient: linear-gradient(to right, #2A7B9B, #EDDD53);
-}
-
-html, body {
-    font-size: 16px;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    background-color: var(--color-bg-base);
-    line-height: 1.6;
-    min-height: 100dvh;
-    height: 100%;
-}
-*, *::before, *::after{
-    box-sizing: border-box;
 }

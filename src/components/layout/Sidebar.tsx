@@ -69,7 +69,7 @@ export default function Sidebar() {
 
         {/**Others */}
         <div className="flex flex-col gap-1 mx-5 mt-3">
-          <p className="text-[var(--color-)] mt-4 text-[0.9rem] font-light">
+          <p className="mt-4 text-[0.9rem] font-light">
             Others
           </p>
           {OthersItems.map((otherItem) => (

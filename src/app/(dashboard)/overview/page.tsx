@@ -3,13 +3,11 @@
 import { useEffect, useState } from "react";
 import Card from "@/components/ui/Card";
 import TransactionItem from "@/components/layout/TransactionItem";
-import { LineChart, Pie, PieChart, ResponsiveContainer } from "recharts";
 import { transactions } from "@/lib/mocks/mockTransactions";
 import { useUser } from "@/lib/hooks/useUser";
-import { accounts, monthlyExpenses, monthlyIncome } from "@/lib/mocks/mockAccounts";
-import MonthlySummaryChart from "@/lib/charts/monthlySummaryCharts";
-
-const AccountCard = ({ name, amount }: { name: string; amount: string }) => {};
+import { accounts } from "@/lib/mocks/mockAccounts";
+import { ArrowUp } from "lucide-react";
+import Small from "@/components/ui/Small";
 
 export default function Overview() {
   const [time, setTime] = useState("");
@@ -44,8 +42,8 @@ export default function Overview() {
       range: [6, 12],
       icon: (
         <svg
-          className="text-(--color-text-primary)"
-          fill='currentColor'
+          className="text-primary"
+          fill="currentColor"
           width="30px"
           height="30px"
           viewBox="0 0 24 24"
@@ -59,7 +57,7 @@ export default function Overview() {
       range: [12, 17],
       icon: (
         <svg
-          className="text-(--color-text-primary)"
+          className="text-primary"
           width="30px"
           height="30px"
           viewBox="0 0 15 15"
@@ -67,7 +65,7 @@ export default function Overview() {
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            clip-rule="evenodd"
+            clipRule="evenodd"
             d="M7.5 0C7.77614 0 8 0.223858 8 0.5V2.5C8 2.77614 7.77614 3 7.5 3C7.22386 3 7 2.77614 7 2.5V0.5C7 0.223858 7.22386 0 7.5 0ZM2.1967 2.1967C2.39196 2.00144 2.70854 2.00144 2.90381 2.1967L4.31802 3.61091C4.51328 3.80617 4.51328 4.12276 4.31802 4.31802C4.12276 4.51328 3.80617 4.51328 3.61091 4.31802L2.1967 2.90381C2.00144 2.70854 2.00144 2.39196 2.1967 2.1967ZM0.5 7C0.223858 7 0 7.22386 0 7.5C0 7.77614 0.223858 8 0.5 8H2.5C2.77614 8 3 7.77614 3 7.5C3 7.22386 2.77614 7 2.5 7H0.5ZM2.1967 12.8033C2.00144 12.608 2.00144 12.2915 2.1967 12.0962L3.61091 10.682C3.80617 10.4867 4.12276 10.4867 4.31802 10.682C4.51328 10.8772 4.51328 11.1938 4.31802 11.3891L2.90381 12.8033C2.70854 12.9986 2.39196 12.9986 2.1967 12.8033ZM12.5 7C12.2239 7 12 7.22386 12 7.5C12 7.77614 12.2239 8 12.5 8H14.5C14.7761 8 15 7.77614 15 7.5C15 7.22386 14.7761 7 14.5 7H12.5ZM10.682 4.31802C10.4867 4.12276 10.4867 3.80617 10.682 3.61091L12.0962 2.1967C12.2915 2.00144 12.608 2.00144 12.8033 2.1967C12.9986 2.39196 12.9986 2.70854 12.8033 2.90381L11.3891 4.31802C11.1938 4.51328 10.8772 4.51328 10.682 4.31802ZM8 12.5C8 12.2239 7.77614 12 7.5 12C7.22386 12 7 12.2239 7 12.5V14.5C7 14.7761 7.22386 15 7.5 15C7.77614 15 8 14.7761 8 14.5V12.5ZM10.682 10.682C10.8772 10.4867 11.1938 10.4867 11.3891 10.682L12.8033 12.0962C12.9986 12.2915 12.9986 12.608 12.8033 12.8033C12.608 12.9986 12.2915 12.9986 12.0962 12.8033L10.682 11.3891C10.4867 11.1938 10.4867 10.8772 10.682 10.682ZM5.5 7.5C5.5 6.39543 6.39543 5.5 7.5 5.5C8.60457 5.5 9.5 6.39543 9.5 7.5C9.5 8.60457 8.60457 9.5 7.5 9.5C6.39543 9.5 5.5 8.60457 5.5 7.5ZM7.5 4.5C5.84315 4.5 4.5 5.84315 4.5 7.5C4.5 9.15685 5.84315 10.5 7.5 10.5C9.15685 10.5 10.5 9.15685 10.5 7.5C10.5 5.84315 9.15685 4.5 7.5 4.5Z"
           />
         </svg>
@@ -77,7 +75,7 @@ export default function Overview() {
       range: [17, 20],
       icon: (
         <svg
-          className="text-(--color-text-primary)"
+          className="text-primary"
           fill="currentColor"
           width="30px"
           height="30px"
@@ -102,13 +100,13 @@ export default function Overview() {
           height="30px"
           viewBox="0 0 15 15"
           fill="currentColor"
+          className="text-primary"
           xmlns="http://www.w3.org/2000/svg"
-          className="text-(--color-text-primary)"
         >
           <path
             d="M1.66077 11.3619C2.09296 11.4524 2.54093 11.5 3.00002 11.5C6.58987 11.5 9.50002 8.58987 9.50002 5.00002C9.50002 3.25482 8.81224 1.67027 7.69295 0.502625C11.4697 0.604839 14.5 3.69855 14.5 7.50002C14.5 11.366 11.366 14.5 7.49999 14.5C5.06138 14.5 2.91401 13.253 1.66077 11.3619Z"
-            stroke="#000000"
-            stroke-linejoin="round"
+            stroke="currentColor"
+            strokeLinejoin="round"
           />
         </svg>
       )
@@ -116,11 +114,18 @@ export default function Overview() {
   };
 
   return (
-    <div className="flex flex-col w-full h-full px-10 gap-5 pb-5">
+    <div className="flex flex-col w-full h-full gap-5">
       {/* Header */}
-      <div className="flex items-center gap-3 font-mono text-(--color-text-primary) text-xl">
-        {getOverviewIcon({ time })}
-        <p>Welcome, {user.first_name}!</p>
+      <div className="flex flex-col">
+        <div className="flex items-center gap-5 text-xl text-primary">
+          {getOverviewIcon({ time })}
+          <div className="flex flex-col">
+            <p className="font-mono">Welcome,{user.first_name}!</p>
+            <p className="font-light text-(--color-text-secondary) text-sm mt-2 text-secondary">
+              Your finances are looking healthy this month
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Main Content */}
@@ -145,30 +150,39 @@ export default function Overview() {
 
         {/* Right side */}
         <div className="flex w-full h-full flex-col gap-5">
-          <Card header="Monthly summary" subheader="Outflows and Inflows">
-            <div className="flex w-full items-stretch justify-center">
-              <MonthlySummaryChart
-                source={monthlyExpenses}
-                dataKey="percent"
-                nameKey="category"
-                total={"988.00"}
-              />
-              <MonthlySummaryChart
-                source={monthlyIncome}
-                dataKey="percent"
-                nameKey="category"
-                total={"2,154.00"}
-              />
-            </div>
-          </Card>
+          <div className="flex flex-row gap-5">
+            <Card header="Income">
+              <div className="flex flex-col gap-2 px-5 py-3">
+                <>
+                  <p className="text-3xl font-mono text-primary">3,145.00</p>
+                </>
 
+                <Small status="increasing" className="text-[0.9rem]">
+                  <ArrowUp size={13} />
+                  <p>17%</p>
+                </Small>
+              </div>
+            </Card>
+            <Card header="Expenses">
+              <div className="flex flex-col gap-2 px-5 py-3">
+                <>
+                  <p className="text-3xl font-mono text-primary">3,145.00</p>
+                </>
+
+                <Small status="increasing" className="text-[0.9rem]">
+                  <ArrowUp size={13} />
+                  <p>17%</p>
+                </Small>
+              </div>
+            </Card>
+          </div>
           <Card
             header="Your accounts"
             link="/accounts"
             linkText="See your accounts"
           >
             {accounts.map((item) => (
-              <div className=""></div>
+              <div></div>
             ))}
           </Card>
         </div>
