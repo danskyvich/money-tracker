@@ -2,13 +2,13 @@ import Link from "next/link";
 
 const variants = {
   primary:
-    "bg-[var(--color-brand-accent-green)] font-bold rounded-xl border-1 border-[var(--color-brand-accent-green)] text-white py-2 hover:cursor-pointer hover:bg-[var(--color-brand-green)]",
+    "bg-(--color-brand-accent-green) font-bold rounded-xl border border-(--color-brand-accent-green) text-white py-2 hover:cursor-pointer hover:bg-(--color-brand-green)",
   secondary:
-    "bg-[var(--color-brand-secondary)] rounded-xl border-1 border-[var(--color-brand-gold)] hover:cursor-pointer hover:bg-[var(--color-brand-gold)] hover:text-[var(--color-bg-base)]",
+    "bg-(--color-brand-secondary) rounded-xl border border-(--color-brand-gold) hover:cursor-pointer hover:bg-(--color-brand-gold) hover:text-(--color-bg-base)",
   ghost:
-    "text-[var(--color-text-primary)] border-[var(--color-border-strong)] bg-transparent hover:bg-[var(--color-brand-green)] border-1 rounded-xl hover:cursor-pointer",
+    "text-(--color-text-primary) border-(--color-border-strong) bg-transparent hover:bg-(--color-brand-green) border rounded-xl hover:cursor-pointer",
   danger:
-    "hover:opacity-90 text-white bg-[var(--color-error)] rounded-xl hover:cursor-pointer",
+    "hover:opacity-90 text-white bg-(--color-error) rounded-xl hover:cursor-pointer",
 } as const;
 
 type Variant = keyof typeof variants;

@@ -59,7 +59,7 @@ export default function Sidebar() {
 
         {/**Sidebar list */}
         <div className="flex flex-col gap-1 mx-5 mt-5">
-          <p className="text-[var(--color-text-secondary)] text-[0.9rem] font-light mb-2">
+          <p className="text-(--color-text-secondary) text-[0.9rem] font-light mb-2">
             Overview
           </p>
           {OverviewItems.map((overviewItem) => (

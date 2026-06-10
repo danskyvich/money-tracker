@@ -14,7 +14,7 @@ export default function TransactionItem({className, category, amount, icon, acco
       >
         <div className="flex mr-2">{icon}</div>
         <p className="flex-1 text-[0.9rem]">{category}</p>
-        <div className="flex flex-col flex-[2]">
+        <div className="flex flex-col flex-2">
           <p className="text-[0.9rem]">{description}</p>
           <p className="text-[0.7rem] text-(--color-text-secondary)">
             {account}
