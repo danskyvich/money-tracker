@@ -84,7 +84,7 @@ export default function RegisterPage() {
             />
             <Button
             link="/overview"
-            className="mt-4"
+            className="mt-4 w-full"
             text="Register"
             />
           </form>

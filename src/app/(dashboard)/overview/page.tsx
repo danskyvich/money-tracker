@@ -6,7 +6,7 @@ import TransactionItem from "@/components/layout/TransactionItem";
 import { transactions } from "@/lib/mocks/mockTransactions";
 import { useUser } from "@/lib/hooks/useUser";
 import { accounts } from "@/lib/mocks/mockAccounts";
-import { ArrowUp } from "lucide-react";
+import { ArrowDown, ArrowUp } from "lucide-react";
 import Small from "@/components/ui/Small";
 
 export default function Overview() {
@@ -119,9 +119,9 @@ export default function Overview() {
       <div className="flex flex-col">
         <div className="flex items-center gap-5 text-xl text-primary">
           {getOverviewIcon({ time })}
-          <div className="flex flex-col">
-            <p className="font-mono">Welcome,{user.first_name}!</p>
-            <p className="font-light text-(--color-text-secondary) text-sm mt-2 text-secondary">
+          <div className="flex flex-col justify-center">
+            <p className="flex font-mono text-[1.5rem]">Welcome,{user.first_name}!</p>
+            <p className="flex font-normal text-(--color-text-primary) text-[0.8rem] text-secondary">
               Your finances are looking healthy this month
             </p>
           </div>
@@ -136,6 +136,7 @@ export default function Overview() {
           subheader="Your transactions for the month of May"
           link="/transactions"
           linkText="See your transactions"
+          className="h-full"
         >
           {transactions.map((object) => (
             <TransactionItem
@@ -151,7 +152,7 @@ export default function Overview() {
         {/* Right side */}
         <div className="flex w-full h-full flex-col gap-5">
           <div className="flex flex-row gap-5">
-            <Card header="Income">
+            <Card header="Income" className="h-fit">
               <div className="flex flex-col gap-2 px-5 py-3">
                 <>
                   <p className="text-3xl font-mono text-primary">3,145.00</p>
@@ -163,28 +164,44 @@ export default function Overview() {
                 </Small>
               </div>
             </Card>
-            <Card header="Expenses">
+            <Card header="Expenses" className="h-fit">
               <div className="flex flex-col gap-2 px-5 py-3">
                 <>
-                  <p className="text-3xl font-mono text-primary">3,145.00</p>
+                  <p className="text-3xl font-mono text-primary">1,116.00</p>
                 </>
 
                 <Small status="decreasing" className="text-[0.9rem]">
-                  <ArrowUp size={13} />
-                  <p>17%</p>
+                  <ArrowDown size={13} />
+                  <p>3%</p>
                 </Small>
               </div>
             </Card>
           </div>
-          <Card
-            header="Your accounts"
-            link="/accounts"
-            linkText="See your accounts"
-          >
-            {accounts.map((item) => (
-              <div></div>
-            ))}
-          </Card>
+
+          <div className="flex w-full h-full gap-5">
+            <Card
+              header="Your accounts"
+              link="/accounts"
+              linkText="See your accounts"
+              className="h-full"
+            >
+              <div className="flex flex-col p-5 gap-3">
+                {accounts.map((item) => (
+                  <div className="flex border border-(--color-border-default) rounded-xl py-3 px-4 hover:bg-(--color-border-subtle) hover:cursor-pointer">
+                    <p className="font-mono text-[1rem]">{item.name}</p>
+                    <div className="flex flex-auto w-auto h-fit" />
+                    <p className="flex text-[1.12rem]">
+                      <span className="flex items-end text-[0.9rem] mr-1 text-(--color-text-secondary)">
+                        ₱
+                      </span>
+                      <p className="flex font-mono">{item.amount}</p>
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </Card>
+            <Card header="Summary" className="h-full"></Card>
+          </div>
         </div>
       </div>
     </div>

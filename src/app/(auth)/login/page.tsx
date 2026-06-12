@@ -7,6 +7,7 @@ import { LoginFormData, loginSchema } from "../../../lib/schemas/LoginSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EyeClosed, EyeIcon, Lock, MailIcon } from "lucide-react";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 const GoogleIcon = (
   props: React.SVGProps<SVGSVGElement>,
@@ -96,12 +97,24 @@ export default function LoginPage() {
                 )
               }
             />
-            <Button link="/overview" text="Sign in" className="mt-4" />
+            <Button link="/overview" text="Sign in" className="mt-4 w-full" />
           </form>
 
           {/* Provider buttons for sign in */}
-          <Button link="/" text="Sign in using Google" variant="ghost" icon={<GoogleIcon/>} />
-          <Button link="/" text="Sign in using Facebook" variant="ghost" icon={<FacebookIcon />}/>
+          <div className="flex flex-col gap-2 mb-2">
+            <Button
+              link="/"
+              text="Sign in using Google"
+              variant="ghost"
+              icon={<GoogleIcon />}
+            />
+            <Button
+              link="/"
+              text="Sign in using Facebook"
+              variant="ghost"
+              icon={<FacebookIcon />}
+            />
+          </div>
 
           <div className="relative flex text-center items-center ">
             <hr className="flex-1 border border-(--color-border-subtle)" />
@@ -118,6 +131,24 @@ export default function LoginPage() {
             variant="secondary"
             className="mt-4"
           />
+
+          <div className="flex w-full mt-2 gap-2 text-(--color-text-secondary) text-[0.8rem] font-mono items-center justify-center">
+            <Link
+              href="/terms-and-conditions"
+              className="hover:cursor-pointer hover:underline"
+            >
+              <p>Terms and conditions</p>
+            </Link>
+
+            <p>•</p>
+
+            <Link
+              href="/privacy-policy"
+              className="hover:cursor-pointer hover:underline"
+            >
+              <p>Privacy policy</p>
+            </Link>
+          </div>
         </div>
       </div>
     );

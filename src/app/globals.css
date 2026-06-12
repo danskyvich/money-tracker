@@ -4,22 +4,21 @@
     --background-image-brand-gradient: linear-gradient(to right, #2A7B9B, #EDDD53);
 }
 
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
 html,
 body {
     font-size: 16px;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: var(--color-bg-base);
     line-height: 1.6;
     min-height: 100dvh;
     height: 100%;
-}
-
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
 }
 
 :root,
@@ -27,7 +26,7 @@ body {
 {
     /*brand core*/
     --color-brand-red: #aa0000;
-    --color-brand-dark-green: rgba(82, 183, 136, 0.10);
+    --color-brand-green-subtle: rgba(82, 183, 136, 0.10);
     --color-brand-green: #52B788;
     --color-brand-green-accent: #74C69D;
     --color-brand-gold: #C9A84C;
@@ -35,7 +34,7 @@ body {
 
     /*Surface*/
     --color-bg-base: #13131d;
-    --color-bg-secondary: #13111f;
+    --color-bg-secondary: #111022;
     --color-bg-subtle: #17162d;
 
     /*Border/Divider*/

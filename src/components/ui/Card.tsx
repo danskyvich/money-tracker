@@ -21,7 +21,7 @@ export default function Card({
 }: CardProps) {
   return (
     <div
-      className={`flex flex-col w-full h-full border rounded-xl shadow-xl ${className}`}
+      className={`flex flex-col w-full h-fit border rounded-xl shadow-xl ${className}`}
       style={{ borderColor: "var(--color-border-default)" }}
     >
       <div className="flex w-full items-center justify-center px-5 py-4 ">
@@ -53,8 +53,7 @@ export default function Card({
       </div>
 
       <hr
-        className="border"
-        style={{ borderColor: "var(--color-border-subtle)" }}
+        className="border-(--color-border-default)"
       />
 
       {children && (
