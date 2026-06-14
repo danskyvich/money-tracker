@@ -13,7 +13,7 @@ export default function Configuration() {
     setDayPressed(DAYS[index]);
   }
     return (
-      <div className="flex flex-col w-full h-full py-5 px-9 gap-3">
+      <div className="flex flex-col w-full h-full py-5 px-9 gap-1">
         {/* Main Currency */}
         <SettingItem label="Main currency">
           <div className="flex">

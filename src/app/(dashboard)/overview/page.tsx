@@ -194,7 +194,7 @@ export default function Overview() {
                       <span className="flex items-end text-[0.9rem] mr-1 text-(--color-text-secondary)">
                         ₱
                       </span>
-                      <p className="flex font-mono">{item.amount}</p>
+                      <span className="flex font-mono">{item.amount}</span>
                     </p>
                   </div>
                 ))}

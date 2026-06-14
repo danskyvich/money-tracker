@@ -18,7 +18,7 @@ interface ButtonProps<T extends SVGElement = SVGSVGElement> extends React.Button
   text?: string;
   icon?: React.ReactElement<React.SVGProps<T>>;
   className?: string;
-  link: string
+  link?: string
 }
 
 export default function Button<T extends SVGElement = SVGElement>({
@@ -36,7 +36,7 @@ export default function Button<T extends SVGElement = SVGElement>({
       type={type}
       {...props}
     >
-      <Link href={link} className="flex flex-row items-center justify-center gap-3">
+      <Link href={link ?? ""} className="flex flex-row items-center justify-center gap-3">
         {icon}
         <p>{text}</p>
       </Link>

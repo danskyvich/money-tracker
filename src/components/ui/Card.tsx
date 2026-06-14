@@ -21,8 +21,7 @@ export default function Card({
 }: CardProps) {
   return (
     <div
-      className={`flex flex-col w-full h-fit border rounded-xl shadow-xl ${className}`}
-      style={{ borderColor: "var(--color-border-default)" }}
+      className={`flex flex-col w-full h-fit border rounded-xl shadow-md border-(--color-border-default) ${className}`}
     >
       <div className="flex w-full items-center justify-center px-5 py-4 ">
         {header && (

@@ -33,6 +33,8 @@ export default function Settings() {
     setActive(path);
   };
 
+  const currentChoice = CHOICES.find((item) => item.path === active);
+
   return (
     <div className="flex flex-col w-full h-full gap-5">
       <div className="flex w-fit h-fit gap-4">
@@ -48,7 +50,9 @@ export default function Settings() {
         ))}
       </div>
 
-      <Card className="flex flex-3 flex-col w-full h-full">
+      <Card className="flex flex-3 flex-col w-full h-full"
+        header={currentChoice?.name}
+      >
         <ContainerComponent path={active} />
       </Card>
     </div>

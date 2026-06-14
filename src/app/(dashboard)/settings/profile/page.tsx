@@ -15,8 +15,11 @@ export default function Profile() {
     })
     const t = useUser();
 
+    // Modal states
+    const [isDelete, setDelete] = useState<boolean>(false);
+
     return (
-      <div className="flex flex-col w-full h-full p-5">
+      <div className="flex flex-col w-full h-full p-5 gap-1">
         {/* User header */}
         <div className="flex flex-1 w-full h-fit gap-5 p-5 bg-linear-to-r from-gray-800 to-slate-900 rounded-3xl shadow-lg ">
           {/* Avatar */}
@@ -42,7 +45,7 @@ export default function Profile() {
             <Switcher />
           </SettingItem>
 
-          <SettingItem label="Change password" icon={<CircleQuestionMarkIcon size={20}/>}>
+          <SettingItem label="Change password" icon={<CircleQuestionMarkIcon size={20}/>} tooltip="Your password cannot be changed if you signed up using Google">
             <Button
               text="Change password"
               link="/"
