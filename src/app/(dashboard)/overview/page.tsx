@@ -120,7 +120,9 @@ export default function Overview() {
         <div className="flex items-center gap-5 text-xl text-primary">
           {getOverviewIcon({ time })}
           <div className="flex flex-col justify-center">
-            <p className="flex font-mono text-[1.5rem]">Welcome,{user.first_name}!</p>
+            <p className="flex font-mono text-[1.5rem]">
+              Welcome,{user.first_name}!
+            </p>
             <p className="flex font-normal text-(--color-text-primary) text-[0.8rem] text-secondary">
               Your finances are looking healthy this month
             </p>
@@ -178,29 +180,17 @@ export default function Overview() {
             </Card>
           </div>
 
-          <div className="flex w-full h-full gap-5">
-            <Card
-              header="Your accounts"
-              link="/accounts"
-              linkText="See your accounts"
-              className="h-full"
-            >
-              <div className="flex flex-col p-5 gap-3">
-                {accounts.map((item) => (
-                  <div className="flex border border-(--color-border-default) rounded-xl py-3 px-4 hover:bg-(--color-border-subtle) hover:cursor-pointer">
-                    <p className="font-mono text-[1rem]">{item.name}</p>
-                    <div className="flex flex-auto w-auto h-fit" />
-                    <p className="flex text-[1.12rem]">
-                      <span className="flex items-end text-[0.9rem] mr-1 text-(--color-text-secondary)">
-                        ₱
-                      </span>
-                      <span className="flex font-mono">{item.amount}</span>
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </Card>
-            <Card header="Summary" className="h-full"></Card>
+          <div className="flex flex-col w-full h-fit border border-(--color-border-default) p-5 rounded-lg gap-5">
+            <p className="text-[1.2rem] font-display font-semibold">
+              Quick actions
+            </p>
+            <div className="flex w-full gap-5">
+              {/* Add new transaction */}
+              <div className="flex flex-1 h-fit border border-(--color-border-default) rounded-lg p-5"></div>
+
+              {/* Add new account type */}
+              <div className="flex flex-1 h-fit border border-(--color-border-default) rounded-lg p-5"></div>
+            </div>
           </div>
         </div>
       </div>

@@ -15,6 +15,7 @@ import {
   Trash,
   X,
 } from "lucide-react";
+import { useModal } from "@/lib/hooks/useModal";
 
 const filterOptions = ["Type", "Category", "Account"];
 
@@ -32,12 +33,24 @@ export default function Transactions() {
   const [search, setSearch] = useState<boolean>(false);
   const [isTransactionModalOpen, setIsTransactionModalOpen] =
     useState<number | null>(null);
+  const {openModal, closeModal } = useModal();
 
   //functions
   const handleFilterClose = (choice: string) => {
     setSelectedFilter(choice);
     setFilter(false);
   };
+
+  //open modal
+  const handleOpenModal = (index: number) => {
+    openModal();
+    setIsTransactionModalOpen(index);
+  }
+
+  const handleCloseModal = () => {
+    closeModal();
+    setIsTransactionModalOpen(null);
+  }
 
   return (
     <div className="flex w-full h-full gap-5">
@@ -80,6 +93,7 @@ export default function Transactions() {
             <ChevronDown size={20} />
           </div>
 
+          {/* Search field */}
           <div className="px-3 flex w-75 h-full border border-(--color-border-default) rounded-md items-center gap-2">
             <Search size={15} className="flex" />
             <input
@@ -106,14 +120,14 @@ export default function Transactions() {
         {/* Transaction Table */}
         <div className="overflow-auto flex-1">
           {/** Transaction headers */}
-          <div className="grid grid-cols-[50px_100px_100px_100px_1fr_200px_200px] gap-4 font-mono text-[0.9rem] text-(--color-text-secondary) py-2 px-5 pt-1 font-semibold">
+          <div className="grid grid-cols-[50px_100px_100px_100px_1fr_200px_200px] gap-4 font-mono text-[0.9rem] text-(--color-text-secondary) py-2 px-5 pt-1 font-display">
             <div>Icon</div>
             <div>Date</div>
             <div>Time</div>
             <div>Type</div>
             <div>Description</div>
             <div>Account</div>
-            <div className="font-semibold text-left">Amount</div>
+            <div className="text-left">Amount</div>
           </div>
 
           {/* Transaction rows */}
@@ -146,7 +160,7 @@ export default function Transactions() {
 
                 {/* Transaction */}
                 <div>
-                  <p className="font-semibold text-(--color-text-primary)">
+                  <p className="text-(--color-text-primary)">
                     {transaction.description}
                   </p>
                 </div>

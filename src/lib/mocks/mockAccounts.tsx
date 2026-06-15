@@ -1,8 +1,12 @@
+export const accountCategories = [
+  "Cash", "Accounts", "Savings", "Loans", "Insurance", "Others"
+]
+
 export const accounts = [
-  { name: "BPI", amount: "8765.00" },
-  { name: "Cash", amount: "456.00" },
-  { name: "Homebook", amount: "200.00" },
-  { name: "GCash", amount: "47.01" },
+  { name: "BPI", amount: "8765.00", type: "Savings", description: null },
+  { name: "Cash", amount: "456.00", type: "Cash", description: null },
+  { name: "Homebook", amount: "200.00", type: "Cash", description: null },
+  { name: "GCash", amount: "47.01", type: "Accounts", description: null },
 ];
 
 export const monthlyExpenses = [
