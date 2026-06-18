@@ -21,18 +21,6 @@ export default function Sidebar() {
         isActive: false,
       },
       {
-        icon: <ArrowDownUpIcon size={20} />,
-        label: "Cash flow",
-        path: "/cash-flow",
-        isActive: false,
-      },
-      {
-        icon: <PiggyBank size={20} />,
-        label: "Budget",
-        path: "/budget",
-        isActive: false,
-      },
-      {
         icon: <BaggageClaimIcon size={20} />,
         label: "Accounts",
         path: "/accounts",

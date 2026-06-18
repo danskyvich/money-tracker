@@ -18,8 +18,8 @@ export default function ThemeSwitcher() {
 
   return (
     <div className="flex p-3 z-50 items-end gap-3 border border-(--color-border-default) rounded-xl shadow-sm">
-      {THEMES.map((t) => (
-        <div className="flex hover:bg-(--color-bg-secondary)">
+      {THEMES.map((t, index) => (
+        <div className="flex hover:bg-(--color-bg-secondary)" key={index}>
           <button
             key={t.name}
             onClick={() => {

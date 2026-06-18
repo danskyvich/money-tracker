@@ -5,13 +5,15 @@ import Card from "@/components/ui/Card";
 import TransactionItem from "@/components/layout/TransactionItem";
 import { transactions } from "@/lib/mocks/mockTransactions";
 import { useUser } from "@/lib/hooks/useUser";
-import { accounts } from "@/lib/mocks/mockAccounts";
-import { ArrowDown, ArrowUp } from "lucide-react";
+import { accountCategories, accounts } from "@/lib/mocks/mockAccounts";
+import { ArrowDown, ArrowUp, ChevronRight, Plus } from "lucide-react";
 import Small from "@/components/ui/Small";
 
 export default function Overview() {
   const [time, setTime] = useState("");
   const { user } = useUser();
+  const pagination = [1,2,3];
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
   useEffect(() => {
     document.title = "Dashboard";
@@ -140,58 +142,142 @@ export default function Overview() {
           linkText="See your transactions"
           className="h-full"
         >
-          {transactions.map((object) => (
-            <TransactionItem
-              amount={object.amount}
-              account={object.account}
-              category={object.category}
-              description={object.description}
-              icon={object.icon}
-            />
-          ))}
+          <div className="flex flex-col w-full h-full">
+            <div className="grid flex-0 grid-cols-[100px_100px_100px_1fr_100px] gap-4 font-mono text-sm text-secondary py-2 px-5 font-display">
+              <div>Icon</div>
+              <div>Account</div>
+              <div>Type</div>
+              <div>Description</div>
+              <div>Amount</div>
+            </div>
+
+            <div className="flex flex-col flex-1 w-full h-full">
+              {transactions.map((transaction, index) => (
+                <div
+                  key={index}
+                  className="grid grid-cols-[100px_100px_100px_1fr_100px] gap-4 items-center py-3 text-[0.9rem] hover:bg-(--color-bg-subtle) hover:cursor-pointer active:bg-(--color-border-default) px-5 border-b border-(--color-border-subtle)"
+                >
+                  {/* Icon */}
+                  <div className="flex items-center">{transaction.icon}</div>
+
+                  {/* Account */}
+                  <div className="text-(--color-text-secondary)">
+                    {transaction.account}
+                  </div>
+
+                  {/* Type */}
+                  <div className="text-(--color-text-secondary)">
+                    {transaction.type}
+                  </div>
+
+                  {/* Transaction */}
+                  <div>
+                    <p className="text-(--color-text-primary)">
+                      {transaction.description}
+                    </p>
+                  </div>
+
+                  {/* Amount */}
+                  <div
+                    className={`text-left font-semibold ${
+                      transaction.type.match("Expense")
+                        ? "text-red-400"
+                        : transaction.type.match("Transfer")
+                          ? "text-(--color-text-primary)"
+                          : "text-green-400"
+                    }`}
+                  >
+                    {transaction.amount}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex flex-0 text-[0.9rem] w-full h-fit px-5 py-2 font-display text-(--color-text-secondary) gap-2 items-center">
+              <p>Show data</p>
+
+              <div className="flex border border-(--color-border-default) text-(--color-text-secondary) px-3 py-2 rounded-lg shadow-sm">
+                <p>10</p>
+              </div>
+
+              <p>of 200</p>
+
+              <div className="flex flex-auto w-auto" />
+
+              <div className="flex w-fit gap-2">
+                {pagination.map((item) => (
+                  <div
+                    className={`border border-(--color-border-default) rounded-lg px-3 py-2 shadow-sm hover:cursor-pointer ${currentPage === item ? "bg-(--color-border-strong) text-white" : null}`}
+                    onClick={() => setCurrentPage(item)}
+                  >
+                    <p>{item}</p>
+                  </div>
+                ))}
+
+                <div className="flex w-fit px-3 py-2 font display items-center border border-(--color-border-default) rounded-lg hover:cursor-pointer hover:bg-(--color-border-subtle) shadow-md">
+                  <p>Next</p>
+                  <ChevronRight size={20} />
+                </div>
+              </div>
+            </div>
+          </div>
         </Card>
 
         {/* Right side */}
         <div className="flex w-full h-full flex-col gap-5">
-          <div className="flex flex-row gap-5">
-            <Card header="Income" className="h-fit">
-              <div className="flex flex-col gap-2 px-5 py-3">
-                <>
-                  <p className="text-3xl font-mono text-primary">3,145.00</p>
-                </>
 
-                <Small status="increasing" className="text-[0.9rem]">
-                  <ArrowUp size={13} />
-                  <p>17%</p>
-                </Small>
+          {/* Top */}
+          <div className="flex flex-1 w-full h-full gap-5">
+            <div className="flex flex-col w-full gap-5">
+              {/* Income */}
+              <div className="flex flex-col border border-(--color-border-default) p-5 rounded-lg shadow-lg">
+                <p>Income</p>
+                <p className="font-mono text-2xl">3,105.25</p>
               </div>
-            </Card>
-            <Card header="Expenses" className="h-fit">
-              <div className="flex flex-col gap-2 px-5 py-3">
-                <>
-                  <p className="text-3xl font-mono text-primary">1,116.00</p>
-                </>
-
-                <Small status="decreasing" className="text-[0.9rem]">
-                  <ArrowDown size={13} />
-                  <p>3%</p>
-                </Small>
-              </div>
-            </Card>
-          </div>
-
-          <div className="flex flex-col w-full h-fit border border-(--color-border-default) p-5 rounded-lg gap-5">
-            <p className="text-[1.2rem] font-display font-semibold">
-              Quick actions
-            </p>
-            <div className="flex w-full gap-5">
-              {/* Add new transaction */}
-              <div className="flex flex-1 h-fit border border-(--color-border-default) rounded-lg p-5"></div>
-
-              {/* Add new account type */}
-              <div className="flex flex-1 h-fit border border-(--color-border-default) rounded-lg p-5"></div>
+              {/* Expenses */}
+              <div className="flex flex-col border border-(--color-border-default) p-5 rounded-lg shadow-lg">
+                <p>Expenses</p>
+                <p className="font-mono text-2xl">1,220.00</p>
+              </div>{" "}
             </div>
+
+            <Card header="Quick actions" subheader="Add account or transaction">
+              <div className="flex flex-col p-5 gap-5">
+                <div className="flex w-full px-2 py-3 gap-2 border border-(--color-border-default) rounded-lg text-[0.95rem] hover:bg-(--color-brand-green) cursor-pointer transition-all duration-150">
+                  <Plus size={20} />
+                  <p>Add a transaction</p>
+                </div>
+
+                <div className="flex w-full px-2 py-3 gap-2 border border-(--color-border-default) rounded-lg text-[0.95rem] hover:bg-(--color-brand-green) cursor-pointer transition-all duration-150">
+                  <Plus size={20} />
+                  <p>Add an account</p>
+                </div>
+              </div>
+            </Card>
           </div>
+
+          {/* Bottom */}
+          <Card
+            className="flex flex-3 w-full h-full flex-col"
+            header="Accounts"
+            subheader="All accounts and account categories"
+            linkText="See all accounts"
+            link="/accounts"
+          >
+            <div className="flex flex-3 w-full h-full">
+            </div>
+
+            <div className="flex flex-1 w-full h-full">
+              {accountCategories.map((item, index) => (
+                <div className="flex flex-col w-full" key={index}>
+
+                  {/* Header */}
+                  <div className="">
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
         </div>
       </div>
     </div>

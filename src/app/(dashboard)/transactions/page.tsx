@@ -79,7 +79,7 @@ export default function Transactions() {
                     className="hover:bg-(--color-bg-subtle) px-5 py-1 hover:cursor-pointer"
                     onClick={() => handleFilterClose(item)}
                   >
-                    <p className="font-display text-[0.9rem]">{item}</p>
+                    <p className="font-display text-[0.8rem]">{item}</p>
                   </div>
                 ))}
               </div>
@@ -130,59 +130,63 @@ export default function Transactions() {
             <div className="text-left">Amount</div>
           </div>
 
-          {/* Transaction rows */}
-          {transactions.map((transaction, index) => (
-            <>
-              <div
-                key={index}
-                onClick={() => setIsTransactionModalOpen(index)}
-                className="grid grid-cols-[50px_100px_100px_100px_1fr_200px_200px] gap-4 items-center py-3 text-[0.9rem] hover:bg-(--color-bg-subtle) hover:cursor-pointer active:bg-(--color-border-default) px-5 border-b border-(--color-border-subtle)"
-              >
-                {/* Icon */}
-                <div className="flex items-center justify-center">
-                  {transaction.icon}
-                </div>
-
-                {/*Date */}
-                <div className="text-(--color-text-secondary)">
-                  {transaction.date}
-                </div>
-
-                {/* Time */}
-                <div className="text-(--color-text-secondary)">
-                  {transaction.time}
-                </div>
-
-                {/* Type */}
-                <div className="text-(--color-text-secondary)">
-                  {transaction.type}
-                </div>
-
-                {/* Transaction */}
-                <div>
-                  <p className="text-(--color-text-primary)">
-                    {transaction.description}
-                  </p>
-                </div>
-
-                {/* Account */}
-                <div className="text-(--color-text-secondary)">
-                  {transaction.account}
-                </div>
-
-                {/* Amount */}
+          <div className="flex flex-col flex-1">
+            {/* Transaction rows */}
+            {transactions.map((transaction, index) => (
+              <>
                 <div
-                  className={`text-left font-semibold ${
-                    transaction.type.match("Expense")
-                      ? "text-red-400"
-                      : "text-emerald-500"
-                  }`}
+                  key={index}
+                  onClick={() => setIsTransactionModalOpen(index)}
+                  className="grid grid-cols-[50px_100px_100px_100px_1fr_200px_200px] gap-4 items-center py-3 text-[0.9rem] hover:bg-(--color-bg-subtle) hover:cursor-pointer active:bg-(--color-border-default) px-5 border-b border-(--color-border-subtle)"
                 >
-                  {transaction.amount}
+                  {/* Icon */}
+                  <div className="flex items-center justify-center">
+                    {transaction.icon}
+                  </div>
+
+                  {/*Date */}
+                  <div className="text-(--color-text-secondary)">
+                    {transaction.date}
+                  </div>
+
+                  {/* Time */}
+                  <div className="text-(--color-text-secondary)">
+                    {transaction.time}
+                  </div>
+
+                  {/* Type */}
+                  <div className="text-(--color-text-secondary)">
+                    {transaction.type}
+                  </div>
+
+                  {/* Transaction */}
+                  <div>
+                    <p className="text-(--color-text-primary)">
+                      {transaction.description}
+                    </p>
+                  </div>
+
+                  {/* Account */}
+                  <div className="text-(--color-text-secondary)">
+                    {transaction.account}
+                  </div>
+
+                  {/* Amount */}
+                  <div
+                    className={`text-left font-semibold ${
+                      transaction.type.match("Expense")
+                        ? "text-red-400"
+                        : transaction.type.match("Transfer")
+                          ? "text-(--color-text-primary)"
+                          : "text-green-400"
+                    }`}
+                  >
+                    {transaction.amount}
+                  </div>
                 </div>
-              </div>
-            </>
-          ))}
+              </>
+            ))}
+          </div>
 
           {/* Transaction Info Modal */}
           {isTransactionModalOpen !== null && (
@@ -228,9 +232,7 @@ export default function Transactions() {
                       Amount
                     </p>
                     <div className="flex flex-auto w-auto" />
-                    <p>
-                      {transactions[isTransactionModalOpen].amount}
-                    </p>
+                    <p>{transactions[isTransactionModalOpen].amount}</p>
                   </div>
 
                   <div className="flex flex-1 w-full py-1 rounded-xl items-center text-[0.8rem]">
@@ -249,9 +251,7 @@ export default function Transactions() {
                       Category
                     </p>
                     <div className="flex flex-auto w-auto" />
-                    <p>
-                      {transactions[isTransactionModalOpen].category}
-                    </p>
+                    <p>{transactions[isTransactionModalOpen].category}</p>
                   </div>
                 </div>
 
@@ -261,7 +261,7 @@ export default function Transactions() {
                     className="flex p-2 border border-(--color-border-default) bg-transparent rounded-[50%] cursor-pointer hover:bg-emerald-600 active:bg-(--color-border-strong) hover:text-white duration-100 transition-all"
                     onClick={() => setIsTransactionModalOpen(null)}
                   >
-                    <X size={20}/>
+                    <X size={20} />
                   </div>
                   <div className="flex p-2 border border-(--color-brand-red) bg-(--color-brand-red) rounded-[50%] cursor-pointer hover:bg-red-900 hover:border-red-900">
                     <Trash size={20} className="text-white" />
@@ -275,7 +275,7 @@ export default function Transactions() {
           )}
         </div>
 
-        <div className="flex text-[0.9rem] w-full h-fit px-5 py-2 font-display text-(--color-text-secondary) gap-2 items-center">
+        <div className="flex flex-0 text-[0.9rem] w-full h-fit px-5 py-2 font-display text-(--color-text-secondary) gap-2 items-center">
           <p>Show data</p>
 
           <div className="flex border border-(--color-border-default) text-(--color-text-secondary) px-3 py-2 rounded-lg shadow-sm">
