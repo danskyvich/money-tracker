@@ -2,18 +2,17 @@
 
 import { useEffect, useState } from "react";
 import Card from "@/components/ui/Card";
-import TransactionItem from "@/components/layout/TransactionItem";
 import { transactions } from "@/lib/mocks/mockTransactions";
 import { useUser } from "@/lib/hooks/useUser";
 import { accountCategories, accounts } from "@/lib/mocks/mockAccounts";
 import { ArrowDown, ArrowUp, ChevronRight, Plus } from "lucide-react";
-import Small from "@/components/ui/Small";
 
 export default function Overview() {
   const [time, setTime] = useState("");
   const { user } = useUser();
   const pagination = [1,2,3];
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [accountCurrentPage, setAccountCurrentPage] = useState<number>(1);
 
   useEffect(() => {
     document.title = "Dashboard";
@@ -196,19 +195,20 @@ export default function Overview() {
             <div className="flex flex-0 text-[0.9rem] w-full h-fit px-5 py-2 font-display text-(--color-text-secondary) gap-2 items-center">
               <p>Show data</p>
 
-              <div className="flex border border-(--color-border-default) text-(--color-text-secondary) px-3 py-2 rounded-lg shadow-sm">
-                <p>10</p>
-              </div>
+              <p className="border border-(--color-border-default) px-2 py-2 rounded-lg">
+                10
+              </p>
 
               <p>of 200</p>
 
               <div className="flex flex-auto w-auto" />
 
               <div className="flex w-fit gap-2">
-                {pagination.map((item) => (
+                {pagination.map((item, index) => (
                   <div
                     className={`border border-(--color-border-default) rounded-lg px-3 py-2 shadow-sm hover:cursor-pointer ${currentPage === item ? "bg-(--color-border-strong) text-white" : null}`}
                     onClick={() => setCurrentPage(item)}
+                    key={index}
                   >
                     <p>{item}</p>
                   </div>
@@ -225,30 +225,51 @@ export default function Overview() {
 
         {/* Right side */}
         <div className="flex w-full h-full flex-col gap-5">
-
           {/* Top */}
           <div className="flex flex-1 w-full h-full gap-5">
-            <div className="flex flex-col w-full gap-5">
+            <div className="flex flex-col h-full w-full gap-5">
               {/* Income */}
-              <div className="flex flex-col border border-(--color-border-default) p-5 rounded-lg shadow-lg">
-                <p>Income</p>
-                <p className="font-mono text-2xl">3,105.25</p>
+              <div className="flex h-full border border-(--color-border-default) p-5 rounded-lg shadow-lg justify-center">
+                <div className="flex flex-3 flex-col w-full h-full justify-center">
+                  <p className="text-[0.9rem] text-(--color-text-primary)">
+                    Income
+                  </p>
+                  <p className="font-mono text-2xl">3,105.25</p>
+                </div>
+
+                <div className="flex flex-1 w-full h-full items-center">
+                  <div className="flex w-fit h-fit px-5 py-1 rounded-3xl text-white bg-emerald-500 items-center justify-center gap-1">
+                    <ArrowUp size={20} />
+                    <p className="font-mono text-[0.9rem]">9%</p>
+                  </div>
+                </div>
               </div>
               {/* Expenses */}
-              <div className="flex flex-col border border-(--color-border-default) p-5 rounded-lg shadow-lg">
-                <p>Expenses</p>
-                <p className="font-mono text-2xl">1,220.00</p>
-              </div>{" "}
+              <div className="flex h-full border border-(--color-border-default) p-5 rounded-lg shadow-lg justify-center">
+                <div className="flex flex-3 flex-col w-full h-full justify-center">
+                  <p className="text-[0.9rem] text-(--color-text-primary)">
+                    Expenses
+                  </p>
+                  <p className="font-mono text-2xl">1,220.00</p>
+                </div>
+
+                <div className="flex flex-1 w-full h-full items-center">
+                  <div className="flex w-fit h-fit px-5 py-1 rounded-3xl text-white bg-red-500 items-center justify-center gap-1">
+                    <ArrowDown size={20} />
+                    <p className="font-mono text-[0.9rem]">3.5%</p>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <Card header="Quick actions" subheader="Add account or transaction">
               <div className="flex flex-col p-5 gap-5">
-                <div className="flex w-full px-2 py-3 gap-2 border border-(--color-border-default) rounded-lg text-[0.95rem] hover:bg-(--color-brand-green) cursor-pointer transition-all duration-150">
+                <div className="flex w-full px-2 py-3 gap-2 border border-(--color-brand-green) rounded-lg text-[0.95rem] hover:bg-(--color-brand-green) cursor-pointer transition-all duration-150">
                   <Plus size={20} />
                   <p>Add a transaction</p>
                 </div>
 
-                <div className="flex w-full px-2 py-3 gap-2 border border-(--color-border-default) rounded-lg text-[0.95rem] hover:bg-(--color-brand-green) cursor-pointer transition-all duration-150">
+                <div className="flex w-full px-2 py-3 gap-2 border border-(--color-brand-green) rounded-lg text-[0.95rem] hover:bg-(--color-brand-green) cursor-pointer transition-all duration-150">
                   <Plus size={20} />
                   <p>Add an account</p>
                 </div>
@@ -258,24 +279,92 @@ export default function Overview() {
 
           {/* Bottom */}
           <Card
-            className="flex flex-3 w-full h-full flex-col"
+            className="flex flex-3 w-full h-full"
             header="Accounts"
             subheader="All accounts and account categories"
             linkText="See all accounts"
             link="/accounts"
           >
-            <div className="flex flex-3 w-full h-full">
-            </div>
+            <div className="flex w-full h-full">
+              {/* Left side */}
+              <div className="flex flex-col flex-2 w-full h-full border-r border-(--color-border-default)">
+                <div className="grid w-full h-fit font-mono grid-cols-[100px_100px_100px_150px] px-5 py-1 text-[0.9rem] border-b border-(--color-border-default)">
+                  <p>Name</p>
+                  <p>Type</p>
+                  <p>Amount</p>
+                  <p>Description</p>
+                </div>
 
-            <div className="flex flex-1 w-full h-full">
-              {accountCategories.map((item, index) => (
-                <div className="flex flex-col w-full" key={index}>
+                <div className="flex flex-col flex-3 w-full h-full">
+                  {accounts.map((item, index) => (
+                    <div
+                      className="grid grid-cols-[100px_100px_100px_150px] w-full h-fit px-5 py-3 text-[0.9rem] border-b border-(--color-border-subtle) cursor-pointer hover:bg-(--color-bg-subtle)"
+                      key={index}
+                    >
+                      <p>{item.name}</p>
+                      <p>{item.type}</p>
+                      <p
+                        className="font-mono 
+                    "
+                      >
+                        {item.amount}
+                      </p>
+                      <p>
+                        {item.description === null ? "-" : item.description}
+                      </p>
+                    </div>
+                  ))}
+                </div>
 
-                  {/* Header */}
-                  <div className="">
+                <div className="flex flex-0 w-full h-fit px-3 py-2 text-[0.9rem] text-(--color-text-secondary) items-center justify-center">
+                  <div className="flex w-fit h-fit items-center">
+                    <p>Show data</p>
+
+                    <p className="border border-(--color-border-default) px-2 py-2 mx-2 rounded-lg">
+                      10
+                    </p>
+
+                    <p>of 200</p>
+                  </div>
+
+                  <div className="flex flex-auto w-auto h-fit" />
+
+                  <div className="flex w-fit gap-2">
+                    {pagination.map((item) => (
+                      <div
+                        className={`border border-(--color-border-default) rounded-lg px-3 py-2 shadow-sm hover:cursor-pointer ${accountCurrentPage === item ? "bg-(--color-border-strong) text-white" : null}`}
+                        onClick={() => setAccountCurrentPage(item)}
+                      >
+                        <p>{item}</p>
+                      </div>
+                    ))}
+
+                    <div className="flex w-fit px-3 py-2 font display items-center border border-(--color-border-default) rounded-lg hover:cursor-pointer hover:bg-(--color-border-subtle) shadow-md">
+                      <p>Next</p>
+                      <ChevronRight size={20} />
+                    </div>
                   </div>
                 </div>
-              ))}
+              </div>
+
+              {/* Right side */}
+              <div className="flex flex-col flex-1 w-full h-full">
+                <div className="flex w-full h-fit px-5 py-1 font-mono text-[0.9rem] border-b border-(--color-border-default)">
+                  <p>Categories</p>
+                </div>
+
+                {/* Account categories */}
+                <div className="flex w-full flex-col h-full flex-1 px-3 py-2 gap-3">
+                  {accountCategories.map((item, index) => (
+                    <div
+                      className="flex flex-col border border-(--color-border-default) rounded-lg px-2 py-1 text-[0.9rem]"
+                      key={index}
+                    >
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </Card>
         </div>
