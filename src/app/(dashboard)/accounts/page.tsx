@@ -9,7 +9,6 @@ import {
   ArrowUpDown,
   Banknote,
   Calendar,
-  Calendar1,
   Check,
   ChevronDown,
   ChevronRight,
@@ -78,111 +77,121 @@ export default function Accounts({}: {}) {
   return (
     <div className="flex flex-col w-full h-full gap-5">
       {/* Account summary */}
-      <div className="flex w-full flex-1 gap-5">
-        {/* Total assets */}
-        <div className="flex flex-1 w-fit h-full border border-(--color-border-default) rounded-xl shadow-md px-5 py-2 items-center gap-3">
-          <div className="flex rounded-[50%] w-fit h-fit p-2 bg-transparent border-2 border-(--color-brand-gold) ">
-            <Banknote size={30} className="text-(--color-brand-gold)" />
-          </div>
+      <div className="flex w-full flex-1 flex-col min-[1550px]:flex-row gap-5">
+        {/* Left */}
+        <div className="flex flex-1 gap-5">
+          {/* Total assets */}
+          <div className="flex flex-1 w-fit h-full border border-(--color-border-default) rounded-xl shadow-md px-5 py-2 items-center gap-3">
+            <div className="flex rounded-[50%] w-fit h-fit p-2 bg-transparent border-2 border-(--color-brand-gold) ">
+              <Banknote size={30} className="text-(--color-brand-gold)" />
+            </div>
 
-          <div className="flex flex-col w-full h-full justify-center">
-            <p className="whitespace-nowrap text-[0.9rem] text-(--color-text-secondary)">
-              Total assets:
-            </p>
-            <p className="text-[1.2rem] font-mono">5,314.00</p>
+            <div className="flex flex-col w-full h-full justify-center">
+              <p className="whitespace-nowrap text-[0.9rem] text-(--color-text-secondary)">
+                Total assets:
+              </p>
+              <p className="text-[1.2rem] font-mono">5,314.00</p>
+            </div>
           </div>
-        </div>
-        {/* Total liabilities */}
-        <div className="flex flex-1 w-fit h-full border border-(--color-border-default) rounded-xl shadow-md px-5 py-2 items-center gap-3">
-          <div className="flex rounded-[50%] w-fit h-fit p-2 bg-transparent border border-(--color-brand-gold) ">
-            <Wallet2Icon size={30} className="text-(--color-brand-gold)" />
-          </div>
+          {/* Total liabilities */}
+          <div className="flex flex-1 w-fit h-full border border-(--color-border-default) rounded-xl shadow-md px-5 py-2 items-center gap-3">
+            <div className="flex rounded-[50%] w-fit h-fit p-2 bg-transparent border border-(--color-brand-gold) ">
+              <Wallet2Icon size={30} className="text-(--color-brand-gold)" />
+            </div>
 
-          <div className="flex flex-col w-full h-full justify-center">
-            <p className="whitespace-nowrap text-[0.9rem] text-(--color-text-secondary)">
-              Total liabilities:
-            </p>
-            <p className="text-[1.2rem] font-mono">234.00</p>
+            <div className="flex flex-col w-full h-full justify-center">
+              <p className="whitespace-nowrap text-[0.9rem] text-(--color-text-secondary)">
+                Total liabilities:
+              </p>
+              <p className="text-[1.2rem] font-mono">234.00</p>
+            </div>
           </div>
-        </div>
-        {/* Assets - liabilities = total */}
-        <div className="flex flex-1 w-fit h-full border border-(--color-border-default) rounded-xl shadow-md px-5 py-2 items-center gap-3">
-          <div className="flex rounded-[50%] w-fit h-fit p-2 bg-transparent border border-(--color-brand-gold) ">
-            <DollarSign size={30} className="text-(--color-brand-gold)" />
-          </div>
+          {/* Assets - liabilities = total */}
+          <div className="flex flex-1 w-fit h-full border border-(--color-border-default) rounded-xl shadow-md px-5 py-2 items-center gap-3">
+            <div className="flex rounded-[50%] w-fit h-fit p-2 bg-transparent border border-(--color-brand-gold) ">
+              <DollarSign size={30} className="text-(--color-brand-gold)" />
+            </div>
 
-          <div className="flex flex-col w-full h-full justify-center">
-            <p className="whitespace-nowrap text-[0.9rem] text-(--color-text-secondary)">
-              In total:
-            </p>
-            <p className="text-[1.2rem] font-mono">80.00</p>
-          </div>
-        </div>
-
-        {/* Money inflow for current month */}
-        <div className="flex flex-1 w-fit h-full border border-(--color-border-default) rounded-xl shadow-md px-5 py-2 items-center gap-3">
-          <div className="flex rounded-[50%] w-fit h-fit p-2 bg-transparent border border-(--color-brand-green) ">
-            <ArrowDown size={30} className="text-(--color-brand-green)" />
-          </div>
-
-          <div className="flex flex-col w-full h-full justify-center">
-            <p className="whitespace-nowrap text-[0.9rem] text-(--color-text-secondary)">
-              Money inflow ({currentMonth})
-            </p>
-            <p className="text-[1.2rem] font-mono">1,000.00</p>
+            <div className="flex flex-col w-full h-full justify-center">
+              <p className="whitespace-nowrap text-[0.9rem] text-(--color-text-secondary)">
+                In total:
+              </p>
+              <p className="text-[1.2rem] font-mono">80.00</p>
+            </div>
           </div>
         </div>
 
-        {/* Money inflow for current month */}
-        <div className="flex flex-1 w-fit h-full border border-(--color-border-default) rounded-xl shadow-md px-5 py-2 items-center gap-3">
-          <div className="flex rounded-[50%] w-fit h-fit p-2 bg-transparent border border-(--color-brand-green) ">
-            <ArrowUp size={30} className="text-(--color-brand-green)" />
+        {/* Right */}
+        <div className="flex flex-1 gap-5">
+          {/* Money inflow for current month */}
+          <div className="flex flex-1 w-fit h-full border border-(--color-border-default) rounded-xl shadow-md px-5 py-2 items-center gap-3">
+            <div className="flex rounded-[50%] w-fit h-fit p-2 bg-transparent border border-(--color-brand-green) ">
+              <ArrowDown size={30} className="text-(--color-brand-green)" />
+            </div>
+
+            <div className="flex flex-col w-full h-full justify-center">
+              <p className="whitespace-nowrap text-[0.9rem] text-(--color-text-secondary)">
+                Money inflow ({currentMonth})
+              </p>
+              <p className="text-[1.2rem] font-mono">1,000.00</p>
+            </div>
           </div>
 
-          <div className="flex flex-col w-full h-full justify-center">
-            <p className="whitespace-nowrap text-[0.9rem] text-(--color-text-secondary)">
-              Money outflow ({currentMonth})
-            </p>
-            <p className="text-[1.2rem] font-mono">250.00</p>
-          </div>
-        </div>
+          {/* Money inflow for current month */}
+          <div className="flex flex-1 w-fit h-full border border-(--color-border-default) rounded-xl shadow-md px-5 py-2 items-center gap-3">
+            <div className="flex rounded-[50%] w-fit h-fit p-2 bg-transparent border border-(--color-brand-green) ">
+              <ArrowUp
+                size={30}
+                className="text-[0.9rem] xl:text-[0.9rem] text-(--color-brand-green)"
+              />
+            </div>
 
-        {/* Money difference */}
-        <div className="flex flex-1 w-fit h-full border border-(--color-border-default) rounded-xl shadow-md px-5 py-2 items-center gap-3">
-          <div className="flex rounded-[50%] w-fit h-fit p-2 bg-transparent border border-(--color-brand-green) ">
-            <ArrowUpDown size={30} className="text-(--color-brand-green)" />
+            <div className="flex flex-col w-fit h-full justify-center">
+              <p className="whitespace-nowrap text-[0.9rem] text-(--color-text-secondary)">
+                Money outflow ({currentMonth})
+              </p>
+              <p className="text-[1.2rem] font-mono">250.00</p>
+            </div>
           </div>
 
-          <div className="flex flex-col w-full h-full justify-center">
-            <p className="whitespace-nowrap text-[0.9rem] text-(--color-text-secondary)">
-              Monthly flow difference ({currentMonth})
-            </p>
-            <p className="text-[1.2rem] font-mono">750.00</p>
+          {/* Money difference */}
+          <div className="flex flex-1 w-fit h-full border border-(--color-border-default) rounded-xl shadow-md px-5 py-2 items-center gap-3">
+            <div className="flex rounded-[50%] w-fit h-fit p-2 bg-transparent border border-(--color-brand-green) ">
+              <ArrowUpDown size={30} className="text-(--color-brand-green)" />
+            </div>
+
+            <div className="flex flex-col w-fit h-full justify-center">
+              <p className="whitespace-nowrap text-[0.9rem] text-(--color-text-secondary)">
+                Flow difference ({currentMonth})
+              </p>
+              <p className="text-[1.2rem] font-mono">750.00</p>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="flex flex-col w-full h-full gap-5 lg:flex-row">
-        {/* Account table */}
+      <div className="flex min-[1550px]:flex-row flex-col w-full h-full gap-5">
+        {/* Accounts */}
         <Card
-          className="flex flex-1 flex-col w-full h-full flex-3"
+          className="flex w-full h-full flex-3"
           header="Accounts"
+          subheader="View your accounts"
         >
           {/** Top Bar */}
           <div className="flex w-full px-5 py-2 gap-2">
-            <div className="flex w-fit h-full border border-(--color-brand-green-accent) rounded-md px-5 py-2 items-center gap-2 bg-transparent text-(--color-text-primary) hover:text-white hover:bg-emerald-600 cursor-pointer transition-all duration-200 active:bg-emerald-700">
+            <div className="flex w-fit h-full border border-(--color-brand-green) rounded-md px-5 items-center gap-2 bg-transparent text-(--color-text-primary) hover:text-white hover:bg-emerald-600 cursor-pointer transition-all duration-200 active:bg-emerald-700">
               <Plus size={15} />
-              <p className="text-[0.8rem]">Add an account</p>
+              <p className="text-[0.8rem] hidden lg:block">Add an account</p>
             </div>
 
             {/* Filter by */}
             <div className="relative flex flex-col">
               <div
-                className={`flex w-fit h-full items-center border border-(--color-border-default) ${filter ? "rounded-t-lg rounded-tr-lg" : "rounded-lg"} px-3 py-1 gap-2 cursor-pointer hover:bg-(--color-bg-subtle) transition-all duration-100`}
+                className={`flex w-fit h-full items-center border border-(--color-border-default) ${filter ? "rounded-t-lg rounded-tr-lg" : "rounded-lg"} px-5 py-1 gap-2 cursor-pointer hover:bg-(--color-bg-subtle) transition-all duration-100`}
                 onClick={() => setFilter((prev) => !prev)}
               >
                 <ListFilter size={15} className="flex" />
-                <p className="text-[0.8rem]">{selectedType}</p>
+                <p className="text-[0.8rem] hidden lg:block">{selectedType}</p>
                 {filter ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
               </div>
 
@@ -204,7 +213,7 @@ export default function Accounts({}: {}) {
             {/* Date range */}
             <div className="flex w-fit h-full items-center border border-(--color-border-default) rounded-md px-3 py-1 cursor-pointer hover:bg-(--color-bg-subtle) gap-2 transition-all duration-100">
               <Calendar size={15} />
-              <p className="font-display text-[0.8rem] text-(--color-text-primary)">
+              <p className="font-display text-[0.8rem] hidden lg:block text-(--color-text-primary)">
                 Date range
               </p>
               <ChevronDown size={15} />
@@ -221,8 +230,8 @@ export default function Accounts({}: {}) {
           </div>
 
           {/** Transaction headers */}
-          <div className="overflow-auto flex-auto h-full">
-            <div className="grid grid-cols-[200px_200px_1fr_200px_200px] border-b border-(--color-border-default) gap-4 font-mono text-[0.9rem] text-(--color-text-primary) py-2 px-5 pt-1 font-display w-full">
+          <div className="overflow-auto flex-auto w-full h-full">
+            <div className="grid grid-cols-[100px_100px_100px_100px] lg:grid-cols-[] xl:grid-cols-[] border-b border-(--color-border-default) gap-4 font-mono text-[0.9rem] text-(--color-text-primary) py-2 px-5 pt-1 font-display w-full">
               <div>Name</div>
               <div>Type</div>
               <div>Amount</div>
@@ -231,7 +240,7 @@ export default function Accounts({}: {}) {
 
             {accounts.map((account, index) => (
               <div
-                className="grid grid-cols-[200px_200px_1fr_200px_200px] gap-4 px-5 py-2 border-b border-(--color-border-subtle) text-[0.9rem] hover:bg-(--color-bg-subtle) cursor-pointer"
+                className="grid grid-cols-[100px_100px_100px_100px] lg:grid-cols-[] xl:grid-cols-[] gap-4 px-5 py-2 border-b border-(--color-border-subtle) text-[0.9rem] hover:bg-(--color-bg-subtle) cursor-pointer"
                 key={index}
               >
                 <div className="text-(--color-text-secondary)">
@@ -241,7 +250,7 @@ export default function Accounts({}: {}) {
                   {account.type}
                 </div>
                 <div className="font-mono">{account.amount}</div>
-                <div className="text-(--color-text-secondary)">
+                <div className="text-(--color-text-secondary) whitespace-nowrap">
                   {account.description === null ? "-" : account.description}
                 </div>
               </div>
@@ -278,7 +287,8 @@ export default function Accounts({}: {}) {
 
         {/* Account categories */}
         <Card
-          header="Account types"
+          header="Categories"
+          subheader="View all account categories"
           className="flex flex-col flex-1 h-full w-full"
         >
           {/* List account types */}

@@ -41,19 +41,8 @@ export default function Transactions() {
     setFilter(false);
   };
 
-  //open modal
-  const handleOpenModal = (index: number) => {
-    openModal();
-    setIsTransactionModalOpen(index);
-  }
-
-  const handleCloseModal = () => {
-    closeModal();
-    setIsTransactionModalOpen(null);
-  }
-
   return (
-    <div className="flex w-full h-full gap-5">
+    <div className="flex lg:flex-col w-full h-full gap-5">
       {/* Transactions */}
       <Card
         header="Transactions"
@@ -69,7 +58,7 @@ export default function Transactions() {
               onClick={() => setFilter((prev) => !prev)}
             >
               <ListFilterIcon size={15} />
-              <p>{selectedFilter}</p>
+              <p className="hidden lg:block">{selectedFilter}</p>
               {filter ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
             </div>
             {filter && (
@@ -89,12 +78,12 @@ export default function Transactions() {
           {/* Date range */}
           <div className="flex w-fit h-fit border border-(--color-border-default) font-display text-[0.8rem] py-1 px-3 rounded-lg gap-2 items-center justify-center">
             <Calendar size={15} />
-            <p className="whitespace-nowrap">Date range</p>
+            <p className="whitespace-nowrap hidden lg:block">Date range</p>
             <ChevronDown size={20} />
           </div>
 
           {/* Search field */}
-          <div className="px-3 flex w-75 h-full border border-(--color-border-default) rounded-md items-center gap-2">
+          <div className="px-3 flex w-fit h-full border border-(--color-border-default) rounded-md items-center gap-2">
             <Search size={15} className="flex" />
             <input
               placeholder="Search..."
@@ -103,27 +92,14 @@ export default function Transactions() {
           </div>
 
           <div className="flex flex-auto w-auto" />
-
-          <div className="flex w-fit gap-10 text-[0.9rem] items-center">
-            <div className="whitespace-nowrap flex gap-2">
-              <p className="font-display">Income:</p>
-              <p>3,122.00</p>
-            </div>
-
-            <div className="whitespace-nowrap flex gap-2">
-              <p className="font-display">Expense:</p>
-              <p>1,485.24</p>
-            </div>
-          </div>
         </div>
 
         {/* Transaction Table */}
         <div className="overflow-auto flex-1">
           {/** Transaction headers */}
-          <div className="grid grid-cols-[50px_100px_100px_100px_1fr_200px_200px] gap-4 font-mono text-[0.9rem] text-(--color-text-secondary) py-2 px-5 pt-1 font-display">
+          <div className="grid grid-cols-[50px_50px_50px_100px_50px_50px] md:grid-cols-[50px_100px_100px_150px_50px_50px] lg:grid-cols-[100px_100px_100px_250px_100px_100px] xl:grid-cols-[150px_150px_150px_1fr_100px_100px] gap-4 font-mono text-[0.9rem] py-1 px-5 pt-1 font-display border-b border-(--color-border-default)">
             <div>Icon</div>
-            <div>Date</div>
-            <div>Time</div>
+            <div>Date & time</div>
             <div>Type</div>
             <div>Description</div>
             <div>Account</div>
@@ -137,21 +113,17 @@ export default function Transactions() {
                 <div
                   key={index}
                   onClick={() => setIsTransactionModalOpen(index)}
-                  className="grid grid-cols-[50px_100px_100px_100px_1fr_200px_200px] gap-4 items-center py-3 text-[0.9rem] hover:bg-(--color-bg-subtle) hover:cursor-pointer active:bg-(--color-border-default) px-5 border-b border-(--color-border-subtle)"
+                  className="grid grid-cols-[50px_50px_50px_100px_50px_50px] md:grid-cols-[50px_100px_100px_150px_50px_50px] lg:grid-cols-[100px_100px_100px_250px_100px_100px] xl:grid-cols-[150px_150px_150px_1fr_100px_100px] gap-4 items-center py-3 text-[0.8rem] hover:bg-(--color-bg-subtle) hover:cursor-pointer active:bg-(--color-border-default) px-5 border-b border-(--color-border-subtle)"
                 >
                   {/* Icon */}
                   <div className="flex items-center justify-center">
                     {transaction.icon}
                   </div>
 
-                  {/*Date */}
-                  <div className="text-(--color-text-secondary)">
-                    {transaction.date}
-                  </div>
-
-                  {/* Time */}
-                  <div className="text-(--color-text-secondary)">
-                    {transaction.time}
+                  {/*Date & Time*/}
+                  <div className="flex flex-col text-(--color-text-secondary)">
+                    <p>{transaction.date}</p>
+                    <p>{transaction.time}</p>
                   </div>
 
                   {/* Type */}
@@ -190,7 +162,7 @@ export default function Transactions() {
 
           {/* Transaction Info Modal */}
           {isTransactionModalOpen !== null && (
-            <div className="absolute z-50 p-5 top-[25%] left-[35%] w-[30%] border border-(--color-border-default) rounded-xl bg-(--color-bg-secondary) shadow-md">
+            <div className="absolute z-50 p-5 top-[25%] left-[35%] w-[30%] md:left-[10%] md:w-[80%] sm:left-[5%] sm:w-[90%] sm:top-[50%] sm:transform sm:-translate-y-1/2 border border-(--color-border-default) rounded-xl bg-(--color-bg-secondary) shadow-md">
               <div className="flex flex-col w-full gap-3">
                 {/* Header */}
                 <div className="flex w-full items-center gap-4 font-mono">

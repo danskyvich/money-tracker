@@ -3,10 +3,10 @@ export const accountCategories = [
 ]
 
 export const accounts = [
-  { name: "BPI", amount: "8765.00", type: "Savings", description: null },
-  { name: "Cash", amount: "456.00", type: "Cash", description: null },
-  { name: "Homebook", amount: "200.00", type: "Cash", description: null },
-  { name: "GCash", amount: "47.01", type: "Accounts", description: null },
+  { name: "BPI", amount: "8765.00", type: "Savings", description: "Savings/emergency funds" },
+  { name: "Cash", amount: "456.00", type: "Cash", description: "On-the-go cash" },
+  { name: "Homebook", amount: "200.00", type: "Cash", description: "Cash saved at home" },
+  { name: "GCash", amount: "47.01", type: "Accounts", description: "GCash - 09123456789" },
 ];
 
 export const monthlyExpenses = [

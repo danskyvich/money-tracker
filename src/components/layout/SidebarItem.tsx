@@ -18,8 +18,8 @@ export const SidebarItem = ({icon, label, className, path, isActive}: SidebarIte
           : "hover:bg-(--color-border-subtle) hover:cursor-pointer"
       }`}
     >
-      {icon}
-      <p>{label}</p>
+      <div>{icon}</div>
+      <p className="hidden min-[1700px]:block">{label}</p>
     </Link>
   );
 }

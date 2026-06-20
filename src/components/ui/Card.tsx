@@ -44,7 +44,7 @@ export default function Card({
               href={link}
               className="flex px-3 py-2 rounded-2xl text-[0.7rem] font-semibold text-white items-center justify-center bg-(--color-brand-gold)"
             >
-              <p>{linkText}</p>
+              <p className="hidden md:block">{linkText}</p>
               <ChevronRight size={20} />
             </Link>
           </div>

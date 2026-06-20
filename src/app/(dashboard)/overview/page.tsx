@@ -132,7 +132,7 @@ export default function Overview() {
       </div>
 
       {/* Main Content */}
-      <div className="flex w-full h-full gap-5">
+      <div className="flex flex-col 2xl:flex-row w-full h-full gap-5">
         {/* Left side */}
         <Card
           header="Transactions"
@@ -141,8 +141,8 @@ export default function Overview() {
           linkText="See your transactions"
           className="h-full"
         >
-          <div className="flex flex-col w-full h-full">
-            <div className="grid flex-0 grid-cols-[100px_100px_100px_1fr_100px] gap-4 font-mono text-sm text-secondary py-2 px-5 font-display">
+          <div className="flex flex-col w-full h-full overflow-auto">
+            <div className="grid flex-0 grid-cols-[50px_50px_50px_100px_50px] md:grid-cols-[50px_100px_100px_150px_50px] lg:grid-cols-[100px_100px_100px_250px_100px] xl:grid-cols-[100px_100px_150px_350px_100px] gap-4 font-mono text-sm text-secondary py-2 px-5 font-display">
               <div>Icon</div>
               <div>Account</div>
               <div>Type</div>
@@ -154,7 +154,7 @@ export default function Overview() {
               {transactions.map((transaction, index) => (
                 <div
                   key={index}
-                  className="grid grid-cols-[100px_100px_100px_1fr_100px] gap-4 items-center py-3 text-[0.9rem] hover:bg-(--color-bg-subtle) hover:cursor-pointer active:bg-(--color-border-default) px-5 border-b border-(--color-border-subtle)"
+                  className="grid grid-cols-[50px_50px_50px_100px_50px] md:grid-cols-[50px_100px_100px_150px_50px] lg:grid-cols-[100px_100px_100px_250px_100px] xl:grid-cols-[100px_100px_150px_350px_100px] gap-4 items-center py-3 text-[0.9rem] hover:bg-(--color-bg-subtle) hover:cursor-pointer active:bg-(--color-border-default) px-5 border-b border-(--color-border-subtle)"
                 >
                   {/* Icon */}
                   <div className="flex items-center">{transaction.icon}</div>
@@ -226,10 +226,10 @@ export default function Overview() {
         {/* Right side */}
         <div className="flex w-full h-full flex-col gap-5">
           {/* Top */}
-          <div className="flex flex-1 w-full h-full gap-5">
-            <div className="flex flex-col h-full w-full gap-5">
+          <div className="flex flex-1 flex-col md:flex-row w-full h-full gap-5">
+            <div className="flex md:flex-col h-full w-full gap-5">
               {/* Income */}
-              <div className="flex h-full border border-(--color-border-default) p-5 rounded-lg shadow-lg justify-center">
+              <div className="flex flex-col flex-1 md:flex-row md:gap-2 w-full h-full border border-(--color-border-default) p-5 rounded-lg shadow-lg justify-center">
                 <div className="flex flex-3 flex-col w-full h-full justify-center">
                   <p className="text-[0.9rem] text-(--color-text-primary)">
                     Income
@@ -245,7 +245,7 @@ export default function Overview() {
                 </div>
               </div>
               {/* Expenses */}
-              <div className="flex h-full border border-(--color-border-default) p-5 rounded-lg shadow-lg justify-center">
+              <div className="flex flex-col flex-1 md:flex-row md:gap-2 h-full border border-(--color-border-default) p-5 rounded-lg shadow-lg justify-center">
                 <div className="flex flex-3 flex-col w-full h-full justify-center">
                   <p className="text-[0.9rem] text-(--color-text-primary)">
                     Expenses
@@ -295,7 +295,7 @@ export default function Overview() {
                   <p>Description</p>
                 </div>
 
-                <div className="flex flex-col flex-3 w-full h-full">
+                <div className="flex flex-col flex-3 w-full h-full overflow-auto">
                   {accounts.map((item, index) => (
                     <div
                       className="grid grid-cols-[100px_100px_100px_150px] w-full h-fit px-5 py-3 text-[0.9rem] border-b border-(--color-border-subtle) cursor-pointer hover:bg-(--color-bg-subtle)"
@@ -330,10 +330,11 @@ export default function Overview() {
                   <div className="flex flex-auto w-auto h-fit" />
 
                   <div className="flex w-fit gap-2">
-                    {pagination.map((item) => (
+                    {pagination.map((item, index) => (
                       <div
                         className={`border border-(--color-border-default) rounded-lg px-3 py-2 shadow-sm hover:cursor-pointer ${accountCurrentPage === item ? "bg-(--color-border-strong) text-white" : null}`}
                         onClick={() => setAccountCurrentPage(item)}
+                        key={index}
                       >
                         <p>{item}</p>
                       </div>
@@ -344,25 +345,6 @@ export default function Overview() {
                       <ChevronRight size={20} />
                     </div>
                   </div>
-                </div>
-              </div>
-
-              {/* Right side */}
-              <div className="flex flex-col flex-1 w-full h-full">
-                <div className="flex w-full h-fit px-5 py-1 font-mono text-[0.9rem] border-b border-(--color-border-default)">
-                  <p>Categories</p>
-                </div>
-
-                {/* Account categories */}
-                <div className="flex w-full flex-col h-full flex-1 px-3 py-2 gap-3">
-                  {accountCategories.map((item, index) => (
-                    <div
-                      className="flex flex-col border border-(--color-border-default) rounded-lg px-2 py-1 text-[0.9rem]"
-                      key={index}
-                    >
-                      {item}
-                    </div>
-                  ))}
                 </div>
               </div>
             </div>
