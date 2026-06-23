@@ -1,60 +1,84 @@
-"use client";
+'use client'
 
-import ContainerComponent from "@/components/layout/ContainerComponent";
+import SettingItem from "@/components/layout/SettingItem";
 import Card from "@/components/ui/Card";
-import { useEffect, useState } from "react";
+import Switcher from "@/components/ui/Switcher";
+import { ChevronDown, Eye } from "lucide-react";
+import { useState } from "react";
 
-export default function Settings() {
-  useEffect(() => {
-    document.title = "Settings";
-  }, []);
+const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-  const [active, setActive] = useState<string>("/settings/profile");
-
-  //set visited page (settings) to localStorage
-  useEffect(() => {
-    localStorage.setItem("settings-active-page", active);
-  }, [active]);
-
-  //retrieve visited page (settings) from localStorage
-  useEffect(() => {
-    const savedPath = localStorage.getItem("settings-active-page");
-    setActive(savedPath || "/profile");
-  }, []);
-
-  //side menu
-  const CHOICES = [
-    { name: "Profile", path: "/settings/profile" },
-    { name: "Backup", path: "/settings/backup" },
-    { name: "Configuration", path: "/settings/configuration" },
-  ];
-
-  const handleActive = (path: string) => {
-    setActive(path);
-  };
-
-  const currentChoice = CHOICES.find((item) => item.path === active);
-
-  return (
-    <div className="flex flex-col w-full h-full gap-5">
-      <div className="flex w-fit h-fit gap-4">
-        {CHOICES.map((item) => (
-          <div className="border border-(--color-border-default) rounded-xl shadow-sm">
-            <p
-              className={`py-3 px-3 font-normal text-[0.85rem] rounded-xl hover:cursor-pointer ${active === item.path ? "text-(--color-brand-green)" : null}`}
-              onClick={() => handleActive(item.path)}
-            >
-              {item.name}
-            </p>
-          </div>
-        ))}
-      </div>
-
-      <Card className="flex flex-3 flex-col w-full h-full"
-        header={currentChoice?.name}
+export default function Configuration() {
+  const [dayPressed, setDayPressed] = useState<string>('Sunday');
+  const handleDayActive = (index: number) => {
+    setDayPressed(DAYS[index]);
+  }
+    return (
+      <Card
+        header="Settings"
+        subheader="Change main and sub currency, start day, etc."
+        className="flex w-full h-full"
       >
-        <ContainerComponent path={active} />
+        <div className="flex flex-col w-full h-full py-5 px-9 gap-1">
+          {/* Main Currency */}
+          <SettingItem label="Main currency">
+            <div className="flex">
+              <div className="flex border border-r-0 border-(--color-brand-green) text-(--color-text-primary) font-semibold rounded-l-xl py-1 px-3 items-center gap-2">
+                <span className="text-[1.2rem]">₱</span>
+                <p className="text-[0.8rem]">Philippine Peso (PHP)</p>
+              </div>
+              <div className="flex border-l border border-(--color-brand-green) items-center justify-center rounded-r-xl px-2">
+                <ChevronDown size={25} />
+              </div>
+            </div>
+          </SettingItem>
+
+          {/* Sub Currency */}
+          <SettingItem label="Sub currency">
+            <div className="flex">
+              <div className="flex border border-r-0 border-(--color-brand-green) text-(--color-text-primary) rounded-l-xl py-1 px-3 items-center gap-2">
+                <span className="text-[1.2rem]">$</span>
+                <p className="text-[0.8rem]">United States Dollars (USD)</p>
+              </div>
+              <div className="flex border-l border border-(--color-brand-green) items-center justify-center rounded-r-xl px-2">
+                <ChevronDown size={25} />
+              </div>
+            </div>
+          </SettingItem>
+
+          {/* Start Day */}
+          <SettingItem label="Weekly start day">
+            <div className="flex">
+              <div className="flex border border-r-0 border-(--color-brand-green) text-(--color-text-primary) rounded-l-xl py-1 px-3 items-center gap-2">
+                <p className="text-[0.8rem]">{dayPressed}</p>
+              </div>
+              <div className="flex border-l border border-(--color-brand-green) items-center justify-center rounded-r-xl px-2">
+                <ChevronDown size={25} />
+              </div>
+            </div>
+          </SettingItem>
+
+          {/* Modify income categories */}
+          <SettingItem label="Modify income categories">
+            <div className="flex gap-2 hover:cursor-pointer text-(--color-text-primary) border border-(--color-brand-green) font-semibold py-2 px-4 rounded-xl items-center justify-center hover:bg-(--color-border-default) active:bg-(--color-brand-green) active:text-white duration-100 transition-all">
+              <Eye size={20} />
+              <p className="text-[0.9rem]">View income categories</p>
+            </div>
+          </SettingItem>
+
+          {/* Modify expense categories */}
+          <SettingItem label="Modify expense categories">
+            <div className="flex gap-2 hover:cursor-pointer text-(--color-text-primary) border border-(--color-brand-green) font-semibold py-2 px-4 rounded-xl items-center justify-center hover:bg-(--color-border-default) active:bg-(--color-brand-green) active:text-white duration-100 transition-all">
+              <Eye size={20} />
+              <p className="text-[0.9rem]">View expense categories</p>
+            </div>
+          </SettingItem>
+
+          {/* Show description */}
+          <SettingItem label="Show description on transactions">
+            <Switcher />
+          </SettingItem>
+        </div>
       </Card>
-    </div>
-  );
+    );
 }

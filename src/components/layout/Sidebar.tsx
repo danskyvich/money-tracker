@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { SidebarItem } from "./SidebarItem";
-import { ArrowDownUpIcon, BaggageClaimIcon, BarChart, Bell, ChevronLeft, ChevronRight, LayoutDashboardIcon, PiggyBank, Repeat, Settings, Wallet2Icon } from "lucide-react";
+import { ArrowDownUpIcon, ArrowUpDown, BaggageClaimIcon, BarChart, Bell, ChevronLeft, ChevronRight, Database, LayoutDashboardIcon, PiggyBank, Repeat, Settings, User, Wallet2Icon } from "lucide-react";
 import { useState } from "react";
 
 export default function Sidebar({className}:{className?: string}) {
@@ -31,7 +31,8 @@ export default function Sidebar({className}:{className?: string}) {
     ];
 
     const OthersItems = [
-      { icon: <BarChart size={20} />, label: "Analysis", path: "/analysis" },
+      { icon: <User size={20} />, label: "Profile", path: "/profile" },
+      { icon: <Database size={20} />, label: "Backup", path: "/backup" },
       { icon: <Settings size={20} />, label: "Settings", path: "/settings" },
     ];
 

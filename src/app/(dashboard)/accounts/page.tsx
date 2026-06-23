@@ -14,6 +14,7 @@ import {
   ChevronRight,
   ChevronUp,
   DollarSign,
+  File,
   ListFilter,
   PencilIcon,
   Plus,
@@ -76,106 +77,22 @@ export default function Accounts({}: {}) {
 
   return (
     <div className="flex flex-col w-full h-full gap-5">
-      {/* Account summary */}
-      <div className="flex w-full flex-1 flex-col min-[1550px]:flex-row gap-5">
-        {/* Left */}
-        <div className="flex flex-1 gap-5">
-          {/* Total assets */}
-          <div className="flex flex-1 w-fit h-full border border-(--color-border-default) rounded-xl shadow-md px-5 py-2 items-center gap-3">
-            <div className="flex rounded-[50%] w-fit h-fit p-2 bg-transparent border-2 border-(--color-brand-gold) ">
-              <Banknote size={30} className="text-(--color-brand-gold)" />
-            </div>
 
-            <div className="flex flex-col w-full h-full justify-center">
-              <p className="whitespace-nowrap text-[0.9rem] text-(--color-text-secondary)">
-                Total assets:
-              </p>
-              <p className="text-[1.2rem] font-mono">5,314.00</p>
-            </div>
-          </div>
-          {/* Total liabilities */}
-          <div className="flex flex-1 w-fit h-full border border-(--color-border-default) rounded-xl shadow-md px-5 py-2 items-center gap-3">
-            <div className="flex rounded-[50%] w-fit h-fit p-2 bg-transparent border border-(--color-brand-gold) ">
-              <Wallet2Icon size={30} className="text-(--color-brand-gold)" />
-            </div>
+      <div className="flex w-full items-center">
+        <p className="text-3xl font-semibold">Accounts</p>
 
-            <div className="flex flex-col w-full h-full justify-center">
-              <p className="whitespace-nowrap text-[0.9rem] text-(--color-text-secondary)">
-                Total liabilities:
-              </p>
-              <p className="text-[1.2rem] font-mono">234.00</p>
-            </div>
-          </div>
-          {/* Assets - liabilities = total */}
-          <div className="flex flex-1 w-fit h-full border border-(--color-border-default) rounded-xl shadow-md px-5 py-2 items-center gap-3">
-            <div className="flex rounded-[50%] w-fit h-fit p-2 bg-transparent border border-(--color-brand-gold) ">
-              <DollarSign size={30} className="text-(--color-brand-gold)" />
-            </div>
+        <div className="flex w-auto flex-auto"/>
 
-            <div className="flex flex-col w-full h-full justify-center">
-              <p className="whitespace-nowrap text-[0.9rem] text-(--color-text-secondary)">
-                In total:
-              </p>
-              <p className="text-[1.2rem] font-mono">80.00</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Right */}
-        <div className="flex flex-1 gap-5">
-          {/* Money inflow for current month */}
-          <div className="flex flex-1 w-fit h-full border border-(--color-border-default) rounded-xl shadow-md px-5 py-2 items-center gap-3">
-            <div className="flex rounded-[50%] w-fit h-fit p-2 bg-transparent border border-(--color-brand-green) ">
-              <ArrowDown size={30} className="text-(--color-brand-green)" />
-            </div>
-
-            <div className="flex flex-col w-full h-full justify-center">
-              <p className="whitespace-nowrap text-[0.9rem] text-(--color-text-secondary)">
-                Money inflow ({currentMonth})
-              </p>
-              <p className="text-[1.2rem] font-mono">1,000.00</p>
-            </div>
-          </div>
-
-          {/* Money inflow for current month */}
-          <div className="flex flex-1 w-fit h-full border border-(--color-border-default) rounded-xl shadow-md px-5 py-2 items-center gap-3">
-            <div className="flex rounded-[50%] w-fit h-fit p-2 bg-transparent border border-(--color-brand-green) ">
-              <ArrowUp
-                size={30}
-                className="text-[0.9rem] xl:text-[0.9rem] text-(--color-brand-green)"
-              />
-            </div>
-
-            <div className="flex flex-col w-fit h-full justify-center">
-              <p className="whitespace-nowrap text-[0.9rem] text-(--color-text-secondary)">
-                Money outflow ({currentMonth})
-              </p>
-              <p className="text-[1.2rem] font-mono">250.00</p>
-            </div>
-          </div>
-
-          {/* Money difference */}
-          <div className="flex flex-1 w-fit h-full border border-(--color-border-default) rounded-xl shadow-md px-5 py-2 items-center gap-3">
-            <div className="flex rounded-[50%] w-fit h-fit p-2 bg-transparent border border-(--color-brand-green) ">
-              <ArrowUpDown size={30} className="text-(--color-brand-green)" />
-            </div>
-
-            <div className="flex flex-col w-fit h-full justify-center">
-              <p className="whitespace-nowrap text-[0.9rem] text-(--color-text-secondary)">
-                Flow difference ({currentMonth})
-              </p>
-              <p className="text-[1.2rem] font-mono">750.00</p>
-            </div>
-          </div>
+        <div className="flex w-fit h-fit ring ring-inset ring-(--color-brand-green) hover:bg-(--color-brand-green) transition-all duration-100 rounded-lg items-center text-[0.8rem] gap-1 px-5 py-1 cursor-pointer">
+          <File size={15}/>
+          <p>Export report</p>
         </div>
       </div>
 
       <div className="flex min-[1550px]:flex-row flex-col w-full h-full gap-5">
         {/* Accounts */}
-        <Card
-          className="flex w-full h-full flex-3"
-          header="Accounts"
-          subheader="View your accounts"
+        <div
+          className="flex flex-col w-full h-full flex-2 border border-(--color-border-default) rounded-lg shadow-md"
         >
           {/** Top Bar */}
           <div className="flex w-full px-5 py-2 gap-2">
@@ -231,7 +148,7 @@ export default function Accounts({}: {}) {
 
           {/** Transaction headers */}
           <div className="overflow-auto flex-auto w-full h-full">
-            <div className="grid grid-cols-[100px_100px_100px_100px] lg:grid-cols-[] xl:grid-cols-[] border-b border-(--color-border-default) gap-4 font-mono text-[0.9rem] text-(--color-text-primary) py-2 px-5 pt-1 font-display w-full">
+            <div className="grid grid-cols-[100px_100px_100px_100px] lg:grid-cols-[200px_200px_1fr_1fr] xl:grid-cols-[300px_1fr_1fr_1fr] border-b border-(--color-border-default) gap-4 font-mono text-[0.9rem] text-(--color-text-primary) py-2 px-5 pt-1 font-display w-full">
               <div>Name</div>
               <div>Type</div>
               <div>Amount</div>
@@ -240,7 +157,7 @@ export default function Accounts({}: {}) {
 
             {accounts.map((account, index) => (
               <div
-                className="grid grid-cols-[100px_100px_100px_100px] lg:grid-cols-[] xl:grid-cols-[] gap-4 px-5 py-2 border-b border-(--color-border-subtle) text-[0.9rem] hover:bg-(--color-bg-subtle) cursor-pointer"
+                className="grid grid-cols-[100px_100px_100px_100px] lg:grid-cols-[200px_200px_1fr_1fr] xl:grid-cols-[300px_1fr_1fr_1fr] gap-4 px-5 py-2 border-b border-(--color-border-subtle) text-[0.9rem] hover:bg-(--color-bg-subtle) cursor-pointer"
                 key={index}
               >
                 <div className="text-(--color-text-secondary)">
@@ -283,9 +200,10 @@ export default function Accounts({}: {}) {
               </div>
             </div>
           </div>
-        </Card>
+        </div>
 
-        {/* Account categories */}
+        <div className="flex flex-1 flex-col w-full h-full">
+              {/* Account categories */}
         <Card
           header="Categories"
           subheader="View all account categories"
@@ -320,6 +238,11 @@ export default function Accounts({}: {}) {
             </div>
           </div>
         </Card>
+
+        <div className="flex flex-2 flex-col w-full h-full">
+
+        </div>
+        </div>
       </div>
 
       {isCategoryAccountOpen && (

@@ -1,43 +1,137 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Card from "@/components/ui/Card";
-import { transactions } from "@/lib/mocks/mockTransactions";
 import { useUser } from "@/lib/hooks/useUser";
-import { accountCategories, accounts } from "@/lib/mocks/mockAccounts";
-import { ArrowDown, ArrowUp, ChevronRight, Plus } from "lucide-react";
+import {
+  ArrowUp,
+  BaggageClaim,
+  ChevronDown,
+  ChevronRight,
+  CircleDollarSign,
+  CircleQuestionMark,
+  CoinsIcon,
+  FileQuestionMark,
+} from "lucide-react";
+import {
+  MonthlyInflowOutflows,
+  transactions,
+} from "@/lib/mocks/mockTransactions";
+import * as echarts from "echarts";
+import IncomeBreakdownPage from "@/components/ui/IncomeBreakdown";
+import ExpenseBreakdownPage from "@/components/ui/ExpenseBreakdown";
+import { Envelopes } from "@/lib/mocks/mockEnvelopes";
+import BudgetBreakdownPage from "@/components/ui/BudgetBreakdown";
+import { accounts } from "@/lib/mocks/mockAccounts";
 
 export default function Overview() {
+  // variables - general
   const [time, setTime] = useState("");
   const { user } = useUser();
-  const pagination = [1,2,3];
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [accountCurrentPage, setAccountCurrentPage] = useState<number>(1);
+  const pagination = [1, 2, 3];
+  const [selectedPage, setSelectedPage] = useState<number>(1);
+  const labels = [
+    { name: "Income", component: <IncomeBreakdownPage /> },
+    { name: "Expenses", component: <ExpenseBreakdownPage /> },
+    { name: "Budget", component: <BudgetBreakdownPage /> },
+  ];
+  const [chosenPage, setChosenPage] = useState<React.ReactNode>(
+    <IncomeBreakdownPage />,
+  );
 
+  // variables for the stacked bar chart
+  const sixMonthsRef = useRef<HTMLDivElement>(null);
+  const chartRef = useRef<echarts.ECharts | null>(null);
+
+  //declare page title
   useEffect(() => {
     document.title = "Dashboard";
-  });
+  }, []);
 
+  //stacked bar chart
+  useEffect(() => {
+    const options = {
+      tooltip: {
+        trigger: "item",
+        axisPointer: {
+          type: "shadow",
+        },
+      },
+      color: ["#FF6B6B", "#4ECDC4"],
+      grid: {
+        left: "30px",
+        right: "15px",
+        top: "30px",
+        bottom: "30px",
+        containLabel: true,
+      },
+      label: {
+        show: false,
+      },
+      AvoidLabelOverlap: true,
+      xAxis: {
+        data: MonthlyInflowOutflows.map((item) => item.month),
+      },
+      yAxis: {
+        type: "value",
+        data: Math.ceil(
+          Math.max(
+            ...MonthlyInflowOutflows.map(
+              (item) => item.inflows + item.outflows,
+            ),
+          ) / 100,
+        ),
+      },
+      series: [
+        {
+          type: "bar",
+          data: MonthlyInflowOutflows.map((item) => item.inflows),
+          stack: "total",
+        },
+        {
+          type: "bar",
+          data: MonthlyInflowOutflows.map((item) => item.outflows),
+          stack: "total",
+        },
+      ],
+    };
+
+    // attach container ref to chartRef if chartRef is null
+    if (!chartRef.current && sixMonthsRef.current) {
+      chartRef.current = echarts.init(sixMonthsRef.current);
+    }
+
+    if (chartRef.current) {
+      chartRef.current.setOption(options);
+    }
+
+    // function for handling resize
+    const handleResize = () => chartRef.current?.resize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [MonthlyInflowOutflows]);
+
+  // get the time
   useEffect(() => {
     const updateClock = () => {
       const now = new Date();
-
       const getTime = new Intl.DateTimeFormat("en-GB", {
         hour: "2-digit",
         minute: "2-digit",
         second: "2-digit",
         hour12: false,
       }).format(now);
-
       setTime(getTime);
     };
 
     updateClock();
     const interval = setInterval(updateClock, 1000);
-
     return () => clearInterval(interval);
   }, []);
 
+  {
+    /* Sun & Moon icons */
+  }
   const iconMap = [
     {
       range: [6, 12],
@@ -91,6 +185,7 @@ export default function Overview() {
     },
   ];
 
+  //get icon from overview icons
   const getOverviewIcon = ({ time }: { time: string }) => {
     const hour = parseInt(time.split(":")[0], 10);
     return (
@@ -124,9 +219,6 @@ export default function Overview() {
             <p className="flex font-mono text-[1.5rem]">
               Welcome,{user.first_name}!
             </p>
-            <p className="flex font-normal text-(--color-text-primary) text-[0.8rem] text-secondary">
-              Your finances are looking healthy this month
-            </p>
           </div>
         </div>
       </div>
@@ -134,221 +226,251 @@ export default function Overview() {
       {/* Main Content */}
       <div className="flex flex-col 2xl:flex-row w-full h-full gap-5">
         {/* Left side */}
-        <Card
-          header="Transactions"
-          subheader="Your transactions for the month of May"
-          link="/transactions"
-          linkText="See your transactions"
-          className="h-full"
-        >
-          <div className="flex flex-col w-full h-full overflow-auto">
-            <div className="grid flex-0 grid-cols-[50px_50px_50px_100px_50px] md:grid-cols-[50px_100px_100px_150px_50px] lg:grid-cols-[100px_100px_100px_250px_100px] xl:grid-cols-[100px_100px_150px_350px_100px] gap-4 font-mono text-sm text-secondary py-2 px-5 font-display">
-              <div>Icon</div>
-              <div>Account</div>
-              <div>Type</div>
-              <div>Description</div>
-              <div>Amount</div>
+        <div className="flex flex-1 flex-col w-full h-full gap-5">
+          <div className="flex w-full flex-col gap-1">
+            <p className="text-[0.8rem]">Total earnings</p>
+            <p className="flex text-5xl font-mono">
+              <span className="text-3xl self-end mr-2">₱</span>
+              3,100.00
+            </p>
+          </div>
+
+          {/* Summary */}
+          <div className="flex flex-row w-full h-fit gap-5">
+            <div className="flex flex-col h-31.5 flex-1 border border-(--color-border-default) rounded-xl px-5 py-3 shadow-md">
+              <p className="font-semibold">Income</p>
+              <div className="flex flex-auto w-auto h-full" />
+              <p className="flex text-2xl font-display font-normal">
+                <span className="mr-1">₱</span>
+                2,311.25
+              </p>
+              <div className="flex w-full items-center text-sm mt-1 text-(--color-text-secondary)">
+                <p>Growth rate</p>
+
+                <div className="flex w-auto flex-auto" />
+                <ArrowUp size={15} />
+                <p>20%</p>
+              </div>
             </div>
 
-            <div className="flex flex-col flex-1 w-full h-full">
-              {transactions.map((transaction, index) => (
+            <div className="flex flex-col h-31.5 flex-1 border border-(--color-border-default) rounded-xl px-5 py-3 shadow-md">
+              <p className="font-semibold">Expenses</p>
+              <div className="flex flex-auto w-auto h-full" />
+              <p className="flex text-2xl font-display font-normal">
+                <span className="mr-1">₱</span>
+                776.00
+              </p>
+              <div className="flex w-full items-center text-sm mt-1 text-(--color-text-secondary)">
+                <p>Spending rate</p>
+
+                <div className="flex w-auto flex-auto" />
+                <ArrowUp size={15} />
+                <p>5%</p>
+              </div>
+            </div>
+
+            <div className="flex flex-col h-31.5 flex-1 border border-(--color-border-default) rounded-xl px-5 py-3 shadow-md">
+              <p className="font-semibold">Savings</p>
+              <div className="flex flex-auto w-auto h-full" />
+              <p className="flex text-2xl font-display font-normal">
+                <span className="mr-1">₱</span>
+                2,400.12
+              </p>
+              <div className="flex w-full items-center text-sm mt-1 text-(--color-text-secondary)">
+                <p>Saving rate</p>
+
+                <div className="flex w-auto flex-auto" />
+                <ArrowUp size={15} />
+                <p>5%</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom left side */}
+          <div className="flex w-full h-full gap-5">
+            <div className="flex flex-1 flex-col w-full h-full border border-(--color-border-default) rounded-lg px-5 py-3 gap-2 shadow-md">
+              <div className="flex w-full">
+                <div className="flex flex-5 w-auto" />
+                <div className="flex flex-1 w-full gap-3">
+                  {labels.map((item, index) => (
+                    <div
+                      className={`flex w-fit h-full px-5 py-1 border border-(--color-border-default) text-[0.8rem] rounded-lg items-center cursor-pointer hover:bg-(--color-bg-subtle)${chosenPage ? "active:bg-(--color-border-strong)" : null} duration-100 transition-all`}
+                      key={index}
+                      onClick={() => setChosenPage(item.component)}
+                    >
+                      {item.name}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex flex-3 w-full">{chosenPage}</div>
+            </div>
+
+            {/* Transactions list */}
+            <Card
+              header={
+                <div className="flex gap-2 items-center">
+                  <CircleDollarSign size={20} />
+                  <p>Transactions</p>
+                </div>
+              }
+              className="flex flex-1 flex-col w-full h-full border border-(--color-border-default) rounded-lg shadow-md overflow-auto"
+              link="/transactions"
+              linkText="View transactions"
+            >
+              {transactions.map((item, index) => (
                 <div
+                  className="flex w-full h-fit py-2 border border-(--color-border-subtle) gap-3 hover:bg-(--color-bg-subtle) cursor-pointer"
                   key={index}
-                  className="grid grid-cols-[50px_50px_50px_100px_50px] md:grid-cols-[50px_100px_100px_150px_50px] lg:grid-cols-[100px_100px_100px_250px_100px] xl:grid-cols-[100px_100px_150px_350px_100px] gap-4 items-center py-3 text-[0.9rem] hover:bg-(--color-bg-subtle) hover:cursor-pointer active:bg-(--color-border-default) px-5 border-b border-(--color-border-subtle)"
                 >
-                  {/* Icon */}
-                  <div className="flex items-center">{transaction.icon}</div>
-
-                  {/* Account */}
-                  <div className="text-(--color-text-secondary)">
-                    {transaction.account}
+                  <div className="flex flex-col flex-2 w-full h-fit pl-5">
+                    <p className="text-[0.9rem]">{item.description}</p>
+                    <div className="flex flex-1 w-full items-center text-[0.7rem] text-stone-400">
+                      <p>{item.date}</p>
+                      <div className="flex flex-auto w-auto" />
+                      <p>{item.time}</p>
+                    </div>
                   </div>
 
-                  {/* Type */}
-                  <div className="text-(--color-text-secondary)">
-                    {transaction.type}
-                  </div>
-
-                  {/* Transaction */}
-                  <div>
-                    <p className="text-(--color-text-primary)">
-                      {transaction.description}
+                  <div className="flex flex-1 w-full h-full pr-5 items-center justify-end">
+                    <p
+                      className={`text-[1rem] font-semibold ${item.type === "Expense" ? "text-red-400" : item.type === "Income" ? "text-green-400" : "text-(--color-text-primary)"}`}
+                    >
+                      <span className="mr-1">
+                        {item.type === "Expense" ? "-" : null}
+                      </span>
+                      <span className="text-[0.9rem] mr-1 justify-self-end">
+                        ₱
+                      </span>
+                      {item.amount}
                     </p>
-                  </div>
-
-                  {/* Amount */}
-                  <div
-                    className={`text-left font-semibold ${
-                      transaction.type.match("Expense")
-                        ? "text-red-400"
-                        : transaction.type.match("Transfer")
-                          ? "text-(--color-text-primary)"
-                          : "text-green-400"
-                    }`}
-                  >
-                    {transaction.amount}
                   </div>
                 </div>
               ))}
-            </div>
+            </Card>
+          </div>
+        </div>
 
-            <div className="flex flex-0 text-[0.9rem] w-full h-fit px-5 py-2 font-display text-(--color-text-secondary) gap-2 items-center">
-              <p>Show data</p>
-
-              <p className="border border-(--color-border-default) px-2 py-2 rounded-lg">
-                10
+        {/* Right side */}
+        <div className="flex flex-1 w-full h-full flex-col gap-5">
+          {/* Top */}
+          <div className="flex flex-1 flex-col w-full h-full border border-(--color-border-default) rounded-lg px-5 py-3 shadow-md">
+            <div className="flex w-full h-fit items-center">
+              <p className="font-display text-xl font-semibold">
+                Inflows and outflows{" "}
+                <span className="text-[0.9rem] font-light">
+                  ( general, all accounts )
+                </span>
               </p>
-
-              <p>of 200</p>
 
               <div className="flex flex-auto w-auto" />
 
-              <div className="flex w-fit gap-2">
-                {pagination.map((item, index) => (
-                  <div
-                    className={`border border-(--color-border-default) rounded-lg px-3 py-2 shadow-sm hover:cursor-pointer ${currentPage === item ? "bg-(--color-border-strong) text-white" : null}`}
-                    onClick={() => setCurrentPage(item)}
-                    key={index}
-                  >
-                    <p>{item}</p>
-                  </div>
-                ))}
-
-                <div className="flex w-fit px-3 py-2 font display items-center border border-(--color-border-default) rounded-lg hover:cursor-pointer hover:bg-(--color-border-subtle) shadow-md">
-                  <p>Next</p>
-                  <ChevronRight size={20} />
-                </div>
-              </div>
-            </div>
-          </div>
-        </Card>
-
-        {/* Right side */}
-        <div className="flex w-full h-full flex-col gap-5">
-          {/* Top */}
-          <div className="flex flex-1 flex-col md:flex-row w-full h-full gap-5">
-            <div className="flex md:flex-col h-full w-full gap-5">
-              {/* Income */}
-              <div className="flex flex-col flex-1 md:flex-row md:gap-2 w-full h-full border border-(--color-border-default) p-5 rounded-lg shadow-lg justify-center">
-                <div className="flex flex-3 flex-col w-full h-full justify-center">
-                  <p className="text-[0.9rem] text-(--color-text-primary)">
-                    Income
-                  </p>
-                  <p className="font-mono text-2xl">3,105.25</p>
-                </div>
-
-                <div className="flex flex-1 w-full h-full items-center">
-                  <div className="flex w-fit h-fit px-5 py-1 rounded-3xl text-white bg-emerald-500 items-center justify-center gap-1">
-                    <ArrowUp size={20} />
-                    <p className="font-mono text-[0.9rem]">9%</p>
-                  </div>
-                </div>
-              </div>
-              {/* Expenses */}
-              <div className="flex flex-col flex-1 md:flex-row md:gap-2 h-full border border-(--color-border-default) p-5 rounded-lg shadow-lg justify-center">
-                <div className="flex flex-3 flex-col w-full h-full justify-center">
-                  <p className="text-[0.9rem] text-(--color-text-primary)">
-                    Expenses
-                  </p>
-                  <p className="font-mono text-2xl">1,220.00</p>
-                </div>
-
-                <div className="flex flex-1 w-full h-full items-center">
-                  <div className="flex w-fit h-fit px-5 py-1 rounded-3xl text-white bg-red-500 items-center justify-center gap-1">
-                    <ArrowDown size={20} />
-                    <p className="font-mono text-[0.9rem]">3.5%</p>
-                  </div>
-                </div>
+              <div className="flex w-fit h-fit items-center gap-1">
+                <ChevronDown size={15} />
+                <p className="text-[0.8rem]">Monthly</p>
               </div>
             </div>
 
-            <Card header="Quick actions" subheader="Add account or transaction">
-              <div className="flex flex-col p-5 gap-5">
-                <div className="flex w-full px-2 py-3 gap-2 border border-(--color-brand-green) rounded-lg text-[0.95rem] hover:bg-(--color-brand-green) cursor-pointer transition-all duration-150">
-                  <Plus size={20} />
-                  <p>Add a transaction</p>
-                </div>
-
-                <div className="flex w-full px-2 py-3 gap-2 border border-(--color-brand-green) rounded-lg text-[0.95rem] hover:bg-(--color-brand-green) cursor-pointer transition-all duration-150">
-                  <Plus size={20} />
-                  <p>Add an account</p>
-                </div>
+            <div
+              style={{
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                minHeight: 0,
+              }}
+              ref={sixMonthsRef}
+            />
+            <div className="flex w-full h-fit gap-10 justify-center">
+              <div className="flex h-fit gap-2">
+                <div className="flex rounded-md bg-[#FF6B6B] px-4" />
+                <p className="font-mono text-[0.7rem]">Inflows</p>
               </div>
-            </Card>
+
+              <div className="flex h-fit gap-2">
+                <div className="flex rounded-md bg-[#4ECDC4] px-4" />
+                <p className="font-mono text-[0.7rem]">Outflows</p>
+              </div>
+            </div>
           </div>
 
           {/* Bottom */}
-          <Card
-            className="flex flex-3 w-full h-full"
-            header="Accounts"
-            subheader="All accounts and account categories"
-            linkText="See all accounts"
-            link="/accounts"
-          >
-            <div className="flex w-full h-full">
-              {/* Left side */}
-              <div className="flex flex-col flex-2 w-full h-full border-r border-(--color-border-default)">
-                <div className="grid w-full h-fit font-mono grid-cols-[100px_100px_100px_150px] px-5 py-1 text-[0.9rem] border-b border-(--color-border-default)">
+          <div className="flex flex-2 w-full h-full gap-5">
+            {/* Accounts list */}
+            <Card
+              className="flex flex-2 flex-col w-full h-full"
+              header={
+                <div className="flex gap-2 items-center">
+                  <BaggageClaim size={20} />
+                  <p>Accounts</p>
+                </div>
+              }
+              link="/accounts"
+              linkText="View your accounts"
+            >
+              <div className="flex flex-col w-full h-fit">
+                {/* Header */}
+                <div className="grid grid-cols-[150px_150px_150px_1fr] w-full h-full px-5 py-1 font-display text-[0.9rem] border-b border-(--color-border-subtle)">
                   <p>Name</p>
                   <p>Type</p>
                   <p>Amount</p>
                   <p>Description</p>
                 </div>
+              </div>
 
-                <div className="flex flex-col flex-3 w-full h-full overflow-auto">
-                  {accounts.map((item, index) => (
-                    <div
-                      className="grid grid-cols-[100px_100px_100px_150px] w-full h-fit px-5 py-3 text-[0.9rem] border-b border-(--color-border-subtle) cursor-pointer hover:bg-(--color-bg-subtle)"
-                      key={index}
-                    >
-                      <p>{item.name}</p>
-                      <p>{item.type}</p>
-                      <p
-                        className="font-mono 
-                    "
-                      >
-                        {item.amount}
-                      </p>
-                      <p>
-                        {item.description === null ? "-" : item.description}
-                      </p>
-                    </div>
-                  ))}
+              <div className="flex flex-2 flex-col w-full h-fit">
+                {accounts.map((item, index) => (
+                  <div
+                    className="grid grid-cols-[150px_150px_150px_1fr] w-full px-5 py-2 text-[0.9rem] border-b border-(--color-border-subtle) hover:bg-(--color-bg-subtle) cursor-pointer items-center"
+                    key={index}
+                  >
+                    <p className="font-mono text-[0.8rem] text-(--color-text-secondary)">
+                      {item.name}
+                    </p>
+                    <p className="font-mono text-[0.8rem] text-(--color-text-secondary)">
+                      {item.type}
+                    </p>
+                    <p>
+                      <span className="mr-1">₱</span>
+                      {item.amount}
+                    </p>
+                    <p className="text-[0.8rem] text-(--color-text-secondary)">
+                      {item.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex flex-0 w-full h-fit px-5 py-3 text-[0.9rem] text-(--color-text-secondary) whitespace-nowrap items-center">
+                <div className="flex flex-1 w-full h-fit">
+                  <p>
+                    Show data{" "}
+                    <span className="border border-(--color-border-subtle) mx-1 rounded-lg p-2">
+                      6
+                    </span>
+                    of 100
+                  </p>
                 </div>
 
-                <div className="flex flex-0 w-full h-fit px-3 py-2 text-[0.9rem] text-(--color-text-secondary) items-center justify-center">
-                  <div className="flex w-fit h-fit items-center">
-                    <p>Show data</p>
+                <div className="flex flex-auto w-auto h-fit" />
 
-                    <p className="border border-(--color-border-default) px-2 py-2 mx-2 rounded-lg">
-                      10
-                    </p>
-
-                    <p>of 200</p>
-                  </div>
-
-                  <div className="flex flex-auto w-auto h-fit" />
-
-                  <div className="flex w-fit gap-2">
-                    {pagination.map((item, index) => (
-                      <div
-                        className={`border border-(--color-border-default) rounded-lg px-3 py-2 shadow-sm hover:cursor-pointer ${accountCurrentPage === item ? "bg-(--color-border-strong) text-white" : null}`}
-                        onClick={() => setAccountCurrentPage(item)}
-                        key={index}
-                      >
-                        <p>{item}</p>
-                      </div>
-                    ))}
-
-                    <div className="flex w-fit px-3 py-2 font display items-center border border-(--color-border-default) rounded-lg hover:cursor-pointer hover:bg-(--color-border-subtle) shadow-md">
-                      <p>Next</p>
-                      <ChevronRight size={20} />
+                <div className="flex flex-1 w-full h-full items-center justify-end gap-2">
+                  {pagination.map((item, index) => (
+                    <div
+                      className={`flex w-fit h-fit px-2 py-1 rounded-md border border-(--color-border-default) ${selectedPage ? "bg-(--color-border-strong)" : null} cursor-pointer hover:bg-(--color-bg-subtle) duration-100 transition-all`}
+                      key={index}
+                      onClick={() => setSelectedPage(item)}
+                    >
+                      <p>{item}</p>
                     </div>
+                  ))}
+                  <div className="flex w-fit h-fit border-(--color-border-default) border rounded-lg px-2 py-2">
+                    <ChevronRight size={15} />
                   </div>
                 </div>
               </div>
-            </div>
-          </Card>
+            </Card>
+          </div>
         </div>
       </div>
     </div>

@@ -10,16 +10,16 @@ export const accounts = [
 ];
 
 export const monthlyExpenses = [
-  { category: "Food", percent: 12 },
-  { category: "Transportation", percent: 50 },
-  { category: "Education", percent: 10 },
-  { category: "Apparel", percent: 8 },
-  { category: "Telecommunications", percent: 10 },
+  { category: "Food", amount: 1456.00 },
+  { category: "Transportation", amount: 667.00 },
+  { category: "Education", amount: 250.12 },
+  { category: "Apparel", amount: 145.00 },
+  { category: "Telecommunications", amount: 200.00 },
 ];
 
 export const monthlyIncome = [
-  { category: "Allowances", percent: 66 },
-  { category: "Savings", percent: 13 },
-  { category: "Remittances", percent: 20 },
-  { category: "Spare cash", percent: 8 },
+  { category: "Allowances", amount: 660.55 },
+  { category: "Salary", amount: 1445.00 },
+  { category: "Remittances", amount: 200.00 },
+  { category: "Spare cash", amount: 80.25 },
 ];

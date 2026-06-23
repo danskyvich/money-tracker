@@ -74,3 +74,12 @@ export const transactions = [
     to: null,
   },
 ];
+
+export const MonthlyInflowOutflows = [
+  { month: "January", inflows: 1100.34, outflows: 331.00 },
+  { month: "February", inflows: 500.25, outflows: 430.25 },
+  { month: "March", inflows: 1100.00, outflows: 275.00 },
+  { month: "April", inflows: 231.55, outflows: 100.00 },
+  { month: "May", inflows: 150.00, outflows: 50.25 },
+  { month: "June", inflows: 1000.00, outflows: 200.00 },
+];

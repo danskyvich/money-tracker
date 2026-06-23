@@ -1,6 +1,6 @@
-import Backup from "@/app/(dashboard)/settings/backup/page";
-import Configuration from "@/app/(dashboard)/settings/configuration/page";
-import Profile from "@/app/(dashboard)/settings/profile/page";
+import Backup from "@/app/(dashboard)/accounts/backup/page";
+import Configuration from "@/app/(dashboard)/settings/page";
+import Profile from "@/app/(dashboard)/profile/page";
 
 export default function ContainerComponent({path}: {path: string}) {
     const pageMap: Record<string, React.ReactNode> = {

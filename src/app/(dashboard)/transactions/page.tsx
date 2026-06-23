@@ -10,12 +10,12 @@ import {
   ChevronDown,
   ChevronRight,
   ChevronUp,
+  File,
   ListFilterIcon,
   Search,
   Trash,
   X,
 } from "lucide-react";
-import { useModal } from "@/lib/hooks/useModal";
 
 const filterOptions = ["Type", "Category", "Account"];
 
@@ -30,10 +30,9 @@ export default function Transactions() {
   const [filter, setFilter] = useState<boolean>(false);
   const [selectedFilter, setSelectedFilter] = useState("Filter");
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [search, setSearch] = useState<boolean>(false);
-  const [isTransactionModalOpen, setIsTransactionModalOpen] =
-    useState<number | null>(null);
-  const {openModal, closeModal } = useModal();
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<
+    number | null
+  >(null);
 
   //functions
   const handleFilterClose = (choice: string) => {
@@ -43,12 +42,18 @@ export default function Transactions() {
 
   return (
     <div className="flex lg:flex-col w-full h-full gap-5">
+      <div className="flex w-full h-fit items-center">
+        <p className="text-3xl font-semibold">Transactions</p>
+
+        <div className="flex w-auto flex-auto" />
+
+        <div className="flex w-fit h-fit border border-(--color-brand-green) rounded-lg hover:bg-(--color-brand-green) px-5 py-1 text-[0.8rem] cursor-pointer duration-100 transition-all items-center">
+          <File size={15} className="mr-1"/>
+          <p>Export report</p>
+        </div>
+      </div>
       {/* Transactions */}
-      <Card
-        header="Transactions"
-        subheader="View your monthly transactions here"
-        className="flex flex-col flex-3 peer-first-of-type:w-full h-full relative"
-      >
+      <div className="flex flex-col flex-3 peer-first-of-type:w-full h-full relative border border-(--color-border-default) rounded-lg">
         {/* Filter Bar */}
         <div className="flex w-full h-fit px-5 py-2 gap-3 ">
           {/* Filter by header */}
@@ -109,54 +114,56 @@ export default function Transactions() {
           <div className="flex flex-col flex-1">
             {/* Transaction rows */}
             {transactions.map((transaction, index) => (
-              <>
-                <div
-                  key={index}
-                  onClick={() => setIsTransactionModalOpen(index)}
-                  className="grid grid-cols-[50px_50px_50px_100px_50px_50px] md:grid-cols-[50px_100px_100px_150px_50px_50px] lg:grid-cols-[100px_100px_100px_250px_100px_100px] xl:grid-cols-[150px_150px_150px_1fr_100px_100px] gap-4 items-center py-3 text-[0.8rem] hover:bg-(--color-bg-subtle) hover:cursor-pointer active:bg-(--color-border-default) px-5 border-b border-(--color-border-subtle)"
-                >
-                  {/* Icon */}
-                  <div className="flex items-center justify-center">
-                    {transaction.icon}
-                  </div>
-
-                  {/*Date & Time*/}
-                  <div className="flex flex-col text-(--color-text-secondary)">
-                    <p>{transaction.date}</p>
-                    <p>{transaction.time}</p>
-                  </div>
-
-                  {/* Type */}
-                  <div className="text-(--color-text-secondary)">
-                    {transaction.type}
-                  </div>
-
-                  {/* Transaction */}
-                  <div>
-                    <p className="text-(--color-text-primary)">
-                      {transaction.description}
-                    </p>
-                  </div>
-
-                  {/* Account */}
-                  <div className="text-(--color-text-secondary)">
-                    {transaction.account}
-                  </div>
-
-                  {/* Amount */}
-                  <div
-                    className={`text-left font-semibold ${
-                      transaction.type.match("Expense")
-                        ? "text-red-400"
-                        : transaction.type.match("Transfer")
-                          ? "text-(--color-text-primary)"
-                          : "text-green-400"
-                    }`}
-                  >
-                    {transaction.amount}
-                  </div>
+              <div
+                key={index}
+                onClick={() => setIsTransactionModalOpen(index)}
+                className="grid grid-cols-[50px_50px_50px_100px_50px_50px] md:grid-cols-[50px_100px_100px_150px_50px_50px] lg:grid-cols-[100px_100px_100px_250px_100px_100px] xl:grid-cols-[150px_150px_150px_1fr_100px_100px] gap-4 items-center py-1 text-[0.9rem] hover:bg-(--color-bg-subtle) hover:cursor-pointer active:bg-(--color-border-default) px-5 border-b border-(--color-border-subtle)"
+              >
+                {/* Icon */}
+                <div className="flex items-center justify-center">
+                  {transaction.icon}
                 </div>
-              </>
+
+                {/*Date & Time*/}
+                <div className="flex flex-col text-(--color-text-secondary)">
+                  <p>{transaction.date}</p>
+                  <p>{transaction.time}</p>
+                </div>
+
+                {/* Type */}
+                <div className="text-(--color-text-secondary)">
+                  {transaction.type}
+                </div>
+
+                {/* Transaction */}
+                <div>
+                  <p className="text-(--color-text-primary)">
+                    {transaction.description}
+                  </p>
+                </div>
+
+                {/* Account */}
+                <div className="text-(--color-text-secondary)">
+                  {transaction.account}
+                </div>
+
+                {/* Amount */}
+                <div
+                  className={`text-left font-mono text-[1rem] ${
+                    transaction.type.match("Expense")
+                      ? "text-red-400"
+                      : transaction.type.match("Transfer")
+                        ? "text-(--color-text-primary)"
+                        : "text-green-400"
+                  }`}
+                >
+                  <span className="mr-1">
+                    {transaction.type.match("Expense") ? "-" : null}
+                  </span>
+                  <span className="text-[0.8rem] mr-1">₱</span>
+                  {transaction.amount}
+                </div>
+              </div>
             ))}
           </div>
 
@@ -274,7 +281,7 @@ export default function Transactions() {
             </div>
           </div>
         </div>
-      </Card>
+      </div>
     </div>
   );
 }
