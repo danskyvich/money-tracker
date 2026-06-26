@@ -1,77 +1,60 @@
 'use client'
 
-import SettingItem from "@/components/layout/SettingItem";
-import Button from "@/components/ui/Button";
-import Card from "@/components/ui/Card";
-import { CircleQuestionMarkIcon } from "lucide-react";
-import { useState } from "react";
+import Card from "@/components/ui/Card"
+import { DatabaseBackup, MoveDownLeft, MoveUpRight } from "lucide-react"
+import { useEffect } from "react"
 
 export default function Backup() {
-  return (
-    <Card
-      header="Backup"
-      subheader="Export or import data"
-      className="flex w-full h-full"
-    >
-      <div className="flex flex-col w-full h-full py-5 px-9 gap-1">
-        <SettingItem label="Export as JSON">
-          <Button
-            text="Export to JSON"
-            link="/"
-            className="px-5"
-            variant="ghost"
-          />
-        </SettingItem>
+    useEffect(() => {
+        document.title = "Your backup"
+    })
 
-        <SettingItem label="Export data to Excel">
-          <Button
-            text="Export to Excel"
-            link="/"
-            className="px-5"
-            variant="ghost"
-          />
-        </SettingItem>
+    const backup = [
+      {
+        item: "Export data to JSON",
+        value: "Export to JSON",
+        icon: <MoveUpRight size={15} />,
+      },
+      {
+        item: "Export data to Excel",
+        value: "Export to Excel",
+        icon: <MoveUpRight size={15} />,
+      },
+      {
+        item: "Backup/restore on device",
+        value: "Backup or restore",
+        icon: <DatabaseBackup size={15} />,
+      },
+      {
+        item: "Import from an Excel file",
+        value: "Import from excel",
+        icon: <MoveDownLeft size={15} />,
+      },
+      {
+        item: "Import from a JSON file",
+        value: "Import from JSON",
+        icon: <MoveDownLeft size={15} />,
+      },
+    ];
 
-        <SettingItem label="Backup/restore on device">
-          <Button
-            text="Backup or restore"
-            link="/"
-            className="px-5"
-            variant="ghost"
-          />
-        </SettingItem>
+    return (
+      <div className="flex flex-col w-full h-full">
+        <p className="font-semibold text-3xl pb-5">Backup</p>
+        <div className="flex flex-col border border-(--color-border-default) h-full rounded-lg shadow-md">
+          {backup.map((item, index) => (
+            <div
+              className="grid grid-cols-[1fr_1fr] w-full h-fit items-center text-[0.9rem] px-5 py-2"
+              key={index}
+            >
+              <p>{item.item}</p>
 
-        <SettingItem label="Import from Excel file">
-          <Button
-            text="Import from Excel"
-            link="/"
-            className="px-5"
-            variant="ghost"
-          />
-        </SettingItem>
-
-        <div className="flex flex-col mt-10 mb-2">
-          <p className="text-[1.3rem] font-light font-mono">Reset</p>
-          <hr className="border-(--color-border-strong) w-full my-2" />
+              <div className="flex w-fit h-fit cursor-pointer ring ring-inset ring-(--color-brand-green) items-center justify-center whitespace-nowrap rounded-lg gap-1 justify-self-end shadow-md px-5 py-1 hover:bg-(--color-brand-green) text-[0.9rem]">
+                {item.icon}
+                <p>{item.value}</p>
+              </div>
+            </div>
+          ))}
         </div>
-
-        <SettingItem
-          label="Reset everything"
-          icon={<CircleQuestionMarkIcon size={20} />}
-          tooltip="This will delete all your data permanently"
-        >
-          <Button text="Reset" link="/" className="px-5" variant="danger" />
-        </SettingItem>
-
-        <SettingItem label="Reset only the contents">
-          <Button
-            text="Reset contents"
-            link="/"
-            className="px-5"
-            variant="ghost"
-          />
-        </SettingItem>
       </div>
-    </Card>
-  );
+    );
 }

@@ -38,11 +38,11 @@ export default function Sidebar({className}:{className?: string}) {
 
     return (
       <div
-        className={`${className} min-w-20 flex flex-col border-r-2 border-(--color-bg-base) h-full w-fit duration-300 bg-(--color-bg-subtle) min-w-10 transition-all`}
+        className={`${className} hidden md:block px-5 py-2 flex-col border-r-2 border-(--color-bg-base) h-full w-fit duration-300 bg-(--color-bg-subtle) transition-all`}
       >
-        {/**Header */}
+        {/* Header */}
         <header className="flex my-5 items-center justify-center">
-          <p className="hidden min-[1700px]:block font-bold text-3xl mt-5 text-[1.2rem]">
+          <p className="hidden md:block font-bold text-3xl mt-5 text-[1.2rem]">
             Money{" "}
             <span className="bg-brand-gradient bg-clip-text text-transparent">
               Tracker
@@ -50,10 +50,10 @@ export default function Sidebar({className}:{className?: string}) {
           </p>
         </header>
 
-        {/**Sidebar list */}
-        <div className="flex flex-col gap-1 mx-5 mt-5">
+        {/* Sidebar list */}
+        <div className="flex flex-col gap-1">
           <>
-            <p className="hidden min-[1400px]:block text-(--color-text-secondary) text-[0.9rem] font-light mb-2">
+            <p className="hidden md:block text-(--color-text-secondary) text-[0.9rem] font-light mb-2">
               Overview
             </p>
             {OverviewItems.map((overviewItem) => (
@@ -68,10 +68,10 @@ export default function Sidebar({className}:{className?: string}) {
           </>
         </div>
 
-        {/**Others */}
-        <div className="flex flex-col gap-1 mx-5 mt-3">
+        {/* Others */}
+        <div className="flex flex-col gap-1">
           {!isMinimized && (
-            <p className="hidden min-[1400px]:block mt-4 text-[0.9rem] font-light">
+            <p className="hidden md:block mt-4 text-[0.9rem] font-light">
               Others
             </p>
           )}

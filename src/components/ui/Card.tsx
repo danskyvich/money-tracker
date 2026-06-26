@@ -21,14 +21,14 @@ export default function Card({
 }: CardProps) {
   return (
     <div
-      className={`flex flex-col w-full h-fit border rounded-xl shadow-md border-(--color-border-default) ${className}`}
+      className={`flex flex-col w-full min-h-0 border rounded-xl shadow-md border-(--color-border-default) ${className}`}
     >
       <div className="flex w-full items-center justify-center px-5 py-4 ">
         {header && (
           <div className="flex flex-1 flex-col w-full text-xl">
-            <p className="text-(--color-text-primary) font-semibold">
+            <div className="text-(--color-text-primary) font-semibold">
               {header}
-            </p>
+            </div>
             <p
               className="font-mono text-sm font-normal"
               style={{ color: "var(--color-text-secondary)" }}
@@ -56,7 +56,7 @@ export default function Card({
       />
 
       {children && (
-        <div className="flex flex-col w-full h-full">{children}</div>
+        <div className="flex flex-col w-full flex-1 min-h-0">{children}</div>
       )}
     </div>
   );

@@ -8,36 +8,64 @@ import {
   BaggageClaim,
   ChevronDown,
   ChevronRight,
+  ChevronUp,
   CircleDollarSign,
-  CircleQuestionMark,
-  CoinsIcon,
-  FileQuestionMark,
+  Coins,
+  PiggyBank,
+  Plus,
+  X,
 } from "lucide-react";
 import {
   MonthlyInflowOutflows,
+  TransactionCategories,
   transactions,
 } from "@/lib/mocks/mockTransactions";
 import * as echarts from "echarts";
 import IncomeBreakdownPage from "@/components/ui/IncomeBreakdown";
 import ExpenseBreakdownPage from "@/components/ui/ExpenseBreakdown";
-import { Envelopes } from "@/lib/mocks/mockEnvelopes";
-import BudgetBreakdownPage from "@/components/ui/BudgetBreakdown";
-import { accounts } from "@/lib/mocks/mockAccounts";
+import { accountCategories, accounts, monthlyExpenses, monthlyIncome } from "@/lib/mocks/mockAccounts";
+import Input from "@/components/ui/Input";
 
 export default function Overview() {
+
   // variables - general
   const [time, setTime] = useState("");
+  const [isAccountModal, setIsAccountModal] = useState(false);
+  const [selectedPage, setSelectedPage] = useState(1);
   const { user } = useUser();
   const pagination = [1, 2, 3];
-  const [selectedPage, setSelectedPage] = useState<number>(1);
+
+  // Transaction modal
+  const types = ['Income', 'Expense', 'Transfer'];
   const labels = [
     { name: "Income", component: <IncomeBreakdownPage /> },
     { name: "Expenses", component: <ExpenseBreakdownPage /> },
-    { name: "Budget", component: <BudgetBreakdownPage /> },
   ];
   const [chosenPage, setChosenPage] = useState<React.ReactNode>(
     <IncomeBreakdownPage />,
   );
+
+  const categoryMap: {[key: string]: string | undefined} = {
+    "Income": monthlyIncome[0]?.category,
+    "Expenses": monthlyExpenses[0]?.category,
+  }
+  const [isTransactionModal, setIsTransactionModal] = useState<boolean>(false);
+  const [chosenType, setChosenType] = useState("Income");
+
+  // category dropdown
+  const [chosenCategory, setChosenCategory] = useState(
+    categoryMap[chosenType] ?? null,
+  );
+  const [categoryDropdownClicked, setCategoryDropdownClicked] = useState(false);
+
+  // account dropdown
+  const [chosenAccount, setChosenAccount] = useState(accounts.map(item => item.name)[0]);
+  const [accountDropdownClicked, setAccountDropdownClicked] = useState(false)
+
+  //account type
+  const [chosenAccountType, setChosenAccountType] = useState(accountCategories.map(item => item)[0]);
+
+  // date and time
 
   // variables for the stacked bar chart
   const sixMonthsRef = useRef<HTMLDivElement>(null);
@@ -129,9 +157,19 @@ export default function Overview() {
     return () => clearInterval(interval);
   }, []);
 
-  {
-    /* Sun & Moon icons */
+  //close account modal
+  const handleCloseAccountDropdown = (item: string) => {
+    setAccountDropdownClicked(false);
+    setChosenAccount(item);
   }
+
+  //close category modal
+  const handleCloseCategoryDropdown = (item: string) => {
+    setCategoryDropdownClicked(false);
+    setChosenCategory(item);
+  }
+
+  // Sun & moon icons
   const iconMap = [
     {
       range: [6, 12],
@@ -211,6 +249,219 @@ export default function Overview() {
 
   return (
     <div className="flex flex-col w-full h-full gap-5">
+      {/* Add Transaction Modal */}
+      {isTransactionModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 shadow-md">
+          <div className="p-5 w-50 transform:translate(-50%, -50%) md:w-100 border border-(--color-border-default) rounded-xl bg-(--color-bg-secondary) shadow-md">
+            <div className="flex w-full justify-between items-center">
+              <Coins size={20} />
+              <p className="font-semibold text-xl">Add a transaction</p>
+              <X
+                size={15}
+                onClick={() => setIsTransactionModal(false)}
+                className="cursor-pointer"
+              />
+            </div>
+
+            <div className="flex justify-around w-full mt-7 mb-2 gap-2">
+              {types.map((item, index) => (
+                <div
+                  key={index}
+                  className={`inline-flex w-full text-center ring ring-inset ring-(--color-border-strong) rounded-lg px-5 py-1 text-[0.9rem] cursor-pointer duration-100 transition-all ${chosenType === item ? (item === "Income" ? "bg-(--color-brand-green) text-white ring-(--color-brand-green)" : item === "Expense" ? "bg-red-400 ring-red-400 text-white" : "ring-blue-400 text-white bg-blue-400") : null}`}
+                  onClick={() => setChosenType(item)}
+                >
+                  <p>{item}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Content */}
+            <div className="grid grid-cols-[1fr_2fr] gap-y-2 w-full py-2 text-[0.9rem] items-center">
+              {/* Date */}
+              <p>Date</p>
+              <div className="inline-flex w-full gap-5">
+                <div className="border border-(--color-border-default) rounded-lg px-5 py-1 cursor-pointer hover:bg-(--color-bg-subtle) w-full">
+                  <p>6/26/2026</p>
+                </div>
+                <div className="border border-(--color-border-default) rounded-lg px-5 py-1 cursor-pointer hover:bg-(--color-bg-subtle) w-full">
+                  <p>11:50 AM</p>
+                </div>
+              </div>
+
+              {/* Category */}
+              <p>Category</p>
+              <div
+                className="inline-flex relative justify-between items-center border border-(--color-border-default) rounded-lg px-5 py-1 cursor-pointer hover:bg-(--color-bg-subtle)"
+                onClick={() => setCategoryDropdownClicked((prev) => !prev)}
+              >
+                <p>{chosenCategory}</p>
+                {categoryDropdownClicked ? (
+                  <ChevronUp size={15} />
+                ) : (
+                  <ChevronDown size={15} />
+                )}
+
+                {categoryDropdownClicked && (
+                  <div className="flex flex-col top-10 right-17 z-50 absolute w-fit border border-(--color-border-subtle) bg-(--color-bg-base) rounded-lg shadow-md">
+                    {TransactionCategories.map((item) => (
+                      <div
+                        className="flex w-full border-b border-(--color-border-subtle) hover:bg-(--color-bg-subtle) cursor-pointer px-5 py-1"
+                        onClick={() => handleCloseCategoryDropdown(item)}
+                        key={item}
+                      >
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Account */}
+              {chosenType !== "Transfer" ? (
+                <>
+                  <p>Account</p>
+                  <div>
+                    <div
+                      className="flex relative border justify-between items-center border-(--color-border-default) rounded-lg text-[0.9rem] px-5 py-1 cursor-pointer hover:bg-(--color-bg-subtle)"
+                      onClick={() => setAccountDropdownClicked((prev) => !prev)}
+                    >
+                      <p>{chosenAccount}</p>
+                      {accountDropdownClicked ? (
+                        <ChevronUp size={15} />
+                      ) : (
+                        <ChevronDown size={15} />
+                      )}
+                    </div>
+
+                    {accountDropdownClicked && (
+                      <div className="flex flex-col mt-2 rounded-lg absolute border border-(--color-border-default) bg-(--color-bg-base)">
+                        {accounts.map((item, index) => (
+                          <div
+                            className="flex w-full px-5 py-1 cursor-pointer hover:bg-(--color-bg-subtle) border-b border-(--color-border-subtle)"
+                            onClick={() =>
+                              handleCloseAccountDropdown(item.name)
+                            }
+                            key={index}
+                          >
+                            {item.name}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p>From</p>
+                  <div>
+                    <div className="flex border justify-between items-center border-(--color-border-default) rounded-lg text-[0.9rem] px-5 py-1 cursor-pointer hover:bg-(--color-bg-subtle)">
+                      <p>{chosenAccount}</p>
+                      <ChevronDown size={15} />
+                    </div>
+                  </div>
+
+                  <p>To</p>
+                  <div>
+                    <div className="flex border justify-between items-center border-(--color-border-default) rounded-lg text-[0.9rem] px-5 py-1 cursor-pointer hover:bg-(--color-bg-subtle)">
+                      <p>{chosenAccount}</p>
+                      <ChevronDown size={15} />
+                    </div>
+                  </div>
+                </>
+              )}
+
+              <p>Amount</p>
+              <div>
+                <input
+                  placeholder="0.00"
+                  className="focus:outline-none  border border-(--color-border-default) rounded-lg w-full px-5 py-1"
+                />
+              </div>
+
+              <label htmlFor="note">Note</label>
+              <div>
+                <textarea
+                  id="note"
+                  rows={4}
+                  className="w-full border border-(--color-border-default) rounded-lg focus:outline-none resize-none px-5"
+                ></textarea>
+              </div>
+            </div>
+
+            <div className="flex w-full mt-10 mb-3">
+              <div className="cursor-pointer hover:bg-emerald-600 active:bg-emerald-700 bg-(--color-brand-green) text-white rounded-lg text-[0.9rem] px-5 py-1 items-center justify-center w-full text-center">
+                <p onClick={() => setIsTransactionModal(false)}>
+                  Add transaction
+                </p>{" "}
+                {/* Handle data processing here... */}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isAccountModal && (
+        
+        <div className="fixed inset-0 z-50 flex items-center justify-center shadow-md bg-black/50">
+
+          {/* Modal */}
+          <div className="p-5 w-50 transform:translate(-50, -50%) bg-(--color-bg-secondary) md:w-100 border border-(--color-border-default) rounded-lg shadow-md">
+
+            {/* Header */}
+            <div className="flex w-full justify-between items-center">
+              <PiggyBank size={20} />
+              <p className="font-semibold text-xl whitespace-nowrap">
+                Add an account
+              </p>
+              <X
+                size={20}
+                onClick={() => setIsAccountModal(false)}
+                className="cursor-pointer"
+              />
+            </div>
+
+            {/* Content */}
+            <div className="flex-col relative flex w-full h-full my-5">
+              <div className="grid grid-cols-[1fr_2fr] w-full h-full text-[0.9rem] gap-y-3 gap-2 items-center">
+                <label htmlFor="nameInput">Name</label>
+                <input
+                  id="nameInput"
+                  className="focus:outline-none border border-(--color-border-default) rounded-lg px-3 py-1"
+                />
+
+                <p>Type</p>
+                <div
+                  className="relative flex w-full justify-between border border-(--color-border-default) items-center px-5 py-1 rounded-lg hover:bg-(--color-bg-subtle) cursor-pointer"
+                  onClick={() => setAccountDropdownClicked((prev) => !prev)}
+                >
+                  <p>{chosenAccountType}</p>
+                  {accountDropdownClicked ? (
+                    <ChevronUp size={20} />
+                  ) : (
+                    <ChevronDown size={20} />
+                  )}
+                </div>
+
+                {accountDropdownClicked && (
+                  <div className="flex flex-col h-fit absolute top-22 z-50 left-32 w-40 border border-(--color-border-default) rounded-lg bg-(--color-bg-secondary)">
+                    {accountCategories.map((item) => (
+                      <div className="border-b border-(--color-border-subtle) px-5 py-1 hover:bg-(--color-bg-subtle) cursor-pointer" onClick={() => {setChosenAccountType(item); setAccountDropdownClicked(false)}}>{item}</div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Footer - button */}
+            <div className="flex w-full pt-7">
+              <div className="flex bg-(--color-brand-green) rounded-lg shadow-md hover:bg-(--color-brand-green-accent) active:bg-emerald-700 items-center justify-center px-5 py-1 w-full cursor-pointer" onClick={() => setIsAccountModal(false)}>
+                <p className="text-[0.9rem]">Add account</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex flex-col">
         <div className="flex items-center gap-5 text-xl text-primary">
@@ -224,19 +475,19 @@ export default function Overview() {
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-col 2xl:flex-row w-full h-full gap-5">
+      <div className="flex flex-col 2xl:flex-row w-full md:h-full gap-5">
         {/* Left side */}
         <div className="flex flex-1 flex-col w-full h-full gap-5">
           <div className="flex w-full flex-col gap-1">
             <p className="text-[0.8rem]">Total earnings</p>
-            <p className="flex text-5xl font-mono">
+            <p className="flex text-5xl font-display font-semibold">
               <span className="text-3xl self-end mr-2">₱</span>
               3,100.00
             </p>
           </div>
 
           {/* Summary */}
-          <div className="flex flex-row w-full h-fit gap-5">
+          <div className="flex flex-col md:flex-row w-full h-fit gap-5">
             <div className="flex flex-col h-31.5 flex-1 border border-(--color-border-default) rounded-xl px-5 py-3 shadow-md">
               <p className="font-semibold">Income</p>
               <div className="flex flex-auto w-auto h-full" />
@@ -269,26 +520,36 @@ export default function Overview() {
               </div>
             </div>
 
-            <div className="flex flex-col h-31.5 flex-1 border border-(--color-border-default) rounded-xl px-5 py-3 shadow-md">
-              <p className="font-semibold">Savings</p>
-              <div className="flex flex-auto w-auto h-full" />
-              <p className="flex text-2xl font-display font-normal">
-                <span className="mr-1">₱</span>
-                2,400.12
-              </p>
-              <div className="flex w-full items-center text-sm mt-1 text-(--color-text-secondary)">
-                <p>Saving rate</p>
+            <div className="flex flex-col flex-2 border border-(--color-border-default) rounded-lg shadow-md w-full h-full p-5 gap-2">
+              <p className="text-xl font-semibold">Quick Actions</p>
+              <div className="flex w-full h-full gap-5 flex-col md:flex-row">
+                <div
+                  className="flex flex-1 bg-(--color-brand-green) text-white rounded-lg shadow-md items-center justify-center text-[0.9rem] gap-1 py-2 cursor-pointer hover:bg-(--color-brand-green-accent) duration-100 transition-all active:bg-emerald-600"
+                  onClick={() => setIsTransactionModal((prev) => !prev)}
+                >
+                  <Plus size={20} />
+                  <p className="hidden lg:block whitespace-nowrap">
+                    Add a transaction
+                  </p>
+                </div>
 
-                <div className="flex w-auto flex-auto" />
-                <ArrowUp size={15} />
-                <p>5%</p>
+                <div
+                  className="flex flex-1 ring ring-inset ring-(--color-brand-green) hover:bg-(--color-brand-green) rounded-lg shadow-md items-center justify-center text-[0.9rem] gap-1 py-2 cursor-pointer duration-100 transition-all active:bg-emerald-600"
+                  onClick={() => setIsAccountModal((prev) => !prev)}
+                >
+                  <PiggyBank size={20} />
+                  <p className="hidden lg:block whitespace-nowrap">
+                    Add an account
+                  </p>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Bottom left side */}
-          <div className="flex w-full h-full gap-5">
-            <div className="flex flex-1 flex-col w-full h-full border border-(--color-border-default) rounded-lg px-5 py-3 gap-2 shadow-md">
+          {/* Bottom side */}
+          <div className="flex flex-col md:flex-row w-full h-auto gap-5">
+            {/* Pie chart */}
+            <div className="flex flex-col w-full h-75 md:h-full border border-(--color-border-default) rounded-lg px-5 py-3 gap-2 shadow-md">
               <div className="flex w-full">
                 <div className="flex flex-5 w-auto" />
                 <div className="flex flex-1 w-full gap-3">
@@ -310,52 +571,55 @@ export default function Overview() {
             {/* Transactions list */}
             <Card
               header={
-                <div className="flex gap-2 items-center">
+                <div className="flex md:h-auto gap-2 items-center min-h-0">
                   <CircleDollarSign size={20} />
                   <p>Transactions</p>
                 </div>
               }
-              className="flex flex-1 flex-col w-full h-full border border-(--color-border-default) rounded-lg shadow-md overflow-auto"
+              className="flex flex-col w-full h-[500px] border border-(--color-border-default) rounded-lg shadow-md"
               link="/transactions"
               linkText="View transactions"
             >
-              {transactions.map((item, index) => (
-                <div
-                  className="flex w-full h-fit py-2 border border-(--color-border-subtle) gap-3 hover:bg-(--color-bg-subtle) cursor-pointer"
-                  key={index}
-                >
-                  <div className="flex flex-col flex-2 w-full h-fit pl-5">
-                    <p className="text-[0.9rem]">{item.description}</p>
-                    <div className="flex flex-1 w-full items-center text-[0.7rem] text-stone-400">
-                      <p>{item.date}</p>
-                      <div className="flex flex-auto w-auto" />
-                      <p>{item.time}</p>
+              <div className="flex flex-col overflow-auto">
+                {transactions.map((item, index) => (
+                  <div
+                    className="flex w-full h-fit py-2 border border-(--color-border-subtle) gap-3 hover:bg-(--color-bg-subtle) cursor-pointer"
+                    key={index}
+                  >
+                    <div className="flex flex-col flex-2 w-full h-fit pl-5">
+                      <p className="text-[0.9rem]">{item.description}</p>
+                      <div className="flex flex-1 w-full items-center text-[0.7rem] text-stone-400">
+                        <p>{item.date}</p>
+                        <div className="flex flex-auto w-auto" />
+                        <p>{item.time}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-1 w-full h-full pr-5 items-center justify-end">
+                      <p
+                        className={`text-[1rem] font-semibold ${item.type === "Expense" ? "text-red-400" : item.type === "Income" ? "text-green-400" : "text-(--color-text-primary)"}`}
+                      >
+                        <span className="mr-1">
+                          {item.type === "Expense" ? "-" : null}
+                        </span>
+                        <span className="text-[0.9rem] mr-1 justify-self-end">
+                          ₱
+                        </span>
+                        {item.amount}
+                      </p>
                     </div>
                   </div>
-
-                  <div className="flex flex-1 w-full h-full pr-5 items-center justify-end">
-                    <p
-                      className={`text-[1rem] font-semibold ${item.type === "Expense" ? "text-red-400" : item.type === "Income" ? "text-green-400" : "text-(--color-text-primary)"}`}
-                    >
-                      <span className="mr-1">
-                        {item.type === "Expense" ? "-" : null}
-                      </span>
-                      <span className="text-[0.9rem] mr-1 justify-self-end">
-                        ₱
-                      </span>
-                      {item.amount}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </Card>
           </div>
         </div>
 
         {/* Right side */}
-        <div className="flex flex-1 w-full h-full flex-col gap-5">
-          {/* Top */}
-          <div className="flex flex-1 flex-col w-full h-full border border-(--color-border-default) rounded-lg px-5 py-3 shadow-md">
+        <div className="flex flex-1 w-full flex-col gap-5">
+          {/* Stacked bar chart */}
+          <div className="flex flex-col w-full h-100 md:h-full border border-(--color-border-default) rounded-lg px-5 py-3 shadow-md">
+            {/* Header */}
             <div className="flex w-full h-fit items-center">
               <p className="font-display text-xl font-semibold">
                 Inflows and outflows{" "}
@@ -372,6 +636,7 @@ export default function Overview() {
               </div>
             </div>
 
+            {/* Stacked bar chart */}
             <div
               style={{
                 width: "100%",
@@ -381,6 +646,8 @@ export default function Overview() {
               }}
               ref={sixMonthsRef}
             />
+
+            {/* Footer */}
             <div className="flex w-full h-fit gap-10 justify-center">
               <div className="flex h-fit gap-2">
                 <div className="flex rounded-md bg-[#FF6B6B] px-4" />
@@ -395,10 +662,10 @@ export default function Overview() {
           </div>
 
           {/* Bottom */}
-          <div className="flex flex-2 w-full h-full gap-5">
+          <div className="flex flex-2 w-full h-auto gap-5">
             {/* Accounts list */}
             <Card
-              className="flex flex-2 flex-col w-full h-full"
+              className="flex h-100 lg:flex-2 flex-col w-full"
               header={
                 <div className="flex gap-2 items-center">
                   <BaggageClaim size={20} />
@@ -410,7 +677,7 @@ export default function Overview() {
             >
               <div className="flex flex-col w-full h-fit">
                 {/* Header */}
-                <div className="grid grid-cols-[150px_150px_150px_1fr] w-full h-full px-5 py-1 font-display text-[0.9rem] border-b border-(--color-border-subtle)">
+                <div className="grid grid-cols-[1fr_1fr_1fr_1fr] w-full h-full px-5 py-1 font-display text-[0.9rem] border-b border-(--color-border-subtle)">
                   <p>Name</p>
                   <p>Type</p>
                   <p>Amount</p>
@@ -421,7 +688,7 @@ export default function Overview() {
               <div className="flex flex-2 flex-col w-full h-fit">
                 {accounts.map((item, index) => (
                   <div
-                    className="grid grid-cols-[150px_150px_150px_1fr] w-full px-5 py-2 text-[0.9rem] border-b border-(--color-border-subtle) hover:bg-(--color-bg-subtle) cursor-pointer items-center"
+                    className="grid grid-cols-[1fr_1fr_1fr_1fr] w-full px-5 py-2 text-[0.9rem] border-b border-(--color-border-subtle) hover:bg-(--color-bg-subtle) cursor-pointer items-center"
                     key={index}
                   >
                     <p className="font-mono text-[0.8rem] text-(--color-text-secondary)">

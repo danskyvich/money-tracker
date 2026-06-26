@@ -1,84 +1,64 @@
-'use client'
+"use client";
 
-import SettingItem from "@/components/layout/SettingItem";
 import Card from "@/components/ui/Card";
 import Switcher from "@/components/ui/Switcher";
+import { monthlyIncome } from "@/lib/mocks/mockAccounts";
+import { MonthlyInflowOutflows } from "@/lib/mocks/mockTransactions";
 import { ChevronDown, Eye } from "lucide-react";
 import { useState } from "react";
 
-const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const DAYS = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
+
+const settings = [
+  { item: "Main currency", value: "Philippine Peso", icon: "₱" },
+  { item: "Sub currency", value: "United States Dollar", icon: "$" },
+  { item: "Configure start day", value: DAYS[0], icon: null },
+  {
+    item: "Modify income categories",
+    value: "Modify",
+    icon: <Eye size={15} />,
+  },
+  {
+    item: "Modify expense categories",
+    value: "Modify",
+    icon: <Eye size={15} />,
+  },
+];
 
 export default function Configuration() {
-  const [dayPressed, setDayPressed] = useState<string>('Sunday');
-  const handleDayActive = (index: number) => {
-    setDayPressed(DAYS[index]);
-  }
-    return (
-      <Card
-        header="Settings"
-        subheader="Change main and sub currency, start day, etc."
-        className="flex w-full h-full"
+
+  return (
+    <div className="flex flex-col w-full h-full">
+      <p className="text-3xl font-semibold pb-5">Settings</p>
+      <div
+        className="flex flex-col w-full h-full border border-(--color-border-default) rounded-lg shadow-md"
       >
-        <div className="flex flex-col w-full h-full py-5 px-9 gap-1">
-          {/* Main Currency */}
-          <SettingItem label="Main currency">
-            <div className="flex">
-              <div className="flex border border-r-0 border-(--color-brand-green) text-(--color-text-primary) font-semibold rounded-l-xl py-1 px-3 items-center gap-2">
-                <span className="text-[1.2rem]">₱</span>
-                <p className="text-[0.8rem]">Philippine Peso (PHP)</p>
-              </div>
-              <div className="flex border-l border border-(--color-brand-green) items-center justify-center rounded-r-xl px-2">
-                <ChevronDown size={25} />
-              </div>
-            </div>
-          </SettingItem>
+        {settings.map((item, index) => (
+          <div
+            className="grid grid-cols-[1fr_1fr] w-full h-fit px-5 py-2 items-center cursor-pointer min-h-0"
+            key={index}
+          >
+            <p className="text-[0.9rem]">{item.item}</p>
 
-          {/* Sub Currency */}
-          <SettingItem label="Sub currency">
-            <div className="flex">
-              <div className="flex border border-r-0 border-(--color-brand-green) text-(--color-text-primary) rounded-l-xl py-1 px-3 items-center gap-2">
-                <span className="text-[1.2rem]">$</span>
-                <p className="text-[0.8rem]">United States Dollars (USD)</p>
-              </div>
-              <div className="flex border-l border border-(--color-brand-green) items-center justify-center rounded-r-xl px-2">
-                <ChevronDown size={25} />
-              </div>
+            <div className="flex w-fit h-fit ring ring-inset ring-(--color-brand-green) text-[0.9rem] rounded-lg hover:bg-(--color-brand-green) hover:text-white px-5 py-1 items-center justify-center justify-self-end gap-1 duration-100 transition-all">
+              {item.icon === null ? null : item.icon}
+              <p className="text-[0.9rem] whitespace-nowrap">{item.value}</p>
+              {item.item === "Modify income categories" ||
+              item.item === "Modify expense categories" ? null : (
+                <ChevronDown size={20} />
+              )}
             </div>
-          </SettingItem>
-
-          {/* Start Day */}
-          <SettingItem label="Weekly start day">
-            <div className="flex">
-              <div className="flex border border-r-0 border-(--color-brand-green) text-(--color-text-primary) rounded-l-xl py-1 px-3 items-center gap-2">
-                <p className="text-[0.8rem]">{dayPressed}</p>
-              </div>
-              <div className="flex border-l border border-(--color-brand-green) items-center justify-center rounded-r-xl px-2">
-                <ChevronDown size={25} />
-              </div>
-            </div>
-          </SettingItem>
-
-          {/* Modify income categories */}
-          <SettingItem label="Modify income categories">
-            <div className="flex gap-2 hover:cursor-pointer text-(--color-text-primary) border border-(--color-brand-green) font-semibold py-2 px-4 rounded-xl items-center justify-center hover:bg-(--color-border-default) active:bg-(--color-brand-green) active:text-white duration-100 transition-all">
-              <Eye size={20} />
-              <p className="text-[0.9rem]">View income categories</p>
-            </div>
-          </SettingItem>
-
-          {/* Modify expense categories */}
-          <SettingItem label="Modify expense categories">
-            <div className="flex gap-2 hover:cursor-pointer text-(--color-text-primary) border border-(--color-brand-green) font-semibold py-2 px-4 rounded-xl items-center justify-center hover:bg-(--color-border-default) active:bg-(--color-brand-green) active:text-white duration-100 transition-all">
-              <Eye size={20} />
-              <p className="text-[0.9rem]">View expense categories</p>
-            </div>
-          </SettingItem>
-
-          {/* Show description */}
-          <SettingItem label="Show description on transactions">
-            <Switcher />
-          </SettingItem>
-        </div>
-      </Card>
-    );
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }

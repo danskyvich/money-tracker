@@ -75,6 +75,10 @@ export const transactions = [
   },
 ];
 
+export const TransactionCategories = [
+  "Food", "Banking", "Savings", "Telecommunications", "Education", "Apparel"
+]
+
 export const MonthlyInflowOutflows = [
   { month: "January", inflows: 1100.34, outflows: 331.00 },
   { month: "February", inflows: 500.25, outflows: 430.25 },
