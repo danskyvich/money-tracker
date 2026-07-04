@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Card from "@/components/ui/Card";
+import Card from "@/components/layout/Card";
 import { useUser } from "@/lib/hooks/useUser";
 import {
   ArrowUp,
@@ -21,10 +21,10 @@ import {
   transactions,
 } from "@/lib/mocks/mockTransactions";
 import * as echarts from "echarts";
-import IncomeBreakdownPage from "@/components/ui/IncomeBreakdown";
-import ExpenseBreakdownPage from "@/components/ui/ExpenseBreakdown";
+import IncomeBreakdownPage from "@/components/layout/IncomeBreakdown";
+import ExpenseBreakdownPage from "@/components/layout/ExpenseBreakdown";
 import { accountCategories, accounts, monthlyExpenses, monthlyIncome } from "@/lib/mocks/mockAccounts";
-import Input from "@/components/ui/Input";
+import Input from "@/components/layout/Input";
 
 export default function Overview() {
 

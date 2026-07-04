@@ -1,6 +1,6 @@
 'use client'
 
-import Card from "@/components/ui/Card"
+import Card from "@/components/layout/Card"
 import { DatabaseBackup, MoveDownLeft, MoveUpRight } from "lucide-react"
 import { useEffect } from "react"
 

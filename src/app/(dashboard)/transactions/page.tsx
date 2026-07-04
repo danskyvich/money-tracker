@@ -1,6 +1,6 @@
 "use client";
 
-import Card from "@/components/ui/Card";
+import Card from "@/components/layout/Card";
 import { useEffect, useState } from "react";
 import { transactions } from "@/lib/mocks/mockTransactions";
 import {

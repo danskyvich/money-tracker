@@ -1,7 +1,7 @@
 import AvatarBar from "@/components/layout/AvatarBar";
 import Sidebar from "../../components/layout/Sidebar";
 import { ModalProvider } from "@/lib/hooks/useModal";
-import ModalBackdrop from "@/components/ui/Backdrop";
+import ModalBackdrop from "@/components/layout/Backdrop";
 
 export default function DashboardLayout({
   children,
