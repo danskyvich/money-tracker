@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import Card from "@/components/layout/Card";
-import { useUser } from "@/lib/hooks/useUser";
 import {
   ArrowUp,
   BaggageClaim,
@@ -32,7 +31,6 @@ export default function Overview() {
   const [time, setTime] = useState("");
   const [isAccountModal, setIsAccountModal] = useState(false);
   const [selectedPage, setSelectedPage] = useState(1);
-  const { user } = useUser();
   const pagination = [1, 2, 3];
 
   // Transaction modal
@@ -468,7 +466,7 @@ export default function Overview() {
           {getOverviewIcon({ time })}
           <div className="flex flex-col justify-center">
             <p className="flex font-mono text-[1.5rem]">
-              Welcome,{user.first_name}!
+              Welcome, Juan!
             </p>
           </div>
         </div>

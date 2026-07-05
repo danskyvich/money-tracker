@@ -1,7 +1,6 @@
 "use client"
 
 import { useForm } from "react-hook-form";
-import Button from "../layout/Button";
 import Input from "../layout/Input";
 import { LoginFormData, loginSchema } from "../../lib/schemas/LoginSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,6 +8,8 @@ import { MailIcon } from "lucide-react";
 import { useActionState, useEffect, useState } from "react";
 import Link from "next/link";
 import {generalSignIn} from "@/lib/auth/actions";
+import { useRouter } from "next/navigation";
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 
 const GoogleIcon = (
   props: React.SVGProps<SVGSVGElement>,
@@ -44,14 +45,24 @@ export default function LoginPage() {
 
   // states
   const [loading, setLoading] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false)
+  const [rememberMe, setRememberMe] = useState(false);
+  const router = useRouter();
+  const { executeRecaptcha } = useGoogleReCaptcha();
 
   // loginAction from lib/auth/actions.ts
   const [state, formAction, pending] = useActionState(
     async (prev: any, formData: FormData) => {
+
+      //reCAPTCHA fetch token
+      if (!executeRecaptcha) {
+        return { error: "reCAPTCHA not yet ready, please try again."}
+      }
+      const recaptchaToken = await executeRecaptcha("login");
+
       const result = await generalSignIn(
         formData.get("email") as string,
         formData.get("rememberMe") === "on",
+        recaptchaToken,
       );
       return result;
     },
@@ -75,7 +86,7 @@ export default function LoginPage() {
   return (
     <div className="flex flex-col items-center justify-center w-full">
       {/* Card */}
-      <div className="flex w-fit h-fit flex-col rounded-2xl bg-(--color-bg-subtle) px-15 py-20 shadow-2xl">
+      <div className="flex w-135 h-fit flex-col rounded-2xl bg-(--color-bg-subtle) px-15 py-20 shadow-2xl">
         {/* Header */}
         <header className="text-center">
           <p className="font-bold text-5xl">
@@ -121,14 +132,16 @@ export default function LoginPage() {
             <p className="text-[0.9rem] text-red-500">{state.error}</p>
           )}
 
+          {/* Recaptcha here */}
+
+
           <div className="flex w-full flex-col h-fit gap-4">
             <button
               disabled={loading}
-              className="w-full text-[0.9rem] mt-10 bg-(--color-brand-green) rounded-xl py-2 mt-3 cursor-pointer hover:bg-emerald-700 active:bg-emerald-800 transition-all duration-100"
+              className="w-full text-[0.9rem] mt-10 bg-(--color-brand-green) rounded-xl py-2 cursor-pointer hover:bg-emerald-700 active:bg-emerald-800 transition-all duration-100"
             >
               {loading ? "Signing In..." : "Sign in"}
             </button>
-            <Button text="Sign up" link="/register" variant="secondary" />
           </div>
         </form>
 
@@ -153,22 +166,23 @@ export default function LoginPage() {
           />
         </div>
 
-        <div className="flex w-full mt-2 gap-2 text-(--color-text-secondary) text-[0.8rem] font-mono items-center justify-center">
-          <Link
-            href="/terms-and-conditions"
-            className="hover:cursor-pointer hover:underline"
-          >
-            <p>Terms and conditions</p>
-          </Link>
-
-          <p>•</p>
-
-          <Link
-            href="/privacy-policy"
-            className="hover:cursor-pointer hover:underline"
-          >
-            <p>Privacy policy</p>
-          </Link>
+        <div className="flex w-full mt-2 text-(--color-text-secondary) text-[0.8rem] font-mono items-center justify-center">
+          <p className="text-center">
+            By creating an account, you agree to our{" "}
+            <span
+              className="text-(--color-text-primary) hover:underline cursor-pointer"
+              onClick={() => router.push("/privacy-policy")}
+            >
+              Privacy Policy
+            </span>{" "}
+            and{" "}
+            <span
+              className="hover:underline cursor-pointer text-(--color-text-primary)"
+              onClick={() => router.push("/terms-and-conditions")}
+            >
+              Terms and Conditions
+            </span>
+          </p>
         </div>
       </div>
     </div>

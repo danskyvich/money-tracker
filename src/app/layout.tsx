@@ -2,16 +2,20 @@ import { Providers } from "./providers";
 import type { Metadata } from "next";
 import { DM_Mono, Instrument_Sans } from "next/font/google";
 import "./globals.css";
-import ThemeSwitcher from "../components/layout/ThemeSwitcher";
 import { ThemeProvider } from "../components/ThemeProvider";
+import { RecaptchaProvider } from "@/components/RecaptchaProvider";
 
-const sans = Instrument_Sans({ subsets: ['latin'], variable: "--font-body"});
-const mono = DM_Mono({ subsets: ['latin'], weight: ['300','400','500'], variable: "--font-mono"})
+const sans = Instrument_Sans({ subsets: ["latin"], variable: "--font-body" });
+const mono = DM_Mono({
+  subsets: ["latin"],
+  weight: ["300", "400", "500"],
+  variable: "--font-mono",
+});
 
 export const metadata: Metadata = {
-    title: 'Money Tracker',
-    description: 'Track your finances'
-}
+  title: "Money Tracker",
+  description: "Track your finances",
+};
 
 export default function RootLayout({
   children,
@@ -29,16 +33,18 @@ export default function RootLayout({
         className={`h-full ${sans.variable} ${mono.variable}`}
         suppressHydrationWarning
       >
-        <Providers>
-          <ThemeProvider
-            attribute={"class"}
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-          </ThemeProvider>
-        </Providers>
+        <RecaptchaProvider>
+          <Providers>
+            <ThemeProvider
+              attribute={"class"}
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              {children}
+            </ThemeProvider>
+          </Providers>
+        </RecaptchaProvider>
       </body>
     </html>
   );

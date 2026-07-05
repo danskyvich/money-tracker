@@ -2,10 +2,13 @@
 
 import { usePathname } from "next/navigation";
 import { SidebarItem } from "./SidebarItem";
-import { ArrowDownUpIcon, ArrowUpDown, BaggageClaimIcon, BarChart, Bell, ChevronLeft, ChevronRight, Database, LayoutDashboardIcon, PiggyBank, Repeat, Settings, User, Wallet2Icon } from "lucide-react";
+import { BaggageClaimIcon, Database, LayoutDashboardIcon, LogInIcon, Settings, User, UserIcon, Wallet2Icon } from "lucide-react";
 import { useState } from "react";
+import { Session } from "@supabase/supabase-js";
 
-export default function Sidebar({className}:{className?: string}) {
+export default function Sidebar({className, email, lastLogIn}:{className?: string, email: string, lastLogIn: string}) {
+
+    // states
     const path = usePathname();
     const [isMinimized, setIsMinimized] = useState(false);
 
@@ -31,17 +34,17 @@ export default function Sidebar({className}:{className?: string}) {
     ];
 
     const OthersItems = [
-      { icon: <User size={20} />, label: "Profile", path: "/profile" },
-      { icon: <Database size={20} />, label: "Backup", path: "/backup" },
-      { icon: <Settings size={20} />, label: "Settings", path: "/settings" },
+      { icon: <User size={20} />, label: "Profile", path: "/profile", otherData: {email}},
+      { icon: <Database size={20} />, label: "Backup", path: "/backup", otherData: "" },
+      { icon: <Settings size={20} />, label: "Settings", path: "/settings", otherData: "" },
     ];
 
     return (
       <div
-        className={`${className} hidden md:block px-5 py-2 flex-col border-r-2 border-(--color-bg-base) h-full w-fit duration-300 bg-(--color-bg-subtle) transition-all`}
+        className={`${className} hidden md:flex px-5 py-2 flex-col border-r-2 border-(--color-bg-base) h-full w-fit duration-300 bg-(--color-bg-subtle) transition-all`}
       >
         {/* Header */}
-        <header className="flex my-5 items-center justify-center">
+        <header className="flex flex-0 my-5 items-center justify-center">
           <p className="hidden md:block font-bold text-3xl mt-5 text-[1.2rem]">
             Money{" "}
             <span className="bg-brand-gradient bg-clip-text text-transparent">
@@ -51,7 +54,7 @@ export default function Sidebar({className}:{className?: string}) {
         </header>
 
         {/* Sidebar list */}
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-0 flex-col gap-1">
           <>
             <p className="hidden md:block text-(--color-text-secondary) text-[0.9rem] font-light mb-2">
               Overview
@@ -69,7 +72,7 @@ export default function Sidebar({className}:{className?: string}) {
         </div>
 
         {/* Others */}
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-1 flex-col gap-1">
           {!isMinimized && (
             <p className="hidden md:block mt-4 text-[0.9rem] font-light">
               Others
@@ -88,8 +91,21 @@ export default function Sidebar({className}:{className?: string}) {
 
         <div className="flex flex-auto h-auto w-full" />
 
-        <div className="relative flex">
-          
+        {/* Session information */}
+        <div className="relative hidden xl:block w-full px-2 py-3 border-t-2 border-(--color-border-subtle)">
+          <div className="flex flex-col items-center">
+            
+            <div className="flex items-center gap-2">
+              <span>{<LogInIcon size={15}/>}</span>
+              <p className="whitespace-nowrap font-mono text-[0.8rem]">
+                Last sign in:{" "}
+              </p>
+            </div>
+
+            <p className="text-[0.8rem] mt-1 font-display font-light">
+              <span>{`${new Date(lastLogIn).toLocaleDateString()} | ${new Date(lastLogIn).toLocaleTimeString()}`}</span>
+            </p>
+          </div>
         </div>
       </div>
     );

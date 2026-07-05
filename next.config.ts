@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
-  reactStrictMode: true,
+  reactStrictMode: false,
   experimental: {},
   allowedDevOrigins: ['192.168.8.171'],
 }

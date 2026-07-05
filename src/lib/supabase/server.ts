@@ -37,7 +37,7 @@ export async function createClient(rememberMe: boolean = true) {
                             }
                         })
                     } catch {
-                        // ignored since middleware.ts exist
+                        // ignored since middleware/proxy.ts exist
                     }
                 }
             }
