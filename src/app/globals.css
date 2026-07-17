@@ -2,6 +2,8 @@
 
 @theme {
     --background-image-brand-gradient: linear-gradient(to right, #2A7B9B, #EDDD53);
+    --animation-right-to-left: slide-across 5s ease-out forwards;
+    --animation-to-right: slide-from-right-to-left 5s ease-out forwards;
 }
 
 *,
@@ -96,4 +98,22 @@ body {
     --shadow-glow: 0 0 20px rgba(45, 106, 79, 0.14);
 
     color-scheme: light;
+}
+
+@keyframes slide-across {
+    from {
+        transform: translateX(-100%);
+    } to {
+        transform: translateX(100%);
+    }
+}
+
+@keyframes slide-from-right-to-left {
+    from {
+        transform: translateX(0);
+        opacity: 1
+    } to {
+        transform: translateX(110vw);
+        opacity: 0
+    }
 }

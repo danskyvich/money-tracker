@@ -1,11 +1,15 @@
 import ProfilePage from "@/components/ui/ProfilePage";
-import { createClient } from "@/lib/supabase/server";
+import { getUser, isUserMfaEnabled, listUserMfaFactors } from "@/services/supabase/actions";
+import { User } from "@supabase/supabase-js";
 
 export default async function Profile() {
+  const [user, mfaActive] = await Promise.all([
+    getUser(),
+    isUserMfaEnabled(),
+  ])
 
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.mfa.listFactors()
-  if (error) return <p className="text-red-500 text-[0.9rem]">{error.message}</p>
 
-  return <ProfilePage data={data}/>
+  return (
+    <ProfilePage  user={user} mfaActive={mfaActive} />
+  );
 }

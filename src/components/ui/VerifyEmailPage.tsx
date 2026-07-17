@@ -2,21 +2,20 @@
 
 import { useActionState, useEffect, useState } from "react"
 import Input from "../layout/Input"
-import { OTPData, OTPSchema } from "@/lib/schemas/OTPSchema"
+import { OTPData, OTPSchema } from "@/utils/schemas/OTPSchema"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Lock } from "lucide-react"
 import Button from "../layout/Button"
 import { useRouter } from "next/navigation"
-import { verifyOtp } from "@/lib/auth/actions"
+import { resendOtp, verifyOtp } from "@/services/supabase/actions"
+import Spinner from "../layout/Spinner"
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3"
 
-export default function VerifyEmailPage({searchParams}: {searchParams: {email?: string, rememberMe?: string}}) {
+export default function VerifyEmailPage({email}:{email: string}) {
     useEffect(() => {
         document.title = "Verify your email"
     })
-
-    const email = searchParams.email ?? "";
-    const rememberMe = searchParams.rememberMe === "true";
 
     const {
         register,
@@ -30,6 +29,10 @@ export default function VerifyEmailPage({searchParams}: {searchParams: {email?: 
     const router = useRouter();
     const [timer, setTimer] = useState(120);
     const [resendDisabled, setResendDisabled] = useState(true);
+    const [resendPending, setResendPending] = useState(false);
+    const [resendError, setResendError] = useState<string | null>(null);
+    const { executeRecaptcha } = useGoogleReCaptcha();
+    const [showErrorToast, setShowErrorToast] = useState<boolean>(false);
 
     // 120 seconds (2 minutes) timer
     useEffect(() => {
@@ -58,6 +61,27 @@ export default function VerifyEmailPage({searchParams}: {searchParams: {email?: 
       },
       null
     )
+
+    const handleResend = async () => {
+      if (!executeRecaptcha || resendDisabled || resendPending) return;
+
+      setResendPending(true);
+      setResendError(null);
+
+      const recaptchaToken = await executeRecaptcha("resend_otp");
+      const result = await resendOtp(email, recaptchaToken);
+
+      setResendPending(false);
+
+      if (result?.error) {
+        setResendError(result.error);
+        setShowErrorToast(true);
+        return;
+      }
+
+      setTimer(120);
+      setResendDisabled(true);
+    }
 
     return (
       <div className="flex flex-col w-full h-full items-center justify-center">
@@ -90,29 +114,32 @@ export default function VerifyEmailPage({searchParams}: {searchParams: {email?: 
 
               <div className="w-full h-fit flex gap-2 items-center justify-center">
                 <p className="self-center">
-                  <a
-                    href=""
-                    className={`text-[0.9rem] font-mono text-(--color-text-primary) hover:underline active:font-semibold ${resendDisabled && "text-(--color-text-secondary) pointer-events-none cursor-default"}`}
-                    aria-disabled={resendDisabled === true ? true : false}
+                  <button
+                    className={`text-[0.9rem] font-mono text-(--color-text-primary) hover:underline active:font-semibold ${(resendDisabled || resendPending) && "text-(--color-text-secondary) pointer-events-none cursor-default"}`}
+                    onClick={handleResend}
+                    disabled={resendDisabled || resendPending}
+                    aria-disabled={resendDisabled || resendPending}
                   >
-                    Resend code?
-                  </a>
+                    {resendPending ? "Sending..." : "ResendCode"}
+                  </button>
                 </p>
-                <p>
-                  {timer}s
-                </p>
+                <p>{timer}s</p>
               </div>
             </div>
 
             <div className="flex flex-col gap-2 my-5">
-              <button className="bg-(--color-brand-green) py-2 w-full h-fit rounded-xl mt-5 text-[0.9rem] hover:bg-emerald-600 active:bg-emerald-700 cursor-pointer" type="submit">
-                <p>Verify email</p>
+              <button
+                disabled={pending}
+                className="bg-(--color-brand-green) py-2 text-white w-full h-fit rounded-xl mt-5 text-[0.9rem] hover:bg-emerald-600 active:bg-emerald-700 cursor-pointer"
+                type="submit"
+              >
+                {pending ? <Spinner /> : <p>Verify email</p>}
               </button>
               <Button
                 text="Back"
                 variant="secondary"
                 className="w-full h-fit"
-                onClick={() => router.back}
+                onClick={() => router.back()}
               />
             </div>
           </form>

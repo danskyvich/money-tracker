@@ -3,21 +3,23 @@
 import { useEffect, useState } from "react";
 import {
   CircleQuestionMark,
+  Eye,
   LockIcon,
   LogOutIcon,
-  PhoneIcon,
+  VerifiedIcon,
   X,
 } from "lucide-react";
-import { deleteUser, signOut } from "@/lib/auth/actions";
+import { deleteUser, signOut, unenrollFactor } from "@/services/supabase/actions";
 import { useRouter } from "next/navigation";
-import { Factor } from "@supabase/supabase-js";
+import { Factor, User } from "@supabase/supabase-js";
+import Button from "../layout/Button";
 
 export default function ProfilePage({
-  email,
-  data,
+  user,
+  mfaActive,
 }: {
-  email?: string;
-  data: { totp: Factor[] };
+  user?: User | null;
+  mfaActive: boolean;
 }) {
   useEffect(() => {
     document.title = "Profile";
@@ -26,6 +28,8 @@ export default function ProfilePage({
   // states
   const [signOutModalOpen, setSignOutModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [unenrollFactorModalOpen, setUnenrollFactorModalOpen] = useState(false)
+  const [factorId, setFactorId] = useState<string | null>(null)
   const router = useRouter();
 
   const profile = [
@@ -47,10 +51,52 @@ export default function ProfilePage({
       icon: <LockIcon size={15} />,
       onClick: () => router.push("/2fa"),
     },
+    {
+      item: "View all enrolled devices",
+      value: "View",
+      icon: <Eye size={15}/>,
+      onClick: () => alert('Coming Soon')
+    },
   ];
+
+  const handleFactorUnenrollment = (factorId: string) => {
+  }
 
   return (
     <div className="relative flex flex-col w-full h-full">
+      {unenrollFactorModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center w-full h-full bg-black/40">
+          <div className="absolute flex-col w-120 gap-5 z-50 p-5 border border-(--color-border-strong) rounded-lg shadow-md bg-(--color-bg-subtle)">
+            <div className="flex w-full gap-5 items-center">
+              <CircleQuestionMark size={20} />
+              <p className="text-xl font-semibold">
+                Disable MFA on this account
+              </p>
+            </div>
+
+            <p className="text-[0.9rem]/5 font-mono my-4">
+              Are you sure you want to disable multi-factor authentication (MFA)
+              on this account?
+            </p>
+
+            <div className="flex w-full gap-5">
+              <Button
+                variant="secondary"
+                onClick={() => setUnenrollFactorModalOpen(false)}
+                className="flex w-full"
+                text="No"
+              />
+
+              <Button
+                variant="primary"
+                onClick={() => handleFactorUnenrollment(factorId as string)}
+                className="flex w-full"
+                text="Unenroll MFA"
+              />
+            </div>
+          </div>
+        </div>
+      )}
       {/* Sign out modal */}
       {signOutModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center w-full h-full bg-black/40">
@@ -119,85 +165,51 @@ export default function ProfilePage({
         <div className="flex flex-2 w-full h-full border border-(--color-border-default) rounded-lg shadow-md">
           <div className="flex flex-col w-full h-full p-5">
             {/* User header */}
-            <div className="flex flex-0 w-full h-fit gap-5 p-5 rounded-xl bg-linear-to-r mb-2 from-slate-800 to-emerald-600">
-              {/* Avatar */}
-              <div className="flex bg-(--color-brand-gold) h-fit rounded-[50%] px-4 py-3">
-                <p className="text-black">DP</p>
-              </div>
-
+            <div className="flex flex-0 w-full h-fit gap-5 p-5 rounded-xl bg-linear-to-r mb-2 from-slate-800 to-emerald-600 items-center justify-between">
               {/* User information */}
               <div className="flex flex-col w-full h-fit">
                 <p className="text-lg font-mono text-white">
-                  <span>{email}</span>
+                  <span>{user?.email}</span>
                 </p>
-                <p className="text-sm text-white font-mono">{email}</p>
+                <div className="text-[0.85rem] text-white">
+                  <p>
+                    Created on{" "}
+                    {new Date(user?.created_at as string).toLocaleDateString()},{" "}
+                    {new Date(user?.created_at as string).toLocaleTimeString()}
+                  </p>
+                </div>
               </div>
 
-              <div className="flex flex-auto w-auto h-fit" />
+              {/* MFA status */}
+              <div className="flex text-white w-fit h-fit border-white border rounded-lg text-[0.9rem] px-5 py-1 whitespace-nowrap gap-3">
+                <div className="items-center flex gap-1">
+                  <LockIcon size={15} />
+                  <p>MFA status:</p>
+                </div>
+                
+                <div className="flex items-center gap-1">
+                  <p>{mfaActive ? "Active" : "Inactive"}</p>
+                  {mfaActive ? <VerifiedIcon size={17} /> : <X size={17} />}
+                </div>
+              </div>
             </div>
 
+            {/* Content */}
             {profile.map((item, index) => (
               <div
-                className="grid grid-cols-[1fr_1fr] w-full h-fit text-[0.9rem] px-5 py-2 items-center"
+                className="grid grid-cols-[1fr_1fr] w-full h-fit text-[0.9rem] px-5 py-2 items-center justify-between"
                 key={index}
               >
                 <p>{item.item}</p>
 
                 {/* Buttons */}
-                <div
-                  className="flex w-fit h-fit ring ring-inset ring-(--color-brand-green) text-[0.9rem] items-center justify-self-end gap-2 hover:bg-(--color-brand-green) whitespace-nowrap hover:text-white rounded-lg shadow-md px-5 py-1 transition-all duration-100 cursor-pointer"
+                <button
+                  className={`flex w-fit h-fit ring ring-inset ring-(--color-brand-green) text-[0.9rem] items-center justify-self-end gap-2 hover:bg-(--color-brand-green) whitespace-nowrap hover:text-white rounded-lg shadow-md px-5 py-1 transition-all duration-100 cursor-pointer`}
                   onClick={() => item.onClick()}
                 >
                   {item.icon === null ? null : item.icon}
-                  <p>{item.value}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="flex flex-col flex-1 w-full h-full border border-(--color-border-default) rounded-xl">
-          <p className="text-xl font-semibold px-5 pt-2">Enrolled devices</p>
-          <p className="font-mono text-[0.8rem] text-(--color-text-secondary) px-5 pb-2 border-b border-(--color-border-subtle)">
-            Enroll and unenroll devices with MFA enabled
-          </p>
-
-          {/* List */}
-          <div className="flex w-full h-fit mt-5 px-5">
-            {data.totp.map((factor) => (
-              <div
-                className="flex w-full items-center h-fit px-5 py-3 ring ring-inset ring-(--color-border-default) rounded-xl gap-5"
-                key={factor.id}
-              >
-                <PhoneIcon size={20} />
-                <div className="flex flex-col w-full justify-center gap-1">
-                  {/* friendly_name */}
-                  <p className="text-[1rem] font-mono">
-                    {factor.friendly_name}
-                  </p>
-
-                  {/* Created_at, status, and unenroll row */}
-                  <div className="flex w-full items-center justify-between">
-                    <p className="text-[0.75rem] font-light">
-                      {new Date(factor.created_at).toDateString() +
-                        " | " +
-                        new Date(factor.created_at).toLocaleTimeString()}
-                    </p>
-                    <div className="flex gap-5">
-                      <div
-                        className={`rounded-xl flex w-fit px-5 text-(--color-text-primary) text-[0.9rem] ${factor.status === "verified" ? "bg-(--color-brand-green)" : "bg-(--color-brand-red)"}`}
-                      >
-                        <p className="lowercase first-letter:uppercase">
-                          {factor.status}
-                        </p>
-                      </div>
-
-                      <p className="text-red-500 hover:underline active:text-red-400 text-[0.9rem] cursor-pointer">
-                        Unenroll
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                  <p>{item.value === "Set-up MFA" ? "MFA already enabled" : item.value}</p>
+                </button>
               </div>
             ))}
           </div>

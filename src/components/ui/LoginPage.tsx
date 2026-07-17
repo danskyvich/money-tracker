@@ -2,14 +2,15 @@
 
 import { useForm } from "react-hook-form";
 import Input from "../layout/Input";
-import { LoginFormData, loginSchema } from "../../lib/schemas/LoginSchema";
+import { LoginFormData, loginSchema } from "../../utils/schemas/LoginSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { MailIcon } from "lucide-react";
+import { CircleAlert, MailIcon } from "lucide-react";
 import { useActionState, useEffect, useState } from "react";
 import Link from "next/link";
-import {generalSignIn} from "@/lib/auth/actions";
-import { useRouter } from "next/navigation";
+import {generalSignIn, signInWithFacebook, signInWithGoogle} from "@/services/supabase/actions";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
+import Spinner from "../layout/Spinner";
 
 const GoogleIcon = (
   props: React.SVGProps<SVGSVGElement>,
@@ -44,10 +45,10 @@ const FacebookIcon = (
 export default function LoginPage() {
 
   // states
-  const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const router = useRouter();
   const { executeRecaptcha } = useGoogleReCaptcha();
+  const error = useSearchParams().get("error");
 
   // loginAction from lib/auth/actions.ts
   const [state, formAction, pending] = useActionState(
@@ -72,7 +73,7 @@ export default function LoginPage() {
   // change document name
   useEffect(() => {
     document.title = "Sign in to Money Tracker";
-  });
+  }, []);
 
   // zod validation
   const {
@@ -129,18 +130,19 @@ export default function LoginPage() {
 
           {/* Error */}
           {state?.error && (
-            <p className="text-[0.9rem] text-red-500">{state.error}</p>
+            <p className="text-[0.9rem] px-2 text-red-500">{state.error}</p>
           )}
-
-          {/* Recaptcha here */}
-
 
           <div className="flex w-full flex-col h-fit gap-4">
             <button
-              disabled={loading}
-              className="w-full text-[0.9rem] mt-10 bg-(--color-brand-green) rounded-xl py-2 cursor-pointer hover:bg-emerald-700 active:bg-emerald-800 transition-all duration-100"
+              disabled={pending}
+              className={`${pending && "cursor-none bg-emerald-800 active:emerald-800"} flex items-center justify-center w-full text-white text-[0.9rem] mt-10 bg-(--color-brand-green) rounded-xl py-2 cursor-pointer hover:bg-emerald-700 active:bg-emerald-800 transition-all duration-100`}
             >
-              {loading ? "Signing In..." : "Sign in"}
+              {pending ? (
+                <>
+                  <Spinner/>
+                </>) : (
+                <p>Sign In</p>)}
             </button>
           </div>
         </form>
@@ -158,11 +160,11 @@ export default function LoginPage() {
         <div className="flex w-full gap-2 mt-5 mb-2 items-center justify-center">
           <FacebookIcon
             className="cursor-pointer"
-            onClick={() => alert("Google sign up coming soon!")}
+            onClick={() => signInWithFacebook()}
           />
           <GoogleIcon
             className="cursor-pointer"
-            onClick={() => alert("Facebook sign up coming soon!")}
+            onClick={() => signInWithGoogle()}
           />
         </div>
 

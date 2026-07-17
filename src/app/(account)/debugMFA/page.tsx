@@ -1,5 +1,5 @@
 "use client";
-import { listUserMfaFactors, unenrollFactor } from "@/lib/auth/actions";
+import { listUserMfaFactors, unenrollFactor } from "@/services/supabase/actions";
 import { useEffect, useState } from "react";
 
 export default function DebugMfaPage() {

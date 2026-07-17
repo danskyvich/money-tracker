@@ -1,6 +1,6 @@
 "use client"
 
-import { challengeUserMfa, enrollUserMfa } from "@/lib/auth/actions";
+import { challengeUserMfa, enrollUserMfa } from "@/services/supabase/actions";
 import { CircleAlert, NfcIcon, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -34,7 +34,6 @@ export default function MFAPage() {
 
         setFactorId(enrollRes.factorId as string);
         setQrCode(enrollRes.qr_code as string)
-        console.log(enrollRes.qr_code);
         setSecret(enrollRes.secret as string)
 
         // begin mfa challenge

@@ -4,7 +4,6 @@ import { usePathname } from "next/navigation";
 import { SidebarItem } from "./SidebarItem";
 import { BaggageClaimIcon, Database, LayoutDashboardIcon, LogInIcon, Settings, User, UserIcon, Wallet2Icon } from "lucide-react";
 import { useState } from "react";
-import { Session } from "@supabase/supabase-js";
 
 export default function Sidebar({className, email, lastLogIn}:{className?: string, email: string, lastLogIn: string}) {
 

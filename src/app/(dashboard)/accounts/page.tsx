@@ -1,13 +1,14 @@
 "use client";
 
-import Card from "@/components/layout/Card";
-import { accountCategories, accounts } from "@/lib/mocks/mockAccounts";
+import {DeleteAccountCategoryName, InsertAccountCategoryName, UpdateAccountCategoryName} from "@/services/supabase/actions/databaseActions";
+import { createClient } from "@/services/supabase/client";
 import {
+  BookImage,
   Calendar,
-  Check,
   ChevronDown,
-  ChevronRight,
+  ChevronLeft,
   ChevronUp,
+  CircleAlert,
   File,
   ListFilter,
   Pencil,
@@ -16,78 +17,319 @@ import {
   Search,
   X,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { error } from "node:console";
+import { useActionState, useEffect, useState } from "react";
 
 export default function Accounts({}: {}) {
-
   useEffect(() => {
     document.title = "Your accounts";
   }, []);
 
-  const pagination = [1, 2, 3];
-
-  //static categories
-  const [categories, setCategories] = useState(accountCategories);
+  // for fetching data from db
+  const [accountsLoading, setAccountsLoading] = useState(false);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
+  const [fetchAccountError, setFetchAccountError] = useState<string | null>(
+    null,
+  );
+  const [fetchCategoriesError, setFetchCategoriesError] = useState<
+    string | null
+  >(null);
+  const [totalNumberOfCategories, setTotalNumberOfCategories] = useState<
+    number | null
+  >(0);
+  const [accounts, setAccounts] = useState<any[] | null>(null);
+  const [categories, setCategories] = useState<any[] | null>(null);
+  const [totalNumberOfItems, setTotalNumberOfItems] = useState<number | null>(
+    null,
+  );
 
   //for UI changes
   const [filter, setFilter] = useState(false);
   const [selectedType, setSelectedType] = useState<string>("Filter");
   const [isCategoryAccountOpen, setIsCategoryAccountOpen] = useState(false);
 
-  //for UI states
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [editedCategoryName, setEditedCategoryName] = useState("");
-  const [currentPage, setCurrentPage] = useState<number>(1);
-
   // for seeing transactions of that specific account
   const [seeAccountTransactions, setSeeAccountTransactions] = useState(false);
-  const [chosenAccount, setChosenAccount] = useState('');
+  const [chosenAccount, setChosenAccount] = useState("");
 
-  const handleEditCategory = (categoryName: string) => {
-    setSelectedCategory(categoryName);
-    setEditedCategoryName(categoryName);
-    setIsCategoryAccountOpen(true);
-  };
+  // for pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = totalNumberOfItems ? Math.ceil(totalNumberOfItems / 9) : 0;
+  const paginationArray = Array.from({ length: totalPages }, (_, i) => i + 1);
+  const [windowStart, setWindowStart] = useState(0);
+  const visiblePages = paginationArray.slice(windowStart, windowStart + 5);
 
-  const handleSaveCategory = () => {
-    if (selectedCategory) {
-      const updatedCategories = categories.map((cat) =>
-        cat === selectedCategory ? editedCategoryName : cat,
-      );
-      setCategories(updatedCategories);
+  // update account_category
+  const [accountCategoryToBeUpdated, setAccountCategoryToBeUpdated] =
+    useState<string>("");
+  const [uuidToBeTargeted, setUuidToBeTargeted] = useState<string>("");
+  const [updateAccountNameError, setUpdateAccountCategoryError] = useState("");
+
+  // delete account_category
+  const [deleteAccountCategoryError, setDeleteAccountCategoryError] =
+    useState("");
+
+  // insert account_category
+  const [isInsertAccountCategoryOpen, setIsInsertAccountCategoryOpen] = useState<boolean>(false);
+  const [insertAccountCategoryError, setInsertAccountCategoryError] = useState("");
+
+  // fetch accounts data
+  useEffect(() => {
+    const fetchAccounts = async () => {
+      setAccountsLoading(true);
+
+      const [accountsResult, balancesResult] = await Promise.all([
+        // use Promise.all to merge both fetches
+        await (
+          await createClient()
+        )
+          .from("accounts")
+          .select(
+            `id, name, account_categories!category_id(name), description`,
+            { count: "exact" },
+          )
+          .range((currentPage - 1) * 9, (currentPage - 1) * 9 + 9 - 1),
+        await (await createClient())
+          .from("accounts_balances")
+          .select(`account_id, balance`),
+      ]);
+
+      // deconstruct into two sets of variables
+      const {
+        data: accountsData,
+        count,
+        error: accountsError,
+      } = accountsResult;
+      const { data: balancesData, error: balancesError } = balancesResult;
+
+      if (accountsError || balancesError) {
+        setFetchAccountError(
+          accountsError?.message + ", " + balancesError?.message,
+        );
+        console.log(accountsError, balancesError);
+        setAccounts(null);
+        setAccountsLoading(false);
+      }
+
+      let merged: any[] = [];
+
+      if (accountsData && balancesData) {
+        const balancesMap = new Map(
+          balancesData.map((b) => [b.account_id, b.balance]),
+        );
+
+        merged = accountsData.map((a) => ({
+          ...a,
+          balance: balancesMap.get(a.id) ?? 0,
+        }));
+      }
+
+      if (merged.length > 0) {
+        setAccounts(merged);
+        setFetchAccountError(null);
+        setTotalNumberOfItems(count);
+        setAccountsLoading(false);
+      }
+    };
+
+    setAccountsLoading(false);
+    fetchAccounts();
+  }, [currentPage]);
+
+  // fetch account_categories data
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  // fetch accounts & accounts_balances data
+  const fetchCategories = async () => {
+    setCategoriesLoading(true);
+    const { data, count, error } = await (await createClient())
+      .from("account_categories")
+      .select(`id, name`, { count: "exact" }); // select columns to be query, count # of rows
+
+    if (error) {
+      setFetchCategoriesError("Error: " + error.message);
+      setCategories(null);
+      setCategoriesLoading(false);
     }
-    handleCloseModal();
+
+    if (data) {
+      setCategories(data);
+      setFetchCategoriesError(null);
+      setTotalNumberOfCategories(count);
+      setCategoriesLoading(false);
+    }
+
+    setCategoriesLoading(false);
   };
 
-  const handleCloseModal = () => {
-    setIsCategoryAccountOpen(false);
-    setSelectedCategory(null);
-    setEditedCategoryName("");
-  };
+  // client-side update form action
+  const [updateState, updateFormAction, updatePending] = useActionState(
+    async (_prevState: any, formData: FormData) => {
+      const newName = formData.get("category_name") as string;
 
-  const handleFilterTypeChoice = (item: string) => {
-    setSelectedType(item);
-    setFilter(false);
+      if (!newName?.trim())
+        return setUpdateAccountCategoryError("Error: empty fields");
+
+      const result = await UpdateAccountCategoryName(newName, uuidToBeTargeted);
+
+      if (!result.success)
+        return setUpdateAccountCategoryError("Error: " + result.error);
+
+      setIsCategoryAccountOpen(false);
+      fetchCategories();
+    },
+    null,
+  );
+
+  //client-side delete form action
+  const [deleteState, deleteFormAction, deletePending] = useActionState(
+    async (_prevState: any) => {
+      const result = await DeleteAccountCategoryName(uuidToBeTargeted);
+
+      if (!result.success)
+        return setDeleteAccountCategoryError("Error: " + result.error);
+
+      setIsCategoryAccountOpen(false);
+      fetchCategories();
+    },
+    null,
+  );
+
+  // client-side insert form action
+  const [insertState, insertFormAction, insertPending] = useActionState(
+    async (_prevState: any, formData: FormData) => {
+      const nameOfInsertedCategory = formData.get("new_category_name") as string;
+
+      if (!nameOfInsertedCategory?.trim()) return setInsertAccountCategoryError("Error: empty fields");
+
+      const result = await InsertAccountCategoryName(nameOfInsertedCategory);
+
+      if (!result.success) return setInsertAccountCategoryError("Error: " + result.error)
+
+      setIsCategoryAccountOpen(false)
+      fetchCategories();
+    },
+    null
+  )
+
+  const handleAccountCategoryNameUpdateOpenModal = (
+    name: string,
+    uuid: string,
+  ) => {
+    setIsCategoryAccountOpen(true);
+    setAccountCategoryToBeUpdated(name);
+    setUuidToBeTargeted(uuid);
   };
 
   return (
-    <div className="flex flex-col w-full h-full gap-5">
-      {
-        seeAccountTransactions && (
-          <div className="fixed inset-0 z-50 w-full h-full bg-black/50">
-            <div className="flex flex-col transform:translate(-50%, -50%) w-50 md:w-150 w-full border border-(--color-border-default) bg-(--color-bg-secondary) rounded-lg shadow-lg p-5">
-              <div className="flex w-full justify-between items-center">
-                <PiggyBank size={20}/>
-                <p className="text-xl font-semibold">{chosenAccount}</p>
-                <X size={20} onClick={() => setSeeAccountTransactions(false)} className="cursor-pointer"/>
-              </div>
-
-              <div className="">
-              </div>
+    <div className="flex relative flex-col w-full h-full gap-5">
+      {/* Account transactions modal */}
+      {seeAccountTransactions && (
+        <div className="fixed flex inset-0 z-50 w-full h-full bg-black/50 items-center justify-center">
+          <div className="flex flex-col w-115 md:w-150 lg:w-200 xl:w-300 2xl:w-300 h-150 border border-(--color-border-default) bg-(--color-bg-secondary) rounded-lg shadow-lg p-5">
+            <div className="flex w-full justify-between items-center">
+              <PiggyBank size={20} />
+              <p className="text-xl font-semibold">{chosenAccount}</p>
+              <X
+                size={20}
+                onClick={() => setSeeAccountTransactions(false)}
+                className="cursor-pointer"
+              />
             </div>
+
+            <div className="flex flex-col w-full h-full items-center justify-center"></div>
           </div>
-        )
-      }
+        </div>
+      )}
+
+      {/* Category modification modal */}
+      {isCategoryAccountOpen && (
+        <div className="fixed flex z-50 inset-0 bg-black/50 w-full h-full items-center justify-center">
+          <div className="flex flex-col w-75 lg:w-100 h-fit p-5 border border-(--color-border-default) rounded-lg bg-(--color-bg-secondary) shadow-md">
+            <div className="flex w-full h-fit justify-between items-center pb-5">
+              <BookImage size={20} />
+              <p className="font-semibold text-xl whitespace-nowrap">
+                Edit Category Name
+              </p>
+              <X
+                size={20}
+                className="cursor-pointer"
+                onClick={() => setIsCategoryAccountOpen(false)}
+              />
+            </div>
+            <form className="flex flex-col w-full gap-2">
+              {/* Input new category name */}
+              <input
+                placeholder="Enter a new name..."
+                className="flex border rounded-md border-(--color-border-default) px-5 py-1 mb-5 placeholder:text-[0.9rem] text-[0.9rem] outline-none focus:border-(--color-border-strong)"
+                value={accountCategoryToBeUpdated}
+                onChange={(e) => setAccountCategoryToBeUpdated(e.target.value)}
+                name="category_name"
+              />
+
+              <button
+                formAction={updateFormAction}
+                type="submit"
+                className="flex px-5 py-1 border border-(--color-brand-green) bg-(--color-brand-green) rounded-lg shadow-md items-center justify-center text-[0.9rem] text-white cursor-pointer hover:bg-emerald-700 hover:border-emerald-700 active:bg-emerald-800 active:border-emerald-800 duration-100 transition-all"
+              >
+                {updatePending ? (
+                  <p>Updating name...</p>
+                ) : (
+                  <p>Accept changes</p>
+                )}
+              </button>
+
+              <button
+                formAction={deleteFormAction}
+                type="submit"
+                className="flex px-5 py-1 border border-(--color-brand-green) hover:text-white rounded-lg shadow-md items-center justify-center text-[0.9rem] cursor-pointer hover:bg-(--color-brand-green) active:bg-emerald-700 active:border-emerald-800 duration-100 transition-all"
+              >
+                {deletePending ? (
+                  <p>Deleting category...</p>
+                ) : (
+                  <p>Delete category</p>
+                )}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Insert new account_category */}
+      {isInsertAccountCategoryOpen && (
+        <div className="fixed inset-0 z-50 flex w-full h-full bg-black/50 items-center justify-center">
+          <div className="flex flex-col w-75 lg:w-100 h-fit p-5 border border-(--color-border-default) rounded-lg bg-(--color-bg-secondary) shadow-md">
+            <div className="flex w-full h-fit justify-between items-center pb-5">
+              <BookImage size={20} />
+              <p className="font-semibold text-xl whitespace-nowrap">
+                Edit Category Name
+              </p>
+              <X
+                size={20}
+                className="cursor-pointer"
+                onClick={() => setIsInsertAccountCategoryOpen(false)}
+              />
+            </div>
+
+            <form className="flex flex-col w-full gap-2">
+              <input
+                placeholder="Enter a new name..."
+                className="flex border rounded-md border-(--color-border-default) px-5 py-1 mb-5 placeholder:text-[0.9rem] text-[0.9rem] outline-none focus:border-(--color-border-strong)"
+                name="new_category_name"
+              />
+
+              <button type="submit" formAction={insertFormAction} className="flex px-5 py-1 border border-(--color-brand-green) bg-(--color-brand-green) rounded-lg shadow-md items-center justify-center text-[0.9rem] text-white cursor-pointer hover:bg-emerald-700 hover:border-emerald-700 active:bg-emerald-800 active:border-emerald-800 duration-100 transition-all">
+                {
+                  insertPending ? <p>Adding category...</p> : <p>Add new category</p>
+                }
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
       <div className="flex w-full items-center">
         <p className="text-3xl font-semibold">Accounts</p>
 
@@ -102,11 +344,11 @@ export default function Accounts({}: {}) {
       {/* Main content */}
       <div className="flex flex-col xl:flex-row w-full h-full gap-5">
         {/* Accounts */}
-        <div className="flex flex-col w-full h-auto justify-between flex-2 border border-(--color-border-default) rounded-lg shadow-md">
+        <div className="xl:flex-2 h-80dvh xl:h-full grid grid-cols-1 grid-rows-[auto_1fr_auto] h-100dvh border border-(--color-border-default) rounded-lg">
           {/** Transaction headers */}
-          <div className="overflow-auto flex-auto w-full h-full">
+          <div className="flex w-full h-fit">
             {/** Top Bar */}
-            <div className="flex flex-1 w-full h-fit px-5 py-2 gap-2 whitespace-nowrap">
+            <div className="flex w-full h-fit px-5 py-2 gap-2 whitespace-nowrap">
               <div className="flex w-fit h-full border border-(--color-brand-green) rounded-md px-5 py-1 items-center gap-2 bg-transparent text-(--color-text-primary) hover:text-white hover:bg-emerald-600 cursor-pointer transition-all duration-200 active:bg-emerald-700">
                 <Plus size={15} />
                 <p className="text-[0.8rem] hidden lg:block">Add an account</p>
@@ -126,17 +368,7 @@ export default function Accounts({}: {}) {
                 </div>
 
                 {filter && (
-                  <div className="absolute w-full z-50 top-[2.3rem] bg-(--color-bg-secondary) border border-(--color-border-default) rounded-b-lg rounded-bl-lg">
-                    {accountCategories.map((item, index) => (
-                      <div
-                        className="flex w-full flex-col text-[0.8rem] py-2 hover:bg-(--color-bg-subtle) px-5 cursor-pointer"
-                        onClick={() => handleFilterTypeChoice(item)}
-                        key={index}
-                      >
-                        {item}
-                      </div>
-                    ))}
-                  </div>
+                  <div className="absolute w-full z-50 top-[2.3rem] bg-(--color-bg-secondary) border border-(--color-border-default) rounded-b-lg rounded-bl-lg"></div>
                 )}
               </div>
 
@@ -158,116 +390,156 @@ export default function Accounts({}: {}) {
                 />
               </div>
             </div>
-            <div className="h-auto grid grid-cols-[100px_100px_100px_100px] lg:grid-cols-[200px_200px_1fr_1fr] xl:grid-cols-[300px_1fr_1fr_1fr] border-b border-(--color-border-default) gap-4 font-mono text-[0.9rem] text-(--color-text-primary) py-2 px-5 pt-1 font-display w-full">
-              <div>Name</div>
-              <div>Type</div>
-              <div>Amount</div>
+          </div>
+
+          {/* Accounts table */}
+          <div className="flex flex-col w-full h-full overflow-hidden">
+            <div className="grid grid-cols-[repeat(4,1fr)] w-full h-fit px-5 py-1 text-[0.9rem] border-b border-(--color-border-default)">
+              <div>Account</div>
+              <div>Category</div>
               <div>Description</div>
+              <div>Balance</div>
             </div>
 
-            {accounts.map((account, index) => (
-              <div
-                className="flex-col md:grid md:grid-cols-[100px_100px_100px_100px] lg:grid-cols-[200px_200px_1fr_1fr] xl:grid-cols-[300px_1fr_1fr_1fr] gap-4 px-5 py-2 border-b border-(--color-border-subtle) text-[0.9rem] hover:bg-(--color-bg-subtle) cursor-pointer"
-                key={index}
-                onClick={() => {setSeeAccountTransactions(prev => !prev); setChosenAccount(account.name)}}
-              >
-                <div className="text-(--color-text-secondary)">
-                  {account.name}
+            <div className="flex relative w-full h-full overflow-hidden">
+              {accounts ? (
+                <div className="flex relative w-full h-full overflow-hidden">
+                  <div className="flex flex-col w-full h-fit">
+                    {accounts?.map((account) => (
+                      <div className="grid grid-cols-[repeat(4,1fr)] w-full px-5 py-3 border-b border-(--color-border-subtle) text-[0.9rem] hover:bg-(--color-bg-subtle) cursor-pointer">
+                        <div className="line-clamp-1">{account.name}</div>
+                        <div className="line-clamp-1">
+                          {account.account_categories?.name}
+                        </div>
+                        <div className="line-clamp-1">
+                          {account.description}
+                        </div>
+                        <div className="line-clamp-1 font-mono">
+                          {account.balance}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div className="text-(--color-text-secondary)">
-                  {account.type}
+              ) : (
+                <div className="absolute z-50 bg-black/20 flex w-full h-full inset-0 items-center justify-center">
+                  <div className="flex border border-(--color-border-default) bg-(--color-bg-secondary) rounded-lg shadow-md px-5 py-2">
+                    {accountsLoading ? (
+                      <div className="flex w-full items-center gap-4">
+                        <p className="text-[0.9rem] font-mono">
+                          Loading accounts...
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="flex w-full items-center gap-4">
+                        <CircleAlert size={15} />
+                        <p className="text-[0.9rem]">{fetchAccountError}</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div className="font-mono">
-                  <span className="text-[0.8rem] mr-1">₱</span>
-                  {account.amount}
-                </div>
-                <div className="text-(--color-text-secondary) whitespace-nowrap">
-                  {account.description === null ? "-" : account.description}
-                </div>
-              </div>
-            ))}
+              )}
+            </div>
           </div>
 
           {/* Footer */}
-          <div className="flex h-fit w-full px-5 py-2">
+          <div className="flex h-fit justify-between w-full px-5 py-2">
             <div className="flex w-full text-[0.9rem] text-(--color-text-secondary) items-center gap-2">
               <p>Show data</p>
               <div className="flex py-2 px-3 border border-(--color-border-default) rounded-md">
-                <p>10</p>
+                <p>9</p>
               </div>
-              <p>of 200</p>
+              <p>of {totalNumberOfItems}</p>
             </div>
 
-            <div className="flex flex-auto w-auto" />
-
-            <div className="flex w-fit h-full gap-2">
-              {pagination.map((item, index) => (
+            <div className="flex w-fit h-full gap-2 items-center">
+              {windowStart > 0 && (
                 <div
-                  className={`border border-(--color-border-default) rounded-lg px-3 py-2 hover:cursor-pointer ${currentPage === item ? "bg-(--color-border-strong) text-white" : null}`}
+                  className="flex border border-(--color-border-default) hover:bg-(--color-bg-subtle) cursor-pointer rounded-lg shadow-md"
+                  onClick={() =>
+                    setWindowStart((prev) => Math.max(0, prev - 5))
+                  }
+                >
+                  <ChevronLeft size={15} />
+                </div>
+              )}
+              {visiblePages.map((item, index) => (
+                <div
+                  className={`border border-(--color-border-default) rounded-lg px-3 py-2 hover:cursor-pointer ${currentPage === item ? "bg-(--color-brand-green) text-white hover:bg-(--color-brand-green)" : null}`}
                   key={index}
+                  onClick={() => setWindowStart(item)}
                 >
                   <p>{item}</p>
                 </div>
               ))}
-
-              <div className="flex w-fit px-3 py-2 font display items-center border border-(--color-border-default) rounded-lg hover:cursor-pointer hover:bg-(--color-border-subtle)">
-                <p>Next</p>
-                <ChevronRight size={20} />
-              </div>
+              {windowStart + 5 < paginationArray.length && (
+                <div
+                  className="flex border border-(--color-border-default) hover:bg-(--color-bg-subtle) cursor-pointer rounded-lg shadow-md"
+                  onClick={() =>
+                    setWindowStart((prev) => Math.min(0, prev + 5))
+                  }
+                >
+                  <ChevronLeft size={15} />
+                </div>
+              )}
             </div>
           </div>
         </div>
 
         {/* Account categories */}
-        <div
-          className="flex flex-1 flex-col w-full h-200px border border-(--color-border-default) rounded-lg shadow-md"
-        >
-          <p className="text-xl font-semibold px-5 py-3">Categories</p>
-          <div className="overflow-auto">
-            {accountCategories.map((item, index) => (
-              <div
-                className="flex w-full px-5 py-2 cursor-pointer items-center hover:bg-(--color-bg-subtle) border-b border-(--color-border-subtle) px-5 py-1 text-[0.9rem]"
-                key={index}
-              >
-                <p>{item}</p>
-                <div className="flex flex-auto w-full" />
-                <Pencil size={15} />
+        <div className="flex xl:flex-1 flex-col w-full h-50dvh xl:h-full border border-(--color-border-default) rounded-lg shadow-md">
+          <div className="flex w-full items-center justify-between h-fit border-b border-(--color-border-subtle) px-5 py-3">
+            <p className="text-xl font-semibold">Categories</p>
+
+            <div
+              className="flex w-fit h-fit items-center gap-1 cursor-pointer text-white px-3 py-2 text-[0.9rem] font-display bg-(--color-brand-gold) rounded-lg shadow-md hover:bg-yellow-600 duration-100 transition-all"
+              onClick={() => setIsInsertAccountCategoryOpen(true)}
+            >
+              <Plus size={20} />
+              <p className="text-[0.9rem]">Add a category</p>
+            </div>
+          </div>
+
+          {/* Category tables */}
+          <div className="flex relative flex-col w-full h-full overflow-y-auto overflow-x-hidden">
+            {categories ? (
+              categories?.map((category, key) => (
+                <div
+                  className="flex w-full h-fit px-5 py-2 border-(--color-border-subtle) border-b items-center justify-between hover:bg-(--color-bg-subtle) active:bg-(--color-bg-secondary) cursor-pointer"
+                  key={key}
+                  onClick={() =>
+                    handleAccountCategoryNameUpdateOpenModal(
+                      category.item,
+                      category.id,
+                    )
+                  }
+                >
+                  <p className="text-[0.9rem] font-display">{category.name}</p>
+                  <Pencil size={15} />
+                </div>
+              ))
+            ) : (
+              <div className="absolute z-50 bg-black/20 flex w-full h-full inset-0 items-center justify-center">
+                <div className="flex border border-(--color-border-default) bg-(--color-bg-secondary) rounded-lg shadow-md px-5 py-2">
+                  {categoriesLoading ? (
+                    <div className="flex w-full items-center gap-4">
+                      <p className="text-[0.9rem] font-mono">
+                        Loading categories...
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="flex w-full items-center gap-4">
+                      <CircleAlert size={15} />
+                      <p className="text-[0.9rem]">{fetchCategoriesError}</p>
+                    </div>
+                  )}
+                </div>
               </div>
-            ))}
+            )}
           </div>
         </div>
       </div>
-
-      {isCategoryAccountOpen && (
-        <div className="fixed flex-col p-5 border border-(--color-border-default) rounded-lg z-50 top-[50%] left-[50%] bg-(--color-bg-secondary) shadow-md">
-          <p className="mb-2">Edit details</p>
-          <div className="flex w-full gap-2">
-            {/* Input new category name */}
-            <input
-              value={editedCategoryName}
-              onChange={(e) => setEditedCategoryName(e.target.value)}
-              placeholder="Enter a new name..."
-              className="flex border rounded-md border-(--color-border-default) px-5 py-1 placeholder:text-[0.9rem] text-[0.9rem] outline-none focus:border-(--color-border-strong)"
-            />
-
-            {/* Accept */}
-            <div
-              className="px-2 py-2 items-center justify-center rounded-[50%] border-2 border-(--color-brand-green) bg-transparent hover:bg-(--color-brand-green) cursor-pointer active:bg-emerald-700"
-              onClick={() => handleSaveCategory()}
-            >
-              <Check size={15} className="text-(--color-text-primary)" />
-            </div>
-
-            {/* Cancel */}
-            <div
-              className="px-2 py-2 items-center justify-center rounded-[50%] border-2 border-(--color-brand-red) bg-transparent hover:bg-(--color-brand-red) cursor-pointer active:bg-red-900"
-              onClick={() => handleCloseModal()}
-            >
-              <X size={15} className="text-(--color-text-primary)" />
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
-}
+};
+
