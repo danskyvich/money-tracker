@@ -17,7 +17,6 @@ import {
   Search,
   X,
 } from "lucide-react";
-import { error } from "node:console";
 import { useActionState, useEffect, useState } from "react";
 
 export default function Accounts({}: {}) {
@@ -91,7 +90,7 @@ export default function Accounts({}: {}) {
           .range((currentPage - 1) * 9, (currentPage - 1) * 9 + 9 - 1),
         await (await createClient())
           .from("accounts_balances")
-          .select(`account_id, balance`),
+          .select(`account_id, balance::text`),
       ]);
 
       // deconstruct into two sets of variables
@@ -344,7 +343,7 @@ export default function Accounts({}: {}) {
       {/* Main content */}
       <div className="flex flex-col xl:flex-row w-full h-full gap-5">
         {/* Accounts */}
-        <div className="xl:flex-2 h-80dvh xl:h-full grid grid-cols-1 grid-rows-[auto_1fr_auto] h-100dvh border border-(--color-border-default) rounded-lg">
+        <div className="xl:flex-2 h-80dvh xl:h-full grid grid-cols-1 grid-rows-[auto_1fr_auto] border border-(--color-border-default) rounded-lg">
           {/** Transaction headers */}
           <div className="flex w-full h-fit">
             {/** Top Bar */}
@@ -401,12 +400,12 @@ export default function Accounts({}: {}) {
               <div>Balance</div>
             </div>
 
-            <div className="flex relative w-full h-full overflow-hidden">
+            <div className="flex relative w-full h-100 xl:h-full overflow-hidden">
               {accounts ? (
-                <div className="flex relative w-full h-full overflow-hidden">
-                  <div className="flex flex-col w-full h-fit">
+                <div className="flex relative w-full overflow-hidden">
+                  <div className="flex flex-col w-full">
                     {accounts?.map((account) => (
-                      <div className="grid grid-cols-[repeat(4,1fr)] w-full px-5 py-3 border-b border-(--color-border-subtle) text-[0.9rem] hover:bg-(--color-bg-subtle) cursor-pointer">
+                      <div className="grid grid-cols-[repeat(4,1fr)] w-full h-12 px-5 py-3 border-b border-(--color-border-subtle) text-[0.9rem] hover:bg-(--color-bg-subtle) cursor-pointer">
                         <div className="line-clamp-1">{account.name}</div>
                         <div className="line-clamp-1">
                           {account.account_categories?.name}
@@ -431,7 +430,7 @@ export default function Accounts({}: {}) {
                         </p>
                       </div>
                     ) : (
-                      <div className="flex w-full items-center gap-4">
+                      <div className="flex w-full h-fit items-center gap-4">
                         <CircleAlert size={15} />
                         <p className="text-[0.9rem]">{fetchAccountError}</p>
                       </div>
@@ -487,7 +486,7 @@ export default function Accounts({}: {}) {
         </div>
 
         {/* Account categories */}
-        <div className="flex xl:flex-1 flex-col w-full h-50dvh xl:h-full border border-(--color-border-default) rounded-lg shadow-md">
+        <div className="flex xl:flex-1 flex-col w-full xl:h-full border border-(--color-border-default) rounded-lg shadow-md">
           <div className="flex w-full items-center justify-between h-fit border-b border-(--color-border-subtle) px-5 py-3">
             <p className="text-xl font-semibold">Categories</p>
 
@@ -501,7 +500,7 @@ export default function Accounts({}: {}) {
           </div>
 
           {/* Category tables */}
-          <div className="flex relative flex-col w-full h-full overflow-y-auto overflow-x-hidden">
+          <div className="flex relative flex-col w-full h-110 xl:h-full overflow-y-auto overflow-x-hidden">
             {categories ? (
               categories?.map((category, key) => (
                 <div
