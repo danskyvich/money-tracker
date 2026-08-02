@@ -1,4 +1,4 @@
-import VerifyEmailPage from "@/feature/auth/components/verify-email-page";
+import VerifyEmailPage from "@/features/auth/components/verify-email-page";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 

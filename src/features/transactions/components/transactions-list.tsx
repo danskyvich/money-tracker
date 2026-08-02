@@ -1,4 +1,4 @@
-import OverviewTransactionSkeleton from "@/feature/overview/components/skeleton/overview-transaction-skeleton";
+import OverviewTransactionSkeleton from "@/features/overview/components/skeleton/overview-transaction-skeleton";
 import { Transaction } from "@/lib/types/database";
 import ConvertTimestampToDateTime from "@/utils/convertToDateTime";
 import { CircleAlert } from "lucide-react";

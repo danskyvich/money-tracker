@@ -1,5 +1,5 @@
-import OverviewTransactionSkeleton from "@/feature/overview/components/skeleton/overview-transaction-skeleton";
-import QuickActionsSkeleton from "@/feature/overview/components/skeleton/quick-action-skeleton";
+import OverviewTransactionSkeleton from "@/features/overview/components/skeleton/overview-transaction-skeleton";
+import QuickActionsSkeleton from "@/features/overview/components/skeleton/quick-action-skeleton";
 import SnippetSkeleton from "@/components/layout/skeleton/snippet-skeleton";
 
 export default function Loading() {

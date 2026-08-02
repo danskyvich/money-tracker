@@ -1,10 +1,10 @@
-import AccountListSkeleton from "@/feature/accounts/components/account-list-modal";
+import AccountListSkeleton from "@/features/accounts/components/account-list-modal";
 import { Transaction } from "@/lib/types/database";
 import {
   DeleteAccount,
   SelectAccountTransactions,
-} from "@/supabase/dbActions";
-import { createClient } from "@/supabase/client";
+} from "@/supabase/actions/dbActions";
+import { createClient } from "@/supabase/clients/client";
 import ConvertTimestampToDateTime from "@/utils/convertToDateTime";
 import { ChevronLeft, ChevronRight, Filter, PiggyBank, X } from "lucide-react";
 import { useEffect, useState } from "react";

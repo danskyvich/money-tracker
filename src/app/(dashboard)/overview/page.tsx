@@ -1,4 +1,4 @@
-import OverviewPage from "@/feature/overview/overview-page"
+import OverviewPage from "@/features/overview/overview-page"
 
 export default async function Overview() {
 

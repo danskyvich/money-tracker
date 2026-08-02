@@ -1,5 +1,5 @@
-import QuickActionsSkeleton from "@/feature/overview/components/skeleton/quick-action-skeleton";
-import TransactionWrapper from "@/feature/overview/components/transaction-wrapper";
+import QuickActionsSkeleton from "@/features/overview/components/skeleton/quick-action-skeleton";
+import TransactionWrapper from "@/features/overview/components/transaction-wrapper";
 import { PiggyBank, Plus } from "lucide-react";
 import { useState } from "react";
 

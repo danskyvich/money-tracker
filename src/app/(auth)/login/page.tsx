@@ -1,4 +1,4 @@
-import LoginPage from "@/feature/auth/components/login-page";
+import LoginPage from "@/features/auth/components/login-page";
 
 export default async function Login() {
   return(

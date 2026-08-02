@@ -3,9 +3,9 @@
 import { CircleQuestionMark, Code, NfcIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useActionState, useState } from "react";
-import Input from "../../../components/layout/Input";
+import Input from "../../../components/layout/input";
 import { useForm } from "react-hook-form";
-import { OTPData, OTPSchema } from "@/utils/schemas/OTPSchema";
+import { OTPData, OTPSchema } from "@/lib/schemas/OTPSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 export default function VerifyQRPage() {

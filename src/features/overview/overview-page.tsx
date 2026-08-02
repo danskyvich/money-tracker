@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Card from "@/components/layout/Card";
+import Card from "@/components/layout/card";
 import {
   BaggageClaim,
   CircleDollarSign,
@@ -9,8 +9,8 @@ import {
   Plus,
   X,
 } from "lucide-react";
-import IncomeBreakdownPage from "@/feature/overview/components/brakdown-income";
-import ExpenseBreakdownPage from "@/feature/overview/components/breakdown-expense";
+import IncomeBreakdownPage from "@/features/overview/components/brakdown-income";
+import ExpenseBreakdownPage from "@/features/overview/components/breakdown-expense";
 import { getOverviewData } from "@/lib/data/overview";
 import SixMonthsRef from "../../components/charts/BarChart";
 import { getMonthlyInflowOutflow } from "@/lib/data/fetchChartData";

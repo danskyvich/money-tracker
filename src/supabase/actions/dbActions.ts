@@ -1,7 +1,7 @@
 "use server"
 
 import { getUser } from "./actions";
-import { createClient } from "./server"
+import { createClient } from "../clients/server"
 
 // <------------------ accounts ---------------------------------->
 

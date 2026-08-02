@@ -1,4 +1,4 @@
-import VerifyQRPage from "@/feature/mfa/components/verify-qr-page";
+import VerifyQRPage from "@/features/mfa/components/verify-qr-page";
 
 export default function VerifyMFA() {
     return (

@@ -1,4 +1,4 @@
-import { createClient } from "@/supabase/client";
+import { createClient } from "@/supabase/clients/client";
 import { OverviewData } from "../types/database";
 
 const OVERVIEW_ACCOUNTS_ITEMS = 4;

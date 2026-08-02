@@ -1,7 +1,7 @@
 "use client"
 
 import { usePathname } from "next/navigation";
-import { SidebarItem } from "./SidebarItem";
+import { SidebarItem } from "./sidebar-item";
 import { BaggageClaimIcon, Database, LayoutDashboardIcon, LogInIcon, Settings, User, UserIcon, Wallet2Icon } from "lucide-react";
 import { useState } from "react";
 

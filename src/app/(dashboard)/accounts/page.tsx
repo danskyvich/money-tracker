@@ -1,4 +1,4 @@
-import Accounts from "@/feature/accounts/accounts-page";
+import Accounts from "@/features/accounts/accounts-page";
 
 export default function AccountsPage() {
   return(

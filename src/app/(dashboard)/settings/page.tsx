@@ -1,11 +1,6 @@
 "use client";
 
-import Card from "@/components/layout/Card";
-import Switcher from "@/components/layout/Switcher";
-import { monthlyIncome } from "@/lib/mocks/mockAccounts";
-import { MonthlyInflowOutflows } from "@/lib/mocks/mockTransactions";
 import { ChevronDown, Eye } from "lucide-react";
-import { useState } from "react";
 
 const DAYS = [
   "Monday",

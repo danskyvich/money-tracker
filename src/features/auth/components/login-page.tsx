@@ -1,13 +1,13 @@
 "use client"
 
 import { useForm } from "react-hook-form";
-import Input from "../../../components/layout/Input";
-import { LoginFormData, loginSchema } from "../../../utils/schemas/LoginSchema";
+import Input from "../../../components/layout/input";
+import { LoginFormData, loginSchema } from "../../../lib/schemas/LoginSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CircleAlert, MailIcon } from "lucide-react";
 import { useActionState, useEffect, useState } from "react";
 import Link from "next/link";
-import {generalSignIn, signInWithFacebook, signInWithGoogle} from "@/supabase/actions";
+import {generalSignIn, signInWithFacebook, signInWithGoogle} from "@/supabase/actions/actions";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 

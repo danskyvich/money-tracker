@@ -1,6 +1,6 @@
-import AddAccountModal from "@/feature/accounts/components/add-account-modal";
+import AddAccountModal from "@/features/accounts/components/add-account-modal";
 import { AccountCategories } from "@/lib/types/database";
-import { createClient } from "@/supabase/client";
+import { createClient } from "@/supabase/clients/client";
 import {
   Calendar,
   ChevronDown,
@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import AccountDetailsModal from "./accounts-details-modal";
-import AccountListSkeleton from "@/feature/accounts/components/account-list-skeleton";
+import AccountListSkeleton from "@/features/accounts/components/account-list-skeleton";
 
 export default function WholeAccountsList() {
   // general states

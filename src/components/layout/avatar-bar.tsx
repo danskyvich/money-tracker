@@ -1,10 +1,10 @@
 'use client'
 import { Bell, Moon, PiggyBank, Plus, Settings, Sun } from "lucide-react";
 import Link from "next/link";
-import ThemeSwitcher from "./ThemeSwitcher";
+import ThemeSwitcher from "./theme-switcher";
 import { usePathname } from "next/navigation";
 
-export default function AvatarBar({}:{}) {
+export default function AvatarBar() {
   const currentUrl = usePathname();
 
     return (

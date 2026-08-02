@@ -1,4 +1,4 @@
-import BottomBar from "@/components/layout/BottomBar";
+import BottomBar from "@/components/layout/card-bottom-bar";
 
 export default function AccountLayout({children}: {children: React.ReactNode}) {
     return (

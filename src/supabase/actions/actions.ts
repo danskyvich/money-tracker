@@ -1,8 +1,8 @@
 'use server'
 
 import { redirect } from "next/navigation";
-import { createClient } from "./server"
-import { createAdminClient } from "./admin";
+import { createClient } from "../clients/server"
+import { createAdminClient } from "../clients/admin";
 import { User } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 

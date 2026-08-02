@@ -1,4 +1,4 @@
-import OverviewAccountsSkeleton from "@/feature/overview/components/skeleton/overview-account-skeleton";
+import OverviewAccountsSkeleton from "@/features/overview/components/skeleton/overview-account-skeleton";
 import { ChevronLeft, ChevronRight, CircleAlert } from "lucide-react";
 import { useState } from "react";
 

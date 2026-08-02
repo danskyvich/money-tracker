@@ -1,14 +1,14 @@
 'use client'
 
 import { useActionState, useEffect, useState } from "react"
-import Input from "../../../components/layout/Input"
-import { OTPData, OTPSchema } from "@/utils/schemas/OTPSchema"
+import Input from "../../../components/layout/input"
+import { OTPData, OTPSchema } from "@/lib/schemas/OTPSchema"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Lock } from "lucide-react"
-import Button from "../../../components/layout/Button"
+import Button from "../../../components/layout/button"
 import { useRouter } from "next/navigation"
-import { resendOtp, verifyOtp } from "@/supabase/actions"
+import { resendOtp, verifyOtp } from "@/supabase/actions/actions"
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3"
 
 export default function VerifyEmailPage({email, rememberMe}:{email: string, rememberMe: boolean}) {

@@ -1,6 +1,6 @@
 "use server"
 
-import { createClient } from "@/supabase/server";
+import { createClient } from "@/supabase/clients/server";
 
 export interface MonthlyFlow {
     month_start: string;

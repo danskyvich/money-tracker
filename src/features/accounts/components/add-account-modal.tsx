@@ -1,5 +1,5 @@
 import { AccountCategories } from "@/lib/types/database";
-import { InsertAccount } from "@/supabase/dbActions";
+import { InsertAccount } from "@/supabase/actions/dbActions";
 import { ChevronDown, ChevronUp, PiggyBank, X } from "lucide-react";
 import { useEffect, useState } from "react";
 

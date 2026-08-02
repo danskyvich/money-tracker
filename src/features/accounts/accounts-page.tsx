@@ -1,8 +1,8 @@
 "use client";
 
-import WholeAccountsList from "@/feature/accounts/components/accounts-whole";
-import {DeleteAccountCategoryName, InsertAccountCategoryName, UpdateAccountCategoryName} from "@/supabase/dbActions";
-import { createClient } from "@/supabase/client";
+import WholeAccountsList from "@/features/accounts/components/accounts-whole";
+import {DeleteAccountCategoryName, InsertAccountCategoryName, UpdateAccountCategoryName} from "@/supabase/actions/dbActions";
+import { createClient } from "@/supabase/clients/client";
 import {
   BookImage,
   CircleAlert,
