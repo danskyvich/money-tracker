@@ -114,7 +114,7 @@ export default function ProfilePage({
                 No, go back
               </button>
               <button
-                className="flex whitespace-nowrap w-full bg-(--color-brand-red) gap-3 cursor-pointer hover:bg-red-900 active:bg-red-950 rounded-lg px-5 py-1 items-center transition-all duration-100"
+                className="flex whitespace-nowrap w-full bg-(--color-brand-red) text-white gap-3 cursor-pointer hover:bg-red-900 active:bg-red-950 rounded-lg px-5 py-1 items-center transition-all duration-100"
                 onClick={signOut}
               >
                 <LogOutIcon size={15} />
@@ -147,7 +147,7 @@ export default function ProfilePage({
                 No, do not delete
               </button>
               <button
-                className="flex whitespace-nowrap w-fit bg-(--color-brand-red) gap-3 cursor-pointer hover:bg-red-900 active:bg-red-950 rounded-lg px-5 py-1 items-center transition-all duration-100"
+                className="flex whitespace-nowrap w-fit bg-(--color-brand-red) text-white gap-3 cursor-pointer hover:bg-red-900 active:bg-red-950 rounded-lg px-5 py-1 items-center transition-all duration-100"
                 onClick={deleteUser}
               >
                 <LogOutIcon size={15} />
@@ -186,7 +186,7 @@ export default function ProfilePage({
                   <LockIcon size={15} />
                   <p>MFA status:</p>
                 </div>
-                
+
                 <div className="flex items-center gap-1">
                   <p>{mfaActive ? "Active" : "Inactive"}</p>
                   {mfaActive ? <VerifiedIcon size={17} /> : <X size={17} />}
@@ -208,7 +208,11 @@ export default function ProfilePage({
                   onClick={() => item.onClick()}
                 >
                   {item.icon === null ? null : item.icon}
-                  <p>{item.value === "Set-up MFA" ? "MFA already enabled" : item.value}</p>
+                  <p>
+                    {item.value === "Set-up MFA"
+                      ? "MFA already enabled"
+                      : item.value}
+                  </p>
                 </button>
               </div>
             ))}

@@ -17,14 +17,17 @@ export async function getOverviewData(currentPage: number): Promise<OverviewData
 
     const [
         { data: transactionData, error: transactionError, count: transactionCount },
-        { data: accountsData, error: accountsError },
+        { data: accountsData, error: accountsError, count: accountsCount  },
         { data: balancesData, error: balancesError },
         { data: categoryData, error: categoryError },
+        { data: accountCategoriesData, error: accountCategoriesError },
     ] = await Promise.all([
-        supabase.from("transactions").select(`id, date_time, description, amount::text, type, categories!category_id(name), fromAccount:accounts!account_id(name), toAccount:accounts!to_account_id(name)`, {count: "exact"}).range(from, to),
-        supabase.from("accounts").select(`id, name, account_categories!category_id(name), description`).range(Accountsfrom, AccountsTo),
+        //fromAccount: & toAccount: are aliases for FK columns that point to the same account
+        supabase.from("transactions").select(`id, date_time, description, amount::text, type, categories!category_id(id, name), fromAccount:accounts!account_id(id, name), toAccount:accounts!to_account_id(id, name)`, {count: "exact"}).range(from, to),
+        supabase.from("accounts").select(`id, name, category_id:account_categories!category_id(id, name), description`, { count: "exact"}).range(Accountsfrom, AccountsTo),
         supabase.from("accounts_balances").select(`account_id, balance::text`),
         supabase.from('categories').select(`id, name`),
+        supabase.from('account_categories').select(`id, name`)
     ])
 
     return {
@@ -33,9 +36,12 @@ export async function getOverviewData(currentPage: number): Promise<OverviewData
         transactionCount,
         accountsData,
         accountsError,
+        accountsCount,
         balancesData,
         balancesError,
         categoryData,
-        categoryError
+        categoryError,
+        accountCategoriesData,
+        accountCategoriesError,
     }
 }

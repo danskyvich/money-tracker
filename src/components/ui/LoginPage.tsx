@@ -10,7 +10,6 @@ import Link from "next/link";
 import {generalSignIn, signInWithFacebook, signInWithGoogle} from "@/services/supabase/actions";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
-import Spinner from "../layout/Spinner";
 
 const GoogleIcon = (
   props: React.SVGProps<SVGSVGElement>,
@@ -140,7 +139,7 @@ export default function LoginPage() {
             >
               {pending ? (
                 <>
-                  <Spinner/>
+                  <p>Loading...</p>
                 </>) : (
                 <p>Sign In</p>)}
             </button>
