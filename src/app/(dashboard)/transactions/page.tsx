@@ -1,4 +1,4 @@
-import TransactionsPage from "@/components/ui/TransactionsPage";
+import TransactionsPage from "@/feature/transactions/transactions-page";
 
 export default function Transactions() {
   return(

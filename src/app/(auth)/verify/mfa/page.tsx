@@ -1,5 +1,9 @@
-import AuthMFAPage from "@/components/ui/AuthMFAPage";
+import VerifyQRPage from "@/feature/mfa/components/verify-qr-page";
 
-export default function MFA() {
-    return <AuthMFAPage/>
+export default function VerifyMFA() {
+    return (
+      <div className="flex flex-col w-full h-full">
+        <VerifyQRPage />
+      </div>
+    );
 }
