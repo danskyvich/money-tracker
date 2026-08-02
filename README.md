@@ -1,40 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
 
-## Getting Started
+# Money Tracker
 
-First, run the development server:
+A basic web application that tracks your monthly finances by recording your day-to-day transactions using three categories: Income, Transfer, and Expenses.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Authors
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+- [@danskyvich](https://github.com/danskyvich)
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+## Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+To run this project, you will need to add the following environment variables to your .env file
 
-## Learn More
+Variables exposed to not just the Node.js environment but to the browser as well, are prefixed with `-NEXT_PUBLIC_`.
 
-To learn more about Next.js, take a look at the following resources:
+It is **imperative** to include the `.env.local` or any file containing these environment variables on the project's `gitignore` file.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+`NEXT_PUBLIC_SITE_URL`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+For Supabase & GCP:
 
-## Deploy on Vercel
+`NEXT_PUBLIC_SUPABASE_URL`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+`SUPABASE_SERVICE_ROLE_KEY`
+
+`SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET`
+
+`SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID`
+
+For reCAPTCHA v3:
+
+`NEXT_PUBLIC_RECAPTCHA_SITE_KEY`
+
+`RECAPTCHA_SECRET_KEY`
+
+
+
+## Features
+
+- Users can add a transaction (*income*, *expense*, or *transfer*)
+- Real-time changes; changes are reflected immediately after the time of modification.
+- Email, Google, and Facebook authentication
+- Two-factor authentication
+- Data backup (exporting through JSON, Excel) and data import (importing through JSON and Excel files)
+- Deletion of accounts (a group of transactions), transaction/s, and category/s
+- Easy account deletion
+- Responsiveness for smaller screens
+- A basic visual analysis of monthly inflows and outflows, and most recent transactions.
+
+
+## Tech Stack
+
+**Client:** React, HTML, Javascript, Typescript, TailwindCSS, Zod, and lucide-react, and recharts
+
+**Server:** NextJS, Google Cloud Project, Meta for developers, Supabase (Supabase Auth, Supabase) and PostgreSQL
+
+
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)
+
