@@ -2,8 +2,8 @@ import { Providers } from "./providers";
 import type { Metadata } from "next";
 import { DM_Mono, Instrument_Sans } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "../components/ThemeProvider";
-import { RecaptchaProvider } from "@/components/RecaptchaProvider";
+import { ThemeProvider } from "../components/theme-provider";
+import { RecaptchaProvider } from "@/components/recaptcha-provider";
 
 const sans = Instrument_Sans({ subsets: ["latin"], variable: "--font-body" });
 const mono = DM_Mono({

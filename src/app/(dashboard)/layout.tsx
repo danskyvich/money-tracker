@@ -1,5 +1,5 @@
 import AvatarBar from "@/components/layout/avatar-bar";
-import Sidebar from "@/components/layout/Sidebar";
+import Sidebar from "@/components/layout/sidebar-ui";
 import { getUser } from "@/supabase/actions/actions";
 import { redirect } from "next/navigation";
 

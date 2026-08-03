@@ -6,9 +6,7 @@ import { createClient } from "@/supabase/clients/client";
 import {
   BookImage,
   CircleAlert,
-  File,
   Pencil,
-  PiggyBank,
   Plus,
   X,
 } from "lucide-react";
