@@ -5,16 +5,14 @@ import { useState } from "react";
 interface AccountsListProps {
   accountsData: any[] | null | undefined;
   accountsError: string | null;
-  balanceError: string | null;
   loading: boolean;
-  totalNumberOfItems: number | null;
+  totalNumberOfItems: number | null | undefined;
   pressedCurrentPage: (page: number) => void;
 }
 
 export default function AccountsList({
   accountsData,
   accountsError,
-  balanceError,
   loading,
   totalNumberOfItems,
   pressedCurrentPage,
@@ -36,7 +34,7 @@ export default function AccountsList({
   if (loading) return <OverviewAccountsSkeleton/>
 
   return (
-    <div className="flex flex-col w-full h-full">
+    <div className="flex flex-col w-full h-100 2xl:h-full">
 
       {/* Accounts table */}
       <div className="flex relative flex-2 flex-col w-full h-fit overflow-y-auto">
@@ -51,7 +49,7 @@ export default function AccountsList({
                 <div className="text-(--color-text-secondary) line-clamp-1">
                   {item.description}
                 </div>
-                <div className="line-clamp-1">{item.category_id?.name}</div>
+                <div className="line-clamp-1">{item?.category_id?.name}</div>
                 <div className="line-clamp-1">{item.balance}</div>
               </div>
             ))}
@@ -67,7 +65,7 @@ export default function AccountsList({
                 <div className="flex w-full items-center gap-4">
                   <CircleAlert size={15} />
                   <p className="text-[0.9rem]">
-                    {"Error: " + accountsError + balanceError}
+                    {accountsError}
                   </p>
                 </div>
               )}

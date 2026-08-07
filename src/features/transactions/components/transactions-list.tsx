@@ -17,22 +17,25 @@ export default function TransactionList({transactionData, transactionError, load
       <div className="flex relative flex-col overflow-auto">
         {transactionData ? (
           <div className="flex flex-col w-full h-full">
-            {transactionData?.map((item) => (
-              <div className="flex w-full h-17 justify-between hover:bg-(--color-bg-subtle) border-b border-(--color-border-subtle) px-5 py-3 cursor-pointer">
+            {transactionData?.map((transaction, key) => (
+              <div
+                className="flex w-full h-17 justify-between hover:bg-(--color-bg-subtle) border-b border-(--color-border-subtle) px-5 py-3 cursor-pointer"
+                key={key}
+              >
                 <div className="flex flex-col w-[65%]">
                   <p className="font-display text-[0.85rem] line-clamp-1">
-                    {item.description}
+                    {transaction.description}
                   </p>
                   <p className="text-(--color-text-secondary) text-[0.7rem]">
-                    {ConvertTimestampToDateTime(item.date_time)}
+                    {ConvertTimestampToDateTime(transaction.date_time)}
                   </p>
                 </div>
 
                 <div className="flex w-[35%] h-full items-center justify-end">
                   <p
-                    className={`text-[1rem] font-mono ${item.type === "income" ? "text-emerald-500" : item.type === "expense" ? "text-red-500" : "text-(--color-text-primary)"}`}
+                    className={`text-[1rem] font-mono ${transaction.type === "income" ? "text-emerald-500" : transaction.type === "expense" ? "text-red-500" : "text-(--color-text-primary)"}`}
                   >
-                    {item.amount}
+                    {transaction.amount}
                   </p>
                 </div>
               </div>
@@ -50,7 +53,9 @@ export default function TransactionList({transactionData, transactionError, load
               ) : (
                 <div className="flex w-full items-center gap-4">
                   <CircleAlert size={15} />
-                  <p className="text-[0.9rem]">{"Error: " + transactionError}</p>
+                  <p className="text-[0.9rem]">
+                    {transactionError}
+                  </p>
                 </div>
               )}
             </div>

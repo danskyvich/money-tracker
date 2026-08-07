@@ -1,6 +1,5 @@
 import { Coins, X } from "lucide-react";
 import TransactionContent from "./transaction-content";
-import { useEffect, useState } from "react";
 import { Transaction } from "@/lib/types/database";
 
 export default function TransactionWrapper(
@@ -26,7 +25,7 @@ export default function TransactionWrapper(
       <>
         {toggle && (
           <div className="flex fixed z-50 inset-0 w-full h-full bg-black/50 items-center justify-center">
-            <div className="flex flex-col md:w-100 xl:w-135 bg-(--color-bg-secondary) border border-(--color-border-default) rounded-lg shadow-md px-5 py-3">
+            <div className="flex flex-col min-w-fit md:w-115 xl:w-150 bg-(--color-bg-secondary) border border-(--color-border-default) rounded-lg shadow-md px-5 py-3">
               <div className="flex w-full h-fit px-5 py-2 items-center justify-between">
                 <Coins size={20} />
                 <p className="text-xl font-display font-semibold">

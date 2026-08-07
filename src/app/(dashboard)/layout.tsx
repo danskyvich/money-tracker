@@ -1,6 +1,6 @@
 import AvatarBar from "@/components/layout/avatar-bar";
 import Sidebar from "@/components/layout/sidebar-ui";
-import { getUser } from "@/supabase/actions/actions";
+import { getUser } from "@/lib/supabase/actions/auth";
 import { redirect } from "next/navigation";
 
 export default async function DashboardLayout({

@@ -1,11 +1,11 @@
 import { AccountCategories } from "@/lib/types/database";
-import { InsertAccount } from "@/supabase/actions/dbActions";
+import { InsertAccount } from "@/lib/supabase/actions/database";
 import { ChevronDown, ChevronUp, PiggyBank, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface AddAccountProps {
   toggle: boolean;
-  accountCategoriesData: AccountCategories[] | null;
+  accountCategoriesData: AccountCategories[] | undefined;
   onClose: () => void;
   refresh: () => void;
 }

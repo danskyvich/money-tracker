@@ -1,37 +1,31 @@
 import AddAccountModal from "@/features/accounts/components/add-account-modal";
 import { AccountCategories } from "@/lib/types/database";
-import { createClient } from "@/supabase/clients/client";
-import {
-  Calendar,
-  ChevronDown,
+import {  
   ChevronLeft,
-  ChevronUp,
   CircleAlert,
-  ListFilter,
-  PiggyBank,
+  Filter,
   Plus,
   Search,
-  X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import AccountDetailsModal from "./accounts-details-modal";
-import AccountListSkeleton from "@/features/accounts/components/account-list-skeleton";
+import AccountListSkeleton from "@/features/accounts/components/skeleton/account-list-skeleton";
+import FilterModal from "@/components/layout/filter-modal";
+import { FetchAccounts } from "@/lib/supabase/actions/database";
+import { FilterField } from "../types/types";
+import { useFilterModal } from "@/hooks/useUrlFilters";
+
+const numberOfItemsToBeDisplayed = 9;
 
 export default function WholeAccountsList() {
   // general states
-  const [filter, setFilter] = useState(false);
-  const [selectedType, setSelectedType] = useState<string>("Filter");
   const [accountsLoading, setAccountsLoading] = useState(false);
   const [fetchAccountError, setFetchAccountError] = useState<string | null>(
     null,
   );
-  const [accounts, setAccounts] = useState<any[] | null>(null); // for accounts
-  const [accountCategories, setAccountCategories] = useState<
-    AccountCategories[] | null
-  >(null);
-  const [totalNumberOfItems, setTotalNumberOfItems] = useState<number | null>(
-    null,
-  );
+  const [accounts, setAccounts] = useState<any[] | undefined>(undefined); // for accounts
+  const [accountCategories, setAccountCategories] = useState<AccountCategories[] | undefined>(undefined);
+  const [totalNumberOfItems, setTotalNumberOfItems] = useState<number | null | undefined>(undefined,);
 
   // for modals
   const [accountModalOpen, setAccountModalOpen] = useState(false);
@@ -39,82 +33,76 @@ export default function WholeAccountsList() {
   const [addAccountModalOpen, setAddAccountModalOpen] =
     useState<boolean>(false);
 
-  // for pagination
+  // for pagination only
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const totalPages = totalNumberOfItems ? Math.ceil(totalNumberOfItems / 9) : 0;
+  const totalPages = totalNumberOfItems ? Math.ceil(totalNumberOfItems / numberOfItemsToBeDisplayed) : 0;
   const paginationArray = Array.from({ length: totalPages }, (_, i) => i + 1);
   const [windowStart, setWindowStart] = useState(0);
   const visiblePages = paginationArray.slice(windowStart, windowStart + 5);
 
-  // fetch accounts data
+  // run fetch when this component mounts
   useEffect(() => {
     fetchAccounts();
-  }, [currentPage]);
+  }, [currentPage, numberOfItemsToBeDisplayed]);
 
+  const [fields, setFields] = useState<FilterField[]>([
+    {
+      type: "select",
+      key: "type",
+      label: "Account Type",
+      options: [],
+    },
+    {
+      type: "select",
+      key: "category",
+      label: "Category",
+      options: [],
+    },
+    {
+      type: "date",
+      key: "date",
+      label: "Date range",
+    },
+  ]);
+
+  type FetchAccountsResult = // structure of the results coming from fetchAccount[]
+  | {
+    success: true;
+    accountsData: { id: string; name: string; description: string | null}[];
+    totalitems: number;
+    accountCategoriesData: { id: string, name: string }[];
+  }
+  | {
+    success: false, error: string
+  };
+
+  // fetch accounts & account categories
   const fetchAccounts = async () => {
     setAccountsLoading(true);
 
-    const [accountsResult, balancesResult, accountCategoriesResult] =
-      await Promise.all([
-        // use Promise.all to merge both fetches
-        await (
-          await createClient()
-        )
-          .from("accounts")
-          .select(
-            `id, name, account_categories!category_id(name), description`,
-            {
-              count: "exact",
-            },
-          )
-          .range((currentPage - 1) * 9, (currentPage - 1) * 9 + 9 - 1),
-        await (await createClient())
-          .from("accounts_balances")
-          .select(`account_id, balance::text`),
-        await (await createClient())
-          .from("account_categories")
-          .select(`id, name`),
-      ]);
-
-    // deconstruct into two sets of variables
-    const { data: accountsData, count, error: accountsError } = accountsResult;
-    const { data: balancesData, error: balancesError } = balancesResult;
-    const { data: accountCategoriesData, error: accountCategoriesError } =
-      accountCategoriesResult;
-
-    if (accountsError || balancesError || accountCategoriesError) {
-      setFetchAccountError(
-        accountsError?.message +
-          ", " +
-          balancesError?.message +
-          ", " +
-          accountCategoriesError?.message,
-      );
-      setAccounts(null);
-      setAccountsLoading(false);
-      setAccountCategories(null);
+    const result = await FetchAccounts(
+      currentPage,
+      numberOfItemsToBeDisplayed,
+    );
+    if (!result || !result.success) {
+      setFetchAccountError(result?.error ?? "Something went wrong.")
+      setAccountsLoading(false)
+      return;
     }
 
-    let merged: any[] = [];
+    const accountTypeOptions = Array.from(
+      new Set(result.accountsData?.map((a) => a.name))
+    ).map((name) => ({label: name, value: name}))
 
-    if (accountsData && balancesData) {
-      const balancesMap = new Map(
-        balancesData.map((b) => [b.account_id, b.balance]),
-      );
+    const accountCategoriesOptions = result.accountCategoriesData?.map((c) => ({
+      label: c.name,
+      value: c.id,
+    }));
 
-      merged = accountsData.map((a) => ({
-        ...a,
-        balance: balancesMap.get(a.id) ?? 0,
-      }));
-    }
 
-    if (merged.length > 0) {
-      setAccounts(merged);
-      setFetchAccountError(null);
-      setTotalNumberOfItems(count);
-      setAccountsLoading(false);
-      setAccountCategories(accountCategoriesData);
-    }
+    setAccounts(result.accountsData)
+    setAccountCategories(result.accountCategoriesData)
+    setTotalNumberOfItems(result.totalItems)
 
     setAccountsLoading(false);
   };
@@ -133,14 +121,14 @@ export default function WholeAccountsList() {
     setAccountModalOpen(false);
   };
 
+  const { open, openModal, closeModal, draft, setField, apply, clear, activeCount } = useFilterModal(fields);
+
   return (
-    <>
+    <div className="flex xl:w-full h-80dvh xl:h-full border border-(--color-border-default) rounded-lg">
       {accountsLoading ? (
-        <div className="flex w-full h-full">
-          <AccountListSkeleton />
-        </div>
+        <AccountListSkeleton />
       ) : (
-        <div className="xl:flex-2 h-80dvh xl:h-full border border-(--color-border-default) rounded-lg">
+        <>
           <AddAccountModal
             accountCategoriesData={accountCategories}
             toggle={addAccountModalOpen}
@@ -156,57 +144,37 @@ export default function WholeAccountsList() {
           />
 
           <div className="flex flex-col w-full h-full">
-            <div className="flex flex-1 w-full h-fit">
-              <div className="flex w-full h-fit px-5 py-2 gap-2 whitespace-nowrap">
-                <div
-                  className="flex w-fit h-full border border-(--color-brand-green) rounded-md px-5 py-1 items-center gap-2 bg-transparent text-(--color-text-primary) hover:text-white hover:bg-emerald-600 cursor-pointer transition-all duration-200 active:bg-emerald-700"
-                  onClick={() => setAddAccountModalOpen(true)}
-                >
-                  <Plus size={15} />
-                  <p className="text-[0.8rem] hidden lg:block">
-                    Add an account
-                  </p>
-                </div>
+            <div className="flex flex-1 w-full max-h-[10%] py-2 px-2 gap-3 mb-3">
+              <div
+                className="flex w-fit h-full gap-2 border border-(--color-brand-green) rounded-md px-5 py-2 items-center bg-transparent text-(--color-text-primary) hover:text-white hover:bg-emerald-600 cursor-pointer transition-all duration-200 active:bg-emerald-700"
+                onClick={() => setAddAccountModalOpen(true)}
+              >
+                <Plus size={15} />
+                <p className="text-[0.8rem] hidden lg:block">Add an account</p>
+              </div>
 
-                {/* Filter by */}
-                <div className="relative flex flex-col">
-                  <div
-                    className={`flex w-fit items-center border border-(--color-border-default) ${filter ? "rounded-t-lg rounded-tr-lg" : "rounded-lg"} px-5 py-1 gap-2 cursor-pointer hover:bg-(--color-bg-subtle) transition-all duration-100`}
-                    onClick={() => setFilter((prev) => !prev)}
-                  >
-                    <ListFilter size={15} className="flex" />
-                    <p className="text-[0.8rem] hidden lg:block">
-                      {selectedType}
-                    </p>
-                    {filter ? (
-                      <ChevronUp size={15} />
-                    ) : (
-                      <ChevronDown size={15} />
-                    )}
-                  </div>
+              {/* Filter by */}
+              <button onClick={openModal} className="flex w-fit h-full gap-2 border border-(--color-border-default) rounded-md px-5 py-2 items-center bg-transparent text-(--color-text-primary) cursor-pointer">
+                <Filter size={15}/>
+                <p className="text-[0.9rem] hidden lg:block">Filters{activeCount > 0 && ` (${activeCount})`}</p>
+              </button>
+              <FilterModal
+                open={open}
+                onClose={closeModal}
+                fields={fields}
+                values={draft}
+                onChange={setField}
+                onApply={apply}
+                onClear={clear}
+              />
 
-                  {filter && (
-                    <div className="absolute w-full z-50 top-[2.3rem] bg-(--color-bg-secondary) border border-(--color-border-default) rounded-b-lg rounded-bl-lg"></div>
-                  )}
-                </div>
-
-                {/* Date range */}
-                <div className="flex w-fit h-full items-center border border-(--color-border-default) rounded-md px-5 py-1 cursor-pointer hover:bg-(--color-bg-subtle) gap-2 transition-all duration-100">
-                  <Calendar size={15} />
-                  <p className="font-display text-[0.8rem] hidden lg:block text-(--color-text-primary)">
-                    Date range
-                  </p>
-                  <ChevronDown size={15} />
-                </div>
-
-                {/* Search field */}
-                <div className="px-5 flex w-75 border border-(--color-border-default) rounded-md items-center gap-2">
-                  <Search size={15} className="flex" />
-                  <input
-                    placeholder="Search..."
-                    className="flex flex-3 decorations-none placeholder:text-[0.8rem] focus:outline-none focus:ring-0 focus:border-transparent text-[0.8rem]"
-                  />
-                </div>
+              {/* Search field */}
+              <div className="flex px-5 py-2 w-75 border border-(--color-border-default) rounded-md items-center gap-2">
+                <Search size={15} className="flex" />
+                <input
+                  placeholder="Search..."
+                  className="flex flex-3 decorations-none placeholder:text-[0.8rem] focus:outline-none focus:ring-0 focus:border-transparent text-[0.8rem]"
+                />
               </div>
             </div>
 
@@ -307,8 +275,8 @@ export default function WholeAccountsList() {
               </div>
             </div>
           </div>
-        </div>
+        </>
       )}
-    </>
+    </div>
   );
 }

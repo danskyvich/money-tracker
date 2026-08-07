@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { CircleAlert, MailIcon } from "lucide-react";
 import { useActionState, useEffect, useState } from "react";
 import Link from "next/link";
-import {generalSignIn, signInWithFacebook, signInWithGoogle} from "@/supabase/actions/actions";
+import {generalSignIn, signInWithFacebook, signInWithGoogle} from "@/lib/supabase/actions/auth";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 

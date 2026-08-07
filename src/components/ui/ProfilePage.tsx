@@ -9,7 +9,7 @@ import {
   VerifiedIcon,
   X,
 } from "lucide-react";
-import { deleteUser, signOut, unenrollFactor } from "@/supabase/actions/actions";
+import { deleteUser, signOut, unenrollFactor } from "@/lib/supabase/actions/auth";
 import { useRouter } from "next/navigation";
 import { Factor, User } from "@supabase/supabase-js";
 import Button from "../layout/button";

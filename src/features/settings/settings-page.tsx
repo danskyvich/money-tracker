@@ -1,16 +1,9 @@
 "use client";
 
+import Modal from "@/components/layout/modal";
+import { DeleteUserData } from "@/lib/supabase/actions/database";
 import { ChevronDown, Eye, Trash } from "lucide-react";
-
-const DAYS = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
-];
+import { useState } from "react";
 
 const settings = [
   { item: "Main currency", value: "Philippine Peso", icon: "₱" },
@@ -24,12 +17,18 @@ const settings = [
     value: "Modify",
     icon: <Eye size={15} />,
   },
-  {
-    item: "Delete app data", value: "Delete data", icon: <Trash size={15}/>
-  }
 ];
 
+const [deletionLoading, setDeletionLoading] = useState<boolean>(false);
+const [isDataDeletionOpen, setIsDataDeletionOpen] = useState<boolean>(false);
+
 export default function SettingsPage() {
+
+  const handleDataDeletion = async () => {
+    setDeletionLoading(true);
+    
+
+  }
 
   return (
     <div className="flex flex-col w-full h-full">
@@ -37,6 +36,20 @@ export default function SettingsPage() {
       <div
         className="flex flex-col w-full h-full border border-(--color-border-default) rounded-lg shadow-md"
       >
+        {
+          isDataDeletionOpen && (
+            <div className="absolute inset-0 z-50 flex w-full h-full bg-black/50 items-center justify-center">
+              <Modal
+                open={isDataDeletionOpen}
+                onOpen={setIsDataDeletionOpen}
+                onConfirm={handleDataDeletion}
+                header="Delete your data"
+                message="Are you really sure you want to delete your data? Data deletion is irreversible."
+                icon={<Trash size={15}/>}
+              />
+            </div>
+          )
+        }
         {settings.map((item, index) => (
           <div
             className="grid grid-cols-[1fr_1fr] w-full h-fit px-5 py-2 items-center cursor-pointer min-h-0"
@@ -54,6 +67,17 @@ export default function SettingsPage() {
             </div>
           </div>
         ))}
+        <div className="flex w-full h-fit text-[0.9rem] items-center justify-between px-5 py-2 min-h-0">
+          <p>Delete data</p>
+
+          <button
+            onClick={() => setIsDataDeletionOpen(true)}
+            className="flex border border-(--color-brand-green) rounded-lg items-center justify-center px-5 py-1 gap-1 text-[0.9rem] cursor-pointer hover:bg-(--color-brand-green) active:bg-emerald-600 transition-all duration-100"
+          >
+            <Trash size={15}/>
+            <p>Delete data</p>
+          </button>
+        </div>
       </div>
     </div>
   );

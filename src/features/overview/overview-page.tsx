@@ -11,24 +11,23 @@ import {
 } from "lucide-react";
 import IncomeBreakdownPage from "@/features/overview/components/brakdown-income";
 import ExpenseBreakdownPage from "@/features/overview/components/breakdown-expense";
-import { getOverviewData } from "@/lib/data/overview";
 import SixMonthsRef from "../../components/charts/BarChart";
-import { getMonthlyInflowOutflow } from "@/lib/data/fetchChartData";
+import { getMonthlyInflowOutflow } from "@/features/overview/api/fetchChartData";
 import Snippet from "../../components/ui/parts/Snippet";
-import TransactionWrapper from "./components/transaction-wrapper";
 import TransactionList from "../transactions/components/transactions-list";
 import AccountsList from "./components/accounts-partial";
 import OverviewHeader from "./components/icon-and-name";
 import AddAccountModal from "../accounts/components/add-account-modal";
+import { FetchAccounts, FetchTransaction } from "@/lib/supabase/actions/database";
 
 export default function OverviewPage() {
+
   // variables - general
   const [isAccountModal, setIsAccountModal] = useState(false);
-  const [chosenAccountType, setChosenAccountType] = useState<string | null | undefined>(null);
-  const [accountDropdownClicked, setAccountDropdownClicked] = useState(false);
-  const [isTransactionModalOpen, setIsTransactionModalOpen] =
     useState<boolean>(false);
-  const [totalNumberOfItems, setTotalNumberOfItems] = useState<number | null>(null);
+  const [totalNumberOfItems, setTotalNumberOfItems] = useState<
+    number | null | undefined
+  >(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
 
   // for doughnut charts (income and expense)
@@ -39,15 +38,13 @@ export default function OverviewPage() {
   const [chosenPage, setChosenPage] = useState<"income" | "expense">("income")
 
   // fetch data
-  const [transactData, setTransactData] = useState<any[] | null>(null);
-  const [mergedAccountsData, setMergedAccountsData] = useState<any[] | null | undefined>(null)
-  const [categoryData, setCategoryData] = useState<any[] | null>(null);
-  const [transactError, setTransactError] = useState<string | null>(null)
-  const [balanceError, setBalanceError] = useState<string | null>(null);
-  const [categoryError, setCategoryError] = useState<string | null>(null);
+  const [transactionData, setTransactionData] = useState<any[] | null>(null);
+  const [accounts, setAccounts] = useState<any[] | null | undefined>(null)
+  const [transactionError, setTransactionError] = useState<string | null>(null)
   const [accountError, setAccountError] = useState<string | null>(null);
-  const [accountCategoriesData, setAccountCategoriesData] = useState<any[] | null>(null); 
-  const [accountCategoriesError, setAccountCategoriesError] = useState<string | null>(null);
+  const [accountCategoriesData, setAccountCategoriesData] = useState<
+    any[] | undefined
+  >(undefined); 
   const [loadingTransactions, setLoadingTransactions] = useState(false); 
   const [loadingAccounts, setLoadingAccounts] = useState(false); 
 
@@ -58,41 +55,32 @@ export default function OverviewPage() {
 
   // main fetchData() function
   const fetchData = async () => {
-    setLoadingAccounts(true)
     setLoadingTransactions(true)
+    setLoadingAccounts(true)
 
-    const { transactionData, transactionError, accountsData, accountsError, accountsCount, balancesData, balancesError, categoryData, categoryError, accountCategoriesData, accountCategoriesError } = await getOverviewData(currentPage);
-    setTransactError(
-      !transactionData ? "Error: " + transactionError?.message : null,
-    );
-    setAccountError(!accountsData ? "Error: " + accountsError?.message : null);
-    setBalanceError(!balancesData ? "Error: " + balancesError?.message : null);
-    setCategoryError(!categoryData ? "Error: " + categoryError?.message : null);
-    setAccountCategoriesError(!accountCategoriesData ? "Error: " + accountCategoriesError?.message : null);
+    const result = await FetchAccounts(currentPage, 9);
+    if (!result?.success) {
+      setAccountError(result?.error ?? "Fetching data failed.");
+      setLoadingAccounts(false);
+    }
+    
+    setAccounts(result?.accountsData);
+    setAccountCategoriesData(result?.accountCategoriesData)
+    setTotalNumberOfItems(result?.totalItems)
 
-    const sortedTransactions = [...(transactionData ?? [])].sort((a, b) => b.date_time.localeCompare(a.date_time)); // sorts transaction to most recent using localeCompare()
-    setTransactData(sortedTransactions);
-    setTotalNumberOfItems(accountsCount);
-    setCategoryData(categoryData);
-    setAccountCategoriesData(accountCategoriesData);
+    const transactionResult = await FetchTransaction(currentPage, 9);
+    if (!transactionResult?.success) { 
+      setTransactionError(transactionResult?.error ?? "Fetching transactions failed.")
+      setLoadingTransactions(false);
+    }
 
-    setChosenAccountType(
-      !chosenAccountType ? accountCategoriesData?.[0].name : chosenAccountType,
-    );
-
-    // merge accountsData and balancesData
-    const balanceMap = new Map(
-      balancesData?.map((b) => [b.account_id, b.balance]) ?? []
-    );
-
-    const mergedAccounts = accountsData?.map((account) => ({
-      ...account,
-      balance: balanceMap.get(account.id) ?? null,
-    }));
-
-    setMergedAccountsData(mergedAccounts);
-    setLoadingAccounts(false);
-    setLoadingTransactions(false);
+    const sortedTransactions = [...(transactionData ?? [])].sort((a, b) =>
+      b.date_time.localeCompare(a.date_time),
+    ); 
+    setTransactionData(sortedTransactions);
+      
+    setLoadingAccounts(false)
+    setLoadingTransactions(false)
   };
 
   // call fetchData()
@@ -119,24 +107,8 @@ export default function OverviewPage() {
     document.title = "Dashboard";
   }, []);
 
-  // open modal
-  const handleOpenModal = (toggle: boolean) => {
-    setIsTransactionModalOpen(toggle)
-  }
-
-  // handle submit
-
   return (
     <div className="flex flex-col w-full h-full gap-5">
-      <TransactionWrapper
-        toggle={isTransactionModalOpen}
-        currentPage={currentPage}
-        selectedTransaction={null}
-        onClose={() => handleOpenModal(false)}
-        accountsData={mergedAccountsData}
-        categoryData={categoryData}
-        onTransactionSaved={fetchData}
-      />
 
       {/* Create an account */}
       <AddAccountModal
@@ -172,7 +144,6 @@ export default function OverviewPage() {
               <div className="flex w-full h-full gap-5 flex-col md:flex-row">
                 <div
                   className="flex flex-1 bg-(--color-brand-green) text-white rounded-lg shadow-md items-center justify-center text-[0.9rem] gap-1 py-2 cursor-pointer hover:bg-(--color-brand-green-accent) duration-100 transition-all active:bg-emerald-600"
-                  onClick={() => setIsTransactionModalOpen((prev) => !prev)}
                 >
                   <Plus size={20} />
                   <p className="hidden lg:block whitespace-nowrap">
@@ -238,8 +209,8 @@ export default function OverviewPage() {
               linkText="View transactions"
             >
               <TransactionList
-                transactionData={transactData}
-                transactionError={transactError}
+                transactionData={transactionData}
+                transactionError={transactionError}
                 loading={loadingTransactions}
               />
             </Card>
@@ -303,9 +274,8 @@ export default function OverviewPage() {
             </div>
 
             <AccountsList
-              accountsData={mergedAccountsData}
+              accountsData={accounts}
               accountsError={accountError}
-              balanceError={balanceError}
               loading={loadingAccounts}
               totalNumberOfItems={totalNumberOfItems}
               pressedCurrentPage={(page) => handleChildCurrentPage(page)}

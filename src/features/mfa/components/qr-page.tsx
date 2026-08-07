@@ -1,6 +1,6 @@
 "use client"
 
-import { challengeUserMfa, enrollUserMfa } from "@/supabase/actions/actions";
+import { challengeUserMfa, enrollUserMfa } from "@/lib/supabase/actions/auth";
 import { CircleAlert, NfcIcon, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";

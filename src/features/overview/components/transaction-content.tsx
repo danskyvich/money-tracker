@@ -1,5 +1,5 @@
 import { Transaction } from "@/lib/types/database";
-import { DeleteTransaction, InsertTransaction, UpdateTransaction } from "@/supabase/actions/dbActions";
+import { DeleteTransaction, InsertTransaction, UpdateTransaction } from "@/lib/supabase/actions/database";
 import { TransactionSchema } from "@/lib/schemas/TransactionSchema";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useEffect, useState } from "react";

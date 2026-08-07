@@ -1,4 +1,4 @@
-import { getCategoryBreakdown } from "@/lib/data/fetchChartData";
+import { getCategoryBreakdown } from "@/features/overview/api/fetchChartData";
 import { ArrowUp } from "lucide-react";
 import { useEffect, useState } from "react";
 import SnippetSkeleton from "../../layout/skeleton/snippet-skeleton";

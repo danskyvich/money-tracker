@@ -1,6 +1,6 @@
 "use client";
 
-import { getCategoryBreakdown } from "@/lib/data/fetchChartData";
+import { getCategoryBreakdown } from "@/features/overview/api/fetchChartData";
 import { useEffect, useState } from "react";
 import DoughnutChart from "../../../components/charts/DoughnutChart";
 

@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Lock } from "lucide-react"
 import Button from "../../../components/layout/button"
 import { useRouter } from "next/navigation"
-import { resendOtp, verifyOtp } from "@/supabase/actions/actions"
+import { resendOtp, verifyOtp } from "@/lib/supabase/actions/auth"
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3"
 
 export default function VerifyEmailPage({email, rememberMe}:{email: string, rememberMe: boolean}) {

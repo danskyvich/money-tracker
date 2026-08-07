@@ -1,4 +1,4 @@
-import AccountListSkeleton from "@/features/accounts/components/account-list-modal";
+import AccountListSkeleton from "@/features/accounts/components/skeleton/account-list-modal-skeleton";
 
 export default function Loading() {
     return(
