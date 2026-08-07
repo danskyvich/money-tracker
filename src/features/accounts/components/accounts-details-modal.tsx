@@ -4,15 +4,15 @@ import {
   DeleteAccount,
   SelectTransactionsFromChosenAccount,
 } from "@/lib/supabase/actions/database";
-import { createClient } from "@/lib/supabase/clients/client";
 import ConvertTimestampToDateTime from "@/utils/convertToDateTime";
-import { ChevronLeft, ChevronRight, Filter, PiggyBank, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Filter, PiggyBank, Trash, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import Modal from "@/components/layout/modal";
 
 interface AccountDetailsModalProps {
   toggle: boolean;
   accountData: any | null;
-  onClose: () => void;
+  onClose: (value: boolean) => void;
   refresh: () => void;
 }
 
@@ -33,8 +33,7 @@ export default function AccountDetailsModal({
   const [accountTransactionsError, setAccountTransactionsError] = useState<
     string | null
   >(null);
-  const [openFilter, setOpenFilter] = useState<boolean>(false);
-
+  
   //pagination
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [windowStart, setWindowStart] = useState(0);
@@ -43,14 +42,32 @@ export default function AccountDetailsModal({
   const paginationArray = Array.from({ length: totalPages }, (_, i) => i + 1);
   const visiblePages = paginationArray.slice(windowStart, windowStart + 5);
 
-  const handleAccountDeletion = async (id: string) => {
-    setLoading(true);
-    const { error } = await DeleteAccount(id);
+  // confirmation modal
+  const [isAccountDeletionModal, setIsAccountDeletionModal] =
+    useState<boolean>(false);
 
-    setDeleteAccountError(error);
+  const handleDeleteAccountClick = () => {
+    setIsAccountDeletionModal(true);
+    onClose(false);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!accountData?.id) return;
+
+    setIsAccountDeletionModal(false); // close confirmation dialog
+    setLoading(true);
+
+    const { error } = await DeleteAccount(accountData.id);
+
+    if (error) {
+      setDeleteAccountError(error);
+      setLoading(false);
+      return;
+    }
+
     setLoading(false);
-    onClose();
-    refresh();
+    onClose(false); // close AccountDetailsModal since the account no longer exists
+    refresh(); // note: was `refresh;` before — that referenced the function without calling it
   };
 
   const fetchTransactionsOfAccount = async (id: string) => {
@@ -75,6 +92,21 @@ export default function AccountDetailsModal({
 
   return (
     <>
+      {isAccountDeletionModal && (
+        <div className="fixed z-50 inset-0 flex w-full h-full bg-black/50 items-center justify-center">
+          <Modal
+            onOpen={setIsAccountDeletionModal}
+            open={isAccountDeletionModal}
+            header="Delete account"
+            icon={<Trash size={15} />}
+            message="Are you sure you want to delete this account?"
+            onConfirm={handleConfirmDelete}
+            onCancel={() => onClose(true)}
+            noButtonText="No"
+            yesButtonText="Delete account"
+          />
+        </div>
+      )}
       {toggle && (
         <div className="fixed flex inset-0 z-50 bg-black/50 w-full h-full items-center justify-center">
           <div className="flex flex-col xl:w-275 md:w-250 w-150 h-165 bg-(--color-bg-secondary) border border-(--color-border-default) rounded-lg shadow-md justify-between">
@@ -82,7 +114,7 @@ export default function AccountDetailsModal({
             <div className="flex w-full h-fit items-center justify-between px-5 py-2">
               <PiggyBank size={20} />
               <p className="text-2xl font-semibold">{accountData?.name}</p>
-              <X onClick={onClose} size={20} className="cursor-pointer" />
+              <X onClick={() => onClose(false)} size={20} className="cursor-pointer" />
             </div>
 
             {/* Filter bar */}
@@ -210,7 +242,7 @@ export default function AccountDetailsModal({
               <button
                 type="button"
                 className="flex cursor-pointer border border-(--color-border-default) rounded-lg bg-transparent hover:bg-(--color-brand-green) active:bg-emerald-600 w-full items-center justify-center py-1 duration-100 transition-all"
-                onClick={() => handleAccountDeletion(accountData?.id)}
+                onClick={handleDeleteAccountClick}
               >
                 <p className="text-[0.9rem]">
                   {loading ? "Deleting account..." : "Delete account"}

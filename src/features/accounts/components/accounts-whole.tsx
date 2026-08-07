@@ -99,7 +99,6 @@ export default function WholeAccountsList() {
       value: c.id,
     }));
 
-
     setAccounts(result.accountsData)
     setAccountCategories(result.accountCategoriesData)
     setTotalNumberOfItems(result.totalItems)
@@ -142,6 +141,7 @@ export default function WholeAccountsList() {
             onClose={handleCloseAccountDetailsModal}
             refresh={fetchAccounts}
           />
+
 
           <div className="flex flex-col w-full h-full">
             <div className="flex flex-1 w-full max-h-[10%] py-2 px-2 gap-3 mb-3">
