@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 interface ErrorModalProps {
-  message: string | undefined;
+  message: string | null;
 }
 
 export default function ErrorModal({ message }: ErrorModalProps) {
@@ -13,7 +13,7 @@ export default function ErrorModal({ message }: ErrorModalProps) {
     if (!message) return;
     setVisible(true);
     const timer = setTimeout(() => setVisible(false), 5000);
-    message = undefined;
+    message = null;
     return () => clearTimeout(timer);
   }, [message]);
   return (

@@ -1,8 +1,9 @@
 'use client'
 
+import ErrorModal from "@/components/layout/error-modal";
 import Modal from "@/components/layout/modal";
-import { DatabaseBackup, FileSpreadsheet, MoveDownLeft, MoveUpRight } from "lucide-react"
-import Image from "next/image";
+import { exportAllTablesCsv, ExportAllTablesToJSON } from "@/lib/supabase/actions/backup";
+import { ArrowRight, FileSpreadsheet, MoveDownLeft, MoveUpRight } from "lucide-react"
 import { useEffect, useState } from "react"
 
 export default function BackupPage() {
@@ -11,6 +12,15 @@ export default function BackupPage() {
     });
 
     const [activeItem, setActiveItem] = useState<string | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [dates, setDates] = useState({
+      startDate: '',
+      endDate: '',
+    })
+
+    // export to csv
+    const [exportAllData, setExportAllData] = useState<boolean>(false);
+    const [exportError, setExportError] = useState<string | null>(null);
 
     const backup = [
       {
@@ -39,12 +49,53 @@ export default function BackupPage() {
       },
     ];
 
-    const handleExportToCSV = () => {
+    const getTodayString = () => {
+      const today = new Date();
+      return today.toISOString().split("T")[0];
+    };
+    const [dateNow, setDateNow] = useState(getTodayString());
 
+    useEffect(() => {
+      setDateNow(getTodayString());
+    })
+
+    // Export to CSV
+    const handleExportToCSV = async () => {
+      setLoading(true);
+
+      try {
+        await exportAllTablesCsv({
+          exportAll: exportAllData,
+          startDate: dates.startDate,
+          endDate: dates.endDate,
+        });
+      } catch (err) {
+        setExportError(String(err));
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    // Export to JSON
+    const handleExportToJSON = async () => {
+      setLoading(true)
+
+      try {
+        await ExportAllTablesToJSON({
+          exportAll: exportAllData,
+          startDate: dates.startDate,
+          endDate: dates.endDate,
+        });
+      } catch (err) {
+        setExportError(String(err));
+      } finally {
+        setLoading(false);
+      }
     }
 
     return (
       <>
+        {exportError && <ErrorModal message={exportError} />}
         {activeItem && (
           <div className="fixed inset-0 z-50 bg-black/50 flex w-full h-full items-center justify-center">
             {activeItem === "csv" && (
@@ -60,9 +111,50 @@ export default function BackupPage() {
                   setActiveItem(null);
                 }}
                 icon={<FileSpreadsheet size={20} />}
-                yesButtonText="Export to CSV"
+                yesButtonText={loading ? "Exporting data..." : "Export to CSV"}
                 noButtonText="No, don't export"
-              />
+              >
+                <div className="flex flex-col w-full h-fit items-center font-display gap-2">
+                  <div className="flex w-full items-center gap-2">
+                    <input
+                      type="date"
+                      value={dates.startDate || dateNow}
+                      disabled={exportAllData}
+                      onChange={(e) =>
+                        setDates((prev) => ({
+                          ...prev,
+                          startDate: e.target.value,
+                        }))
+                      }
+                      className={`${exportAllData && "text-(--color-text-secondary) pointer-none border-(--color-border-subtle)"} flex cursor-pointer px-3 py-1 border border-(--color-border-default) rounded-lg text-[0.9rem]`}
+                    />
+                    <ArrowRight size={15} />
+                    <input
+                      type="date"
+                      value={dates.endDate || dateNow}
+                      onChange={(e) =>
+                        setDates((prev) => ({
+                          ...prev,
+                          endDate: e.target.value,
+                        }))
+                      }
+                      disabled={exportAllData}
+                      className={`${exportAllData && "text-(--color-text-secondary) pointer-none border-(--color-border-subtle)"} flex cursor-pointer px-3 py-1 border border-(--color-border-default) rounded-lg text-[0.9rem]`}
+                    />
+                  </div>
+
+                  <div className="flex w-full gap-2">
+                    <input
+                      id="allData"
+                      type="checkbox"
+                      checked={exportAllData}
+                      onChange={(e) => setExportAllData((prev) => !prev)}
+                      className="border border-(--color-border-default) rounded-md cursor-pointer"
+                    />
+                    <label htmlFor="allData">Export all data instead</label>
+                  </div>
+                </div>
+              </Modal>
             )}
             {activeItem === "json" && (
               <Modal
@@ -72,13 +164,54 @@ export default function BackupPage() {
                 header="Export to JSON"
                 onCancel={() => setActiveItem(null)}
                 onConfirm={() => {
-                  handleExportToCSV();
+                  handleExportToJSON();
                   setActiveItem(null);
                 }}
                 icon={<FileSpreadsheet size={20} />}
                 yesButtonText="Export to JSON"
                 noButtonText="No, don't export"
-              />
+              >
+                <div className="flex flex-col w-full h-fit items-center font-display gap-2">
+                  <div className="flex w-full items-center gap-2">
+                    <input
+                      type="date"
+                      value={dates.startDate || dateNow}
+                      disabled={exportAllData}
+                      onChange={(e) =>
+                        setDates((prev) => ({
+                          ...prev,
+                          startDate: e.target.value,
+                        }))
+                      }
+                      className={`${exportAllData && "text-(--color-text-secondary) pointer-none border-(--color-border-subtle)"} flex cursor-pointer px-3 py-1 border border-(--color-border-default) rounded-lg text-[0.9rem]`}
+                    />
+                    <ArrowRight size={15} />
+                    <input
+                      type="date"
+                      value={dates.endDate || dateNow}
+                      onChange={(e) =>
+                        setDates((prev) => ({
+                          ...prev,
+                          endDate: e.target.value,
+                        }))
+                      }
+                      disabled={exportAllData}
+                      className={`${exportAllData && "text-(--color-text-secondary) pointer-none border-(--color-border-subtle)"} flex cursor-pointer px-3 py-1 border border-(--color-border-default) rounded-lg text-[0.9rem]`}
+                    />
+                  </div>
+
+                  <div className="flex w-full gap-2">
+                    <input
+                      id="allData"
+                      type="checkbox"
+                      checked={exportAllData}
+                      onChange={(e) => setExportAllData((prev) => !prev)}
+                      className="border border-(--color-border-default) rounded-md cursor-pointer"
+                    />
+                    <label htmlFor="allData">Export all data instead</label>
+                  </div>
+                </div>
+              </Modal>
             )}
             {activeItem === "json-import" && (
               <Modal
@@ -88,13 +221,14 @@ export default function BackupPage() {
                 header="Import data from JSON"
                 onCancel={() => setActiveItem(null)}
                 onConfirm={() => {
-                  handleExportToCSV();
                   setActiveItem(null);
                 }}
                 icon={<FileSpreadsheet size={20} />}
                 yesButtonText="Import data"
                 noButtonText="No, don't import"
-              />
+              >
+                <input type="file" className="flex w-full h-fit"/>
+              </Modal>
             )}
             {activeItem === "csv-import" && (
               <Modal
@@ -104,13 +238,12 @@ export default function BackupPage() {
                 header="Import a CSV file"
                 onCancel={() => setActiveItem(null)}
                 onConfirm={() => {
-                  handleExportToCSV();
                   setActiveItem(null);
                 }}
                 icon={<FileSpreadsheet size={20} />}
                 yesButtonText="Import data"
                 noButtonText="No, don't import"
-              />
+              ></Modal>
             )}
           </div>
         )}

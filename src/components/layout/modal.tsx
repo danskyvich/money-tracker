@@ -10,13 +10,14 @@ interface ModalProps {
     onCancel: () => void;
     noButtonText: string,
     yesButtonText: string,
+    children?: React.ReactNode,
 }
 
-export default function Modal({onCancel, noButtonText, yesButtonText, onOpen, open, header, message, icon, onConfirm}: ModalProps) {
+export default function Modal({children, onCancel, noButtonText, yesButtonText, onOpen, open, header, message, icon, onConfirm}: ModalProps) {
     if (!open) return null;
 
     return (
-      <div className="flex flex-col w-50 sm:w-70 md:w-85 lg:w-110 xl:w-130 border border-(--color-border-default) rounded-lg bg-(--color-bg-secondary) justify-between p-5">
+      <div className="flex flex-col w-100 mx-5 sm:mx-0 sm:w-100 md:w-85 lg:w-110 xl:w-130 border border-(--color-border-default) rounded-lg bg-(--color-bg-secondary) justify-between p-5">
         {/* Header */}
         <div className="flex w-full h-fit items-center justify-between mb-3">
           {icon}
@@ -29,8 +30,9 @@ export default function Modal({onCancel, noButtonText, yesButtonText, onOpen, op
         </div>
 
         {/* Content */}
-        <div className="flex w-full h-fit text-[0.9rem] font-mono my-2">
+        <div className="flex flex-col w-full h-fit text-[0.9rem] font-display my-2 gap-2">
           <p>{message}</p>
+          {children}
         </div>
 
         {/* Buttons */}
