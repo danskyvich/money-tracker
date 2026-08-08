@@ -2,9 +2,9 @@
 
 import ErrorModal from "@/components/layout/error-modal";
 import Modal from "@/components/layout/modal";
-import { exportAllTablesCsv, ExportAllTablesToJSON } from "@/lib/supabase/actions/backup";
+import { exportAllTablesCsv, ExportAllTablesToJSON, ImportFromJSON, validateImportShape } from "@/lib/supabase/actions/backup";
 import { ArrowRight, FileSpreadsheet, MoveDownLeft, MoveUpRight } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 export default function BackupPage() {
     useEffect(() => {
@@ -21,6 +21,9 @@ export default function BackupPage() {
     // export to csv
     const [exportAllData, setExportAllData] = useState<boolean>(false);
     const [exportError, setExportError] = useState<string | null>(null);
+
+    // import from json
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const backup = [
       {
@@ -93,11 +96,33 @@ export default function BackupPage() {
       }
     }
 
+    const handleImportFromJSON = async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      setLoading(true);
+
+      try {
+        const text = await file.text();
+        const parsed = JSON.parse(text);
+
+        if (!validateImportShape(parsed)) throw new Error("File is missing expected files");
+
+        await ImportFromJSON(parsed);
+      } catch (err) {
+        setExportError(String(err));
+      } finally {
+        setLoading(false);
+      }
+    }
+
     return (
       <>
         {exportError && <ErrorModal message={exportError} />}
         {activeItem && (
           <div className="fixed inset-0 z-50 bg-black/50 flex w-full h-full items-center justify-center">
+
+            {/* Export to CSV */}
             {activeItem === "csv" && (
               <Modal
                 open
@@ -156,6 +181,8 @@ export default function BackupPage() {
                 </div>
               </Modal>
             )}
+
+            {/* Export to JSON */}
             {activeItem === "json" && (
               <Modal
                 open
@@ -213,6 +240,8 @@ export default function BackupPage() {
                 </div>
               </Modal>
             )}
+
+            {/* Import from JSON */}
             {activeItem === "json-import" && (
               <Modal
                 open
@@ -220,14 +249,18 @@ export default function BackupPage() {
                 message="Import your JSON file to restore your previous data to Money Tracker"
                 header="Import data from JSON"
                 onCancel={() => setActiveItem(null)}
-                onConfirm={() => {
-                  setActiveItem(null);
-                }}
                 icon={<FileSpreadsheet size={20} />}
-                yesButtonText="Import data"
-                noButtonText="No, don't import"
+                onConfirm={() => fileInputRef.current?.click()}
+                yesButtonText="Import file"
+                noButtonText="No, go back"
               >
-                <input type="file" className="flex w-full h-fit"/>
+                <input 
+                  onChange={handleImportFromJSON}
+                  accept=".json"
+                  ref={fileInputRef}
+                  type="file" 
+                  className="flex w-full h-fit border border-(--color-border-subtle) cursor-pointer hover:bg-(--color-bg-subtle) rounded-lg px-3 py-1"
+                />
               </Modal>
             )}
             {activeItem === "csv-import" && (

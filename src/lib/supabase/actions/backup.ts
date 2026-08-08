@@ -2,6 +2,8 @@ import { createClient } from "../clients/client";
 import Papa from "papaparse";
 import JSZip from "jszip";
 
+// <!------------------------------------ EXPORTS --------------------------------->
+
 type ExportOptions = {
     exportAll: boolean,
     startDate?: string,
@@ -74,7 +76,7 @@ export async function ExportAllTablesToJSON(options: ExportOptions) {
 
             if (dateFiltered && !options.exportAll) {
                 if (options.startDate) query = query.gte('date_time', options.startDate);
-                if (options.endDate) query = query.lte('date_timw', options.endDate);
+                if (options.endDate) query = query.lte('date_time', options.endDate);
             }
 
             const { data, error } = await query;
@@ -92,4 +94,26 @@ export async function ExportAllTablesToJSON(options: ExportOptions) {
     a.download = `export_${new Date().toISOString().split('T')[0]}.json`;
     a.click();
     URL.revokeObjectURL(url);
+}
+
+// <!---------------------------------- IMPORT ------------------------------->
+
+const EXPECTED_TABLES = ['accounts', 'categories', 'account_categories', 'transactions', 'accounts_balances'];
+
+export function validateImportShape(parsed: Record<string, unknown>): boolean {
+    return EXPECTED_TABLES.every((table) => Array.isArray(parsed[table]));
+}
+
+export async function ImportFromJSON(parsed: Record<string, any[]>) {
+    const supabase = await createClient();
+
+    const insertOrder = ['accounts', 'categories', 'account_categories', 'transactions', 'accounts_balances'];
+
+    for (const table of insertOrder) {
+        const rows = parsed[table];
+        if (!rows || rows.length === 0) continue;
+
+        const { error } = await supabase.from(table).upsert(rows);
+        if (error) throw new Error(`Failed importing ${table}: ${error.message}`);
+    }
 }
