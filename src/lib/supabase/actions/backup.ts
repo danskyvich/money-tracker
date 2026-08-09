@@ -13,7 +13,7 @@ type ExportOptions = {
 // EXPORT TO CSV
 
 const FILTERED_TABLES = ['transactions'] as const
-const REFERENCE_TABLES = ['accounts', 'categories', 'account_categories', 'accounts_balances'] as const
+const REFERENCE_TABLES = ['accounts', 'categories', 'account_categories'] as const
 
 async function GetAllTables(
     table: string,
@@ -98,7 +98,7 @@ export async function ExportAllTablesToJSON(options: ExportOptions) {
 
 // <!---------------------------------- IMPORT ------------------------------->
 
-const EXPECTED_TABLES = ['accounts', 'categories', 'account_categories', 'transactions', 'accounts_balances'];
+const EXPECTED_TABLES = ['accounts', 'categories', 'account_categories', 'transactions'];
 
 export function validateImportShape(parsed: Record<string, unknown>): boolean {
     return EXPECTED_TABLES.every((table) => Array.isArray(parsed[table]));
@@ -106,14 +106,13 @@ export function validateImportShape(parsed: Record<string, unknown>): boolean {
 
 export async function ImportFromJSON(parsed: Record<string, any[]>) {
     const supabase = await createClient();
+    
+    const { error } = await supabase.rpc("import_money_tracker_data_from_json", {
+        p_account_categories: parsed.account_categories ?? [],
+        p_accounts: parsed.accounts ?? [],
+        p_categories: parsed.categories ?? [],
+        p_transactions: parsed.transactions ?? [],
+    });
 
-    const insertOrder = ['accounts', 'categories', 'account_categories', 'transactions', 'accounts_balances'];
-
-    for (const table of insertOrder) {
-        const rows = parsed[table];
-        if (!rows || rows.length === 0) continue;
-
-        const { error } = await supabase.from(table).upsert(rows);
-        if (error) throw new Error(`Failed importing ${table}: ${error.message}`);
-    }
+    if (error) throw new Error(`Import failed: ${error.message}`);
 }

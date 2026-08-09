@@ -9,22 +9,24 @@ import {
   Plus,
   X,
 } from "lucide-react";
-import IncomeBreakdownPage from "@/features/overview/components/brakdown-income";
+import IncomeBreakdownPage from "@/features/overview/components/breakdown-income";
 import ExpenseBreakdownPage from "@/features/overview/components/breakdown-expense";
 import SixMonthsRef from "../../components/charts/BarChart";
 import { getMonthlyInflowOutflow } from "@/features/overview/api/fetchChartData";
-import Snippet from "../../components/ui/parts/Snippet";
+import Snippet from "./components/snippet-income-expense";
 import TransactionList from "../transactions/components/transactions-list";
 import AccountsList from "./components/accounts-partial";
 import OverviewHeader from "./components/icon-and-name";
 import AddAccountModal from "../accounts/components/add-account-modal";
 import { FetchAccounts, FetchTransaction } from "@/lib/supabase/actions/database";
+import { Transaction } from "@/lib/types/database";
+import OverviewTransactionSkeleton from "./components/skeleton/overview-transaction-skeleton";
+import TransactionWrapper from "./components/transaction-wrapper";
 
 export default function OverviewPage() {
 
   // variables - general
-  const [isAccountModal, setIsAccountModal] = useState(false);
-    useState<boolean>(false);
+  const [toggle, setToggle] = useState<string | null>(null);
   const [totalNumberOfItems, setTotalNumberOfItems] = useState<
     number | null | undefined
   >(null);
@@ -38,7 +40,7 @@ export default function OverviewPage() {
   const [chosenPage, setChosenPage] = useState<"income" | "expense">("income")
 
   // fetch data
-  const [transactionData, setTransactionData] = useState<any[] | null>(null);
+  const [transactionData, setTransactionData] = useState<Transaction[] | null>(null);
   const [accounts, setAccounts] = useState<any[] | null | undefined>(null)
   const [transactionError, setTransactionError] = useState<string | null>(null)
   const [accountError, setAccountError] = useState<string | null>(null);
@@ -109,14 +111,25 @@ export default function OverviewPage() {
 
   return (
     <div className="flex flex-col w-full h-full gap-5">
-
-      {/* Create an account */}
-      <AddAccountModal
-        toggle={isAccountModal}
-        accountCategoriesData={accountCategoriesData}
-        onClose={() => setIsAccountModal(false)}
-        refresh={() => fetchData()}
-      />
+      {toggle === "add-transaction" && (
+        <TransactionWrapper
+          toggle
+          currentPage={currentPage}
+          selectedTransaction={null}
+          onClose={() => setToggle(null)}
+          accountsData={accounts}
+          categoryData={accountCategoriesData}
+          onTransactionSaved={() => setToggle(null)}
+        />
+      )}
+      {toggle === "add-account" && (
+        <AddAccountModal
+          toggle
+          accountCategoriesData={accountCategoriesData}
+          onClose={() => setToggle(null)}
+          refresh={() => fetchData()}
+        />
+      )}
 
       {/* Header */}
       <OverviewHeader />
@@ -142,18 +155,19 @@ export default function OverviewPage() {
             <div className="flex flex-col flex-2 border border-(--color-border-default) rounded-lg shadow-md w-full h-full p-5 gap-2">
               <p className="text-xl font-semibold">Quick Actions</p>
               <div className="flex w-full h-full gap-5 flex-col md:flex-row">
-                <div
-                  className="flex flex-1 bg-(--color-brand-green) text-white rounded-lg shadow-md items-center justify-center text-[0.9rem] gap-1 py-2 cursor-pointer hover:bg-(--color-brand-green-accent) duration-100 transition-all active:bg-emerald-600"
-                >
+                <div className="flex flex-1 bg-(--color-brand-green) text-white rounded-lg shadow-md items-center justify-center text-[0.9rem] gap-1 py-2 cursor-pointer hover:bg-(--color-brand-green-accent) duration-100 transition-all active:bg-emerald-600">
                   <Plus size={20} />
-                  <p className="hidden lg:block whitespace-nowrap">
+                  <p
+                    className="hidden lg:block whitespace-nowrap"
+                    onClick={() => setToggle("add-transaction")}
+                  >
                     Add a transaction
                   </p>
                 </div>
 
                 <div
                   className="flex flex-1 ring ring-inset ring-(--color-brand-green) hover:bg-(--color-brand-green) hover:text-white rounded-lg shadow-md items-center justify-center text-[0.9rem] gap-1 py-2 cursor-pointer duration-100 transition-all active:bg-emerald-600"
-                  onClick={() => setIsAccountModal((prev) => !prev)}
+                  onClick={() => setToggle("add-account")}
                 >
                   <PiggyBank size={20} />
                   <p className="hidden lg:block whitespace-nowrap">
@@ -208,11 +222,17 @@ export default function OverviewPage() {
               subheader="Most recent transactions"
               linkText="View transactions"
             >
-              <TransactionList
-                transactionData={transactionData}
-                transactionError={transactionError}
-                loading={loadingTransactions}
-              />
+              {transactionError && <p>{transactionError}</p>}
+              {loadingTransactions ? (
+                <OverviewTransactionSkeleton />
+              ) : (
+                <TransactionList
+                  transactionData={transactionData}
+                  transactionError={transactionError}
+                  loading={loadingTransactions}
+                  onLoading={() => setLoadingTransactions(true)}
+                />
+              )}
             </Card>
           </div>
         </div>

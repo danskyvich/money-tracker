@@ -1,4 +1,5 @@
 import { X } from "lucide-react";
+import Spinner from "./spinner";
 
 interface ModalProps {
     onOpen: (value: boolean) => void,
@@ -11,13 +12,14 @@ interface ModalProps {
     noButtonText?: string,
     yesButtonText?: string,
     children?: React.ReactNode,
+    loading: boolean;
 }
 
-export default function Modal({children, onCancel, noButtonText, yesButtonText, onOpen, open, header, message, icon, onConfirm}: ModalProps) {
+export default function Modal({loading, children, onCancel, noButtonText, yesButtonText, onOpen, open, header, message, icon, onConfirm}: ModalProps) {
     if (!open) return null;
 
     return (
-      <div className="flex flex-col w-100 mx-5 sm:mx-0 sm:w-100 md:w-85 lg:w-110 xl:w-130 border border-(--color-border-default) rounded-lg bg-(--color-bg-secondary) justify-between p-5">
+      <div className="flex flex-col w-100 mx-5 sm:mx-0 sm:w-110 md:w-125 lg:w-140 xl:w-160 border border-(--color-border-default) rounded-lg bg-(--color-bg-secondary) justify-between p-5">
         {/* Header */}
         <div className="flex w-full h-fit items-center justify-between mb-3">
           {icon}
@@ -25,7 +27,10 @@ export default function Modal({children, onCancel, noButtonText, yesButtonText, 
           <X
             size={15}
             className="cursor-pointer"
-            onClick={() => {onOpen(false); onCancel()}}
+            onClick={() => {
+              onOpen(false);
+              onCancel();
+            }}
           />
         </div>
 
@@ -36,19 +41,26 @@ export default function Modal({children, onCancel, noButtonText, yesButtonText, 
         </div>
 
         {/* Buttons */}
-        <div className="flex w-full h-fit justify-between items-center mt-3">
+        <div className="grid grid-cols-[1fr_1fr] gap-x-3 mt-3 w-full h-fit">
           <button
-            className={`${!noButtonText && "hidden"} flex w-fit border border-(--color-brand-green) rounded-lg text-[0.9rem] px-5 py-1 hover:bg-(--color-brand-green) active:bg-emerald-600 cursor-pointer transition-all duration-100`}
-            onClick={() => {onOpen(false); onCancel()}}
+            className={`${!noButtonText && "hidden"} whitespace-nowrap py-1 flex w-full items-center justify-center border border-(--color-brand-green) rounded-lg text-[0.9rem] hover:bg-(--color-brand-green) active:bg-emerald-600 cursor-pointer transition-all duration-100`}
+            onClick={() => {
+              onOpen(false);
+              onCancel();
+            }}
           >
             <p>{noButtonText}</p>
           </button>
 
           <button
-            className={`${onConfirm === undefined && 'hidden'} flex w-fit rounded-lg text-[0.9rem] px-5 py-1 bg-(--color-brand-green) hover:bg-emerald-600 active:bg-emerald-700 transition-all duration-100 cursor-pointer`}
-            onClick={() => {onConfirm === undefined ? null : onConfirm()}}
+            className={`${onConfirm === undefined && "hidden"} whitespace-nowrap py-2 flex w-full items-center justify-center rounded-lg text-[0.9rem] bg-(--color-brand-green) hover:bg-emerald-600 active:bg-emerald-700 transition-all duration-100 cursor-pointer`}
+            onClick={() => {
+              onConfirm === undefined ? null : onConfirm();
+            }}
           >
-            <p>{yesButtonText}</p>
+            {
+              loading ? <Spinner/> : yesButtonText
+            }
           </button>
         </div>
       </div>

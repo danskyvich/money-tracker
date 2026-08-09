@@ -1,6 +1,5 @@
 import { FilterField } from "@/features/accounts/types/types";
 import { Filter, X } from "lucide-react";
-import { useEffect } from "react";
 
 interface FilterProps {
   open: boolean;

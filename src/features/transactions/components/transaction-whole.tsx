@@ -63,10 +63,10 @@ export default function WholeTransactionList() {
   };
 
   const transactionItems: FilterItems[] = [
-    { id: 1, item: "No filter"},
-    { id: 2, item: "Type" },
-    { id: 3, item: "Category" },
-    { id: 4, item: "Account" },
+    { origin: "transactions", item: "No filter" },
+    { origin: "transactions", item: "Type" },
+    { origin: "transactions", item: "Category" },
+    { origin: "transactions", item: "Account" },
   ];
 
   return (

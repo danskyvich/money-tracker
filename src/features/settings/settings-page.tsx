@@ -1,7 +1,11 @@
 "use client";
 
+import ErrorModal from "@/components/layout/error-modal";
+import LoadingModal from "@/components/layout/loading-modal";
 import Modal from "@/components/layout/modal";
+import { DeleteUserData } from "@/lib/supabase/actions/database";
 import { ChevronDown, Eye, Trash } from "lucide-react";
+import { error } from "node:console";
 import { useState } from "react";
 
 const settings = [
@@ -20,61 +24,88 @@ const settings = [
 
 export default function SettingsPage() {
   // data deletion modal
-  const [deletionLoading, setDeletionLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [isDataDeletionOpen, setIsDataDeletionOpen] = useState<boolean>(false);
+  const [dataDeletionError, setDataDeletionError] = useState<string | undefined>(undefined);
 
   const handleDataDeletion = async () => {
-    setDeletionLoading(true);
+    setLoading(true);
+
+    try {
+      const result = await DeleteUserData();
+      if (!result.success) {
+      setDataDeletionError(result?.error);
+      return;
+      }
+    } finally {
+    setLoading(false);
+    window.location.reload();
+    };
   };
 
   return (
-    <div className="flex flex-col w-full h-full">
-      <p className="text-3xl font-semibold pb-5">Settings</p>
-      <div className="flex flex-col w-full h-full border border-(--color-border-default) rounded-lg shadow-md">
-        {isDataDeletionOpen && (
-          <div className="absolute inset-0 z-50 flex w-full h-full bg-black/50 items-center justify-center">
-            <Modal
-              open={isDataDeletionOpen}
-              onOpen={setIsDataDeletionOpen}
-              onConfirm={handleDataDeletion}
-              onCancel={() => {}}
-              header="Delete your data"
-              message="Are you really sure you want to delete your data? Data deletion is irreversible."
-              icon={<Trash size={15} />}
-              yesButtonText="Yes, delete my data"
-              noButtonText="No, go back"
-            />
-          </div>
-        )}
-        {settings.map((item, index) => (
-          <div
-            className="grid grid-cols-[1fr_1fr] w-full h-fit px-5 py-2 items-center cursor-pointer min-h-0"
-            key={index}
-          >
-            <p className="text-[0.9rem]">{item.item}</p>
-
-            <div className="flex w-fit h-fit ring ring-inset ring-(--color-brand-green) text-[0.9rem] rounded-lg hover:bg-(--color-brand-green) hover:text-white px-5 py-1 items-center justify-center justify-self-end gap-1 duration-100 transition-all">
-              {item.icon === null ? null : item.icon}
-              <p className="text-[0.9rem] whitespace-nowrap">{item.value}</p>
-              {item.item === "Modify income categories" ||
-              item.item === "Modify expense categories" ? null : (
-                <ChevronDown size={20} />
-              )}
+    <>
+    {
+      loading && (
+        <div className="fixed z-50 inset-0 bg-black/50 flex w-full h-full items-center justify-center">
+          <LoadingModal message="Deleting your data..."/>
+        </div>
+      )
+    }
+      <div className="flex flex-col w-full h-full">
+        {
+          dataDeletionError && (
+            <ErrorModal message={dataDeletionError}/>
+          )
+        }
+        <p className="text-3xl font-semibold pb-5">Settings</p>
+        <div className="flex flex-col w-full h-full border border-(--color-border-default) rounded-lg shadow-md">
+          {isDataDeletionOpen && (
+            <div className="absolute inset-0 z-50 flex w-full h-full bg-black/50 items-center justify-center">
+              <Modal
+                open={isDataDeletionOpen}
+                onOpen={setIsDataDeletionOpen}
+                onConfirm={handleDataDeletion}
+                loading={loading}
+                onCancel={() => {}}
+                header="Delete your data"
+                message="Are you really sure you want to delete your data? Data deletion includes all your transactions, accounts, and current configurations. This action is irreversible."
+                icon={<Trash size={15} />}
+                yesButtonText="Yes, delete my data"
+                noButtonText="No, go back"
+              />
             </div>
-          </div>
-        ))}
-        <div className="flex w-full h-fit text-[0.9rem] items-center justify-between px-5 py-2 min-h-0">
-          <p>Delete data</p>
+          )}
+          {settings.map((item, index) => (
+            <div
+              className="grid grid-cols-[1fr_1fr] w-full h-fit px-5 py-2 items-center cursor-pointer min-h-0"
+              key={index}
+            >
+              <p className="text-[0.9rem]">{item.item}</p>
 
-          <button
-            onClick={() => setIsDataDeletionOpen(true)}
-            className="flex border border-(--color-brand-green) rounded-lg items-center justify-center px-5 py-1 gap-1 text-[0.9rem] cursor-pointer hover:bg-(--color-brand-green) active:bg-emerald-600 transition-all duration-100"
-          >
-            <Trash size={15} />
+              <div className="flex w-fit h-fit ring ring-inset ring-(--color-brand-green) text-[0.9rem] rounded-lg hover:bg-(--color-brand-green) hover:text-white px-5 py-1 items-center justify-center justify-self-end gap-1 duration-100 transition-all">
+                {item.icon === null ? null : item.icon}
+                <p className="text-[0.9rem] whitespace-nowrap">{item.value}</p>
+                {item.item === "Modify income categories" ||
+                item.item === "Modify expense categories" ? null : (
+                  <ChevronDown size={20} />
+                )}
+              </div>
+            </div>
+          ))}
+          <div className="flex w-full h-fit text-[0.9rem] items-center justify-between px-5 py-2 min-h-0">
             <p>Delete data</p>
-          </button>
+
+            <button
+              onClick={() => setIsDataDeletionOpen(true)}
+              className="flex border border-(--color-brand-green) rounded-lg items-center justify-center px-5 py-1 gap-1 text-[0.9rem] cursor-pointer hover:bg-(--color-brand-green) active:bg-emerald-600 transition-all duration-100"
+            >
+              <Trash size={15} />
+              <p>Delete data</p>
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

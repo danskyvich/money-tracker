@@ -14,7 +14,7 @@ import { useGoogleReCaptcha } from "react-google-recaptcha-v3"
 export default function VerifyEmailPage({email, rememberMe}:{email: string, rememberMe: boolean}) {
     useEffect(() => {
         document.title = "Verify your email"
-    })
+    }, [])
 
     const {
         register,

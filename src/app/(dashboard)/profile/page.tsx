@@ -1,13 +1,12 @@
-import ProfilePage from "@/components/ui/ProfilePage";
-import { getUser, isUserMfaEnabled, listUserMfaFactors } from "@/lib/supabase/actions/auth";
-import { User } from "@supabase/supabase-js";
+import ProfilePage from "@/features/profile/ProfilePage";
+import { getUser, isUserMfaEnabled } from "@/lib/supabase/actions/auth";
 
 export default async function Profile() {
+  
   const [user, mfaActive] = await Promise.all([
     getUser(),
     isUserMfaEnabled(),
   ])
-
 
   return (
     <ProfilePage  user={user} mfaActive={mfaActive} />

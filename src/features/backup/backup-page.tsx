@@ -1,6 +1,7 @@
 'use client'
 
 import ErrorModal from "@/components/layout/error-modal";
+import LoadingModal from "@/components/layout/loading-modal";
 import Modal from "@/components/layout/modal";
 import { exportAllTablesCsv, ExportAllTablesToJSON, ImportFromJSON, validateImportShape } from "@/lib/supabase/actions/backup";
 import { ArrowRight, FileSpreadsheet, MoveDownLeft, MoveUpRight } from "lucide-react"
@@ -9,7 +10,7 @@ import { useEffect, useRef, useState } from "react"
 export default function BackupPage() {
     useEffect(() => {
         document.title = "Your backup"
-    });
+    }, []);
 
     const [activeItem, setActiveItem] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
@@ -21,9 +22,6 @@ export default function BackupPage() {
     // export to csv
     const [exportAllData, setExportAllData] = useState<boolean>(false);
     const [exportError, setExportError] = useState<string | null>(null);
-
-    // import from json
-    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const backup = [
       {
@@ -60,7 +58,7 @@ export default function BackupPage() {
 
     useEffect(() => {
       setDateNow(getTodayString());
-    })
+    }, [])
 
     // Export to CSV
     const handleExportToCSV = async () => {
@@ -109,6 +107,7 @@ export default function BackupPage() {
         if (!validateImportShape(parsed)) throw new Error("File is missing expected files");
 
         await ImportFromJSON(parsed);
+        setActiveItem(null);
       } catch (err) {
         setExportError(String(err));
       } finally {
@@ -118,10 +117,14 @@ export default function BackupPage() {
 
     return (
       <>
+        {loading && (
+          <div className="fixed inset-0 z-50 bg-black/50 flex w-full h-full items-center justify-center">
+            <LoadingModal message="Preparing a backup for your data"/>
+          </div>
+        )}
         {exportError && <ErrorModal message={exportError} />}
         {activeItem && (
           <div className="fixed inset-0 z-50 bg-black/50 flex w-full h-full items-center justify-center">
-
             {/* Export to CSV */}
             {activeItem === "csv" && (
               <Modal
@@ -135,6 +138,7 @@ export default function BackupPage() {
                   handleExportToCSV();
                   setActiveItem(null);
                 }}
+                loading={loading}
                 icon={<FileSpreadsheet size={20} />}
                 yesButtonText={loading ? "Exporting data..." : "Export to CSV"}
                 noButtonText="No, don't export"
@@ -194,6 +198,7 @@ export default function BackupPage() {
                   handleExportToJSON();
                   setActiveItem(null);
                 }}
+                loading={loading}
                 icon={<FileSpreadsheet size={20} />}
                 yesButtonText="Export to JSON"
                 noButtonText="No, don't export"
@@ -250,15 +255,13 @@ export default function BackupPage() {
                 header="Import data from JSON"
                 onCancel={() => setActiveItem(null)}
                 icon={<FileSpreadsheet size={20} />}
-                onConfirm={() => fileInputRef.current?.click()}
-                yesButtonText="Import file"
                 noButtonText="No, go back"
+                loading={loading}
               >
-                <input 
+                <input
                   onChange={handleImportFromJSON}
                   accept=".json"
-                  ref={fileInputRef}
-                  type="file" 
+                  type="file"
                   className="flex w-full h-fit border border-(--color-border-subtle) cursor-pointer hover:bg-(--color-bg-subtle) rounded-lg px-3 py-1"
                 />
               </Modal>
@@ -276,6 +279,7 @@ export default function BackupPage() {
                 icon={<FileSpreadsheet size={20} />}
                 yesButtonText="Import data"
                 noButtonText="No, don't import"
+                loading={loading}
               ></Modal>
             )}
           </div>

@@ -20,7 +20,7 @@ export default function ErrorModal({ message }: ErrorModalProps) {
     <AnimatePresence>
       {visible && message && (
         <motion.div
-          className="fixed top-5 left-1/2 items-center justify-center -translate-x-1/2 flex inset-0 z-100 w-fit h-fit gap-3 border border-(--color-border-default) rounded-lg shadow-xl px-5 py-2 bg-(--color-bg-subtle)"
+          className="fixed top-5 text-white left-1/2 items-center justify-center -translate-x-1/2 flex inset-0 z-100 w-fit h-fit gap-3 border border-red-800 rounded-lg shadow-xl px-5 py-2 bg-red-800"
           initial={{ opacity: 0, y: -5 }}
           animate={{ opacity: 1, y: 5 }}
           exit={{ opacity: 0, y: -5 }}

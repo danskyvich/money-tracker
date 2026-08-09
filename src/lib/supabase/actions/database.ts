@@ -233,17 +233,17 @@ export async function DeleteUserData() {
 
     const user_id = user.id;
 
-    const [transactionsResult, balancesResult, accountsResult, accountCategoriesResult, transactionCategoriesResult] = await Promise.all([
-        supabase.from("transactions").delete().eq("user_id", user_id),
-        supabase.from("accounts_balances").delete().eq("user_id", user_id),
-        supabase.from("accounts").delete().eq("user_id", user_id),
-        supabase.from("account_categories").delete().eq("user_id", user_id),
-        supabase.from("categories").delete().eq("user_id", user_id),
-    ])
+    const deletes = [
+        () => supabase.from("transactions").delete().eq("user_id", user_id),
+        () => supabase.from("accounts").delete().eq("user_id", user_id),
+        () => supabase.from("account_categories").delete().eq("user_id", user_id),
+        () => supabase.from("categories").delete().eq("user_id", user_id),
+    ];
 
-    const errors = [transactionsResult.error, balancesResult.error, accountsResult.error, accountCategoriesResult.error, transactionCategoriesResult.error];
+    for (const del of deletes) {
+        const { error } = await del();
+        if (error) return { success: false, error: error.message}
+    }
 
-    if (errors.length > 0) return { success: false, error: errors.map((e) => e!.message).join("; ") };
-    
-    return { success: true };
+    return { success: true};
 }

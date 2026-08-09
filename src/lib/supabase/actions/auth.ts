@@ -263,3 +263,12 @@ export async function signInWithFacebook() {
 
     redirect("/login?error=oauth_failed")
  }
+
+ export async function getUserAuthenticationAssuranceLevel() {
+    const supabase = await createClient();
+
+    const { data, error } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (error) return { success: false, error: error.message};
+
+    return { success: true, data };
+ }

@@ -1,7 +1,7 @@
 import { getCategoryBreakdown } from "@/features/overview/api/fetchChartData";
 import { ArrowUp } from "lucide-react";
 import { useEffect, useState } from "react";
-import SnippetSkeleton from "../../layout/skeleton/snippet-skeleton";
+import SnippetSkeleton from "../../../components/layout/skeleton/snippet-skeleton";
 
 export default function Snippet({type}: {type: "income" | "expense"}) {
 
