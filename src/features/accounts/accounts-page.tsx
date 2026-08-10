@@ -26,13 +26,12 @@ export default function Accounts() {
   >(null);
   const [totalNumberOfCategories, setTotalNumberOfCategories] = useState<
     number | null
-  >(0);
-  const [isCategoryAccountOpen, setIsCategoryAccountOpen] = useState(false);
+  >(0); // use totalNumber if needed
+  
+  const [toggle, setToggle] = useState<boolean>(false);
   const [accountCategoryToBeUpdated, setAccountCategoryToBeUpdated] =
     useState<string>("");
   const [uuidToBeTargeted, setUuidToBeTargeted] = useState<string>("");
-  const [isInsertAccountCategoryOpen, setIsInsertAccountCategoryOpen] =
-    useState<boolean>(false);
 
   // fetch account_categories data
   useEffect(() => {
@@ -66,7 +65,7 @@ export default function Accounts() {
     name: string,
     uuid: string,
   ) => {
-    setIsCategoryAccountOpen(true);
+    setToggle(true);
     setAccountCategoryToBeUpdated(name);
     setUuidToBeTargeted(uuid);
   };
@@ -77,8 +76,9 @@ export default function Accounts() {
       {/* Modify existing account category */}
       <ModifyAccountCategoriesModal
        fetch={fetchCategories} 
-       setIsOpen={setIsCategoryAccountOpen}
-       isOpen={isCategoryAccountOpen}
+       onOpen={() => setToggle(true)}
+       open={toggle}
+       onClose={() => setToggle(false)}
        setAccountCategoryName={setAccountCategoryToBeUpdated}
        accountCategoryName={accountCategoryToBeUpdated}
        uuid={uuidToBeTargeted}
@@ -87,8 +87,9 @@ export default function Accounts() {
       {/* Insert new account_category */}
       <AddAccountCategoryModal
         fetch={fetchCategories}
-        isOpen={isInsertAccountCategoryOpen}
-        setIsOpen={setIsInsertAccountCategoryOpen}
+        open={toggle}
+        onOpen={() => setToggle(true)}
+        onClose={() => setToggle(false)}
       />
 
       <p className="text-3xl font-semibold">Accounts</p>
@@ -104,7 +105,7 @@ export default function Accounts() {
 
             <div
               className="flex w-fit h-fit items-center gap-1 cursor-pointer text-white px-3 py-2 text-[0.9rem] font-display bg-(--color-brand-gold) rounded-lg shadow-md hover:bg-yellow-600 duration-100 transition-all"
-              onClick={() => setIsInsertAccountCategoryOpen(true)}
+              onClick={() => setToggle(true)}
             >
               <Plus size={20} />
               <p className="text-[0.9rem]">Add a category</p>
@@ -112,13 +113,23 @@ export default function Accounts() {
           </div>
 
           {/* Category tables */}
-          <div className="flex relative flex-col w-full h-110 xl:h-full overflow-y-auto overflow-x-hidden">
-            {categories ? (
+          <div className="flex relative flex-col w-full h-110 xl:h-full overflow-y-auto overflow-x-hidden items-center justify-center">
+            {
+              fetchCategoriesError && (
+                <p className="text-[0.9rem]">{fetchCategoriesError}</p>
+              )
+            }
+            {
+              categoriesLoading && (
+                <p className="text-[0.9rem]">Loading categories...</p>
+              )
+            }
+            {categories && categories.length > 0 ? (
               categories?.map((category, key) => (
                 <div
                   className="flex w-full h-fit px-5 py-2 border-(--color-border-subtle) border-b items-center justify-between hover:bg-(--color-bg-subtle) active:bg-(--color-bg-secondary) cursor-pointer"
                   key={key}
-                  onClick={() =>
+                  onClick={() => 
                     handleAccountCategoryNameUpdateOpenModal(
                       category.name,
                       category.id,
@@ -128,25 +139,10 @@ export default function Accounts() {
                   <p className="text-[0.9rem] font-display">{category.name}</p>
                   <Pencil size={15} />
                 </div>
-              ))
-            ) : (
-              <div className="absolute z-50 bg-black/20 flex w-full h-full inset-0 items-center justify-center">
-                <div className="flex border border-(--color-border-default) bg-(--color-bg-secondary) rounded-lg shadow-md px-5 py-2">
-                  {categoriesLoading ? (
-                    <div className="flex w-full items-center gap-4">
-                      <p className="text-[0.9rem] font-mono">
-                        Loading categories...
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="flex w-full items-center gap-4">
-                      <CircleAlert size={15} />
-                      <p className="text-[0.9rem]">{fetchCategoriesError}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
+              ))) : (
+                <p className="text-[0.9rem]">You have no categories.</p>
+              )             
+            }
           </div>
         </div>
       </div>

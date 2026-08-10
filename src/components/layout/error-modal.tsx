@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 interface ErrorModalProps {
-  message: string | null;
+  message: string | null | undefined;
 }
 
 export default function ErrorModal({ message }: ErrorModalProps) {

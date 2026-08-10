@@ -50,6 +50,13 @@ export default function TransactionList({
               </div>
             </div>
           ))}
+          {
+            transactionError && (
+              <div className="flex w-full h-full items-center justify-center text-[0.9rem]">
+                <p>{transactionError}</p>
+              </div>
+            )
+          }
         </div>
       ) : (
         <div className="flex flex-col w-full h-full font-sans text-[0.9rem] items-center justify-center gap-1">

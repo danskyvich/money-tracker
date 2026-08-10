@@ -8,16 +8,18 @@ import { Dispatch, useActionState } from "react";
 
 interface ModifyAccountCategoriesModal {
   fetch: () => void;
-  isOpen: boolean;
+  open: boolean;
+  onClose: () => void;
   accountCategoryName: string;
   uuid: string;
   setAccountCategoryName: Dispatch<React.SetStateAction<string>>;
-  setIsOpen: Dispatch<React.SetStateAction<boolean>>;
+  onOpen: (value: boolean) => void;
 }
 
 export default function ModifyAccountCategoriesModal({
-  isOpen,
-  setIsOpen,
+  open,
+  onOpen,
+  onClose,
   uuid,
   setAccountCategoryName,
   fetch,
@@ -32,9 +34,9 @@ export default function ModifyAccountCategoriesModal({
 
       const result = await UpdateAccountCategoryName(newName, uuid);
 
-      if (!result.success) return { error: result?.error};
+      if (!result.success) return { error: result?.error };
 
-      setIsOpen(false);
+      onOpen(false);
       fetch();
     },
     null,
@@ -47,7 +49,7 @@ export default function ModifyAccountCategoriesModal({
 
       if (!result.success) return { error: result?.error };
 
-      setIsOpen(false);
+      onOpen(false);
       fetch();
     },
     null,
@@ -56,9 +58,9 @@ export default function ModifyAccountCategoriesModal({
   return (
     <>
       {(updateState?.error || deleteState?.error) && (
-        <ErrorModal message={updateState?.error || deleteState?.error}/>
+        <ErrorModal message={"Error: " + updateState?.error || deleteState?.error} />
       )}
-      {isOpen && (
+      {open && (
         <div className="fixed flex z-50 inset-0 bg-black/50 w-full h-full items-center justify-center">
           <div className="flex flex-col w-75 lg:w-100 h-fit p-5 border border-(--color-border-default) rounded-lg bg-(--color-bg-secondary) shadow-md">
             <div className="flex w-full h-fit justify-between items-center pb-5">
@@ -69,7 +71,7 @@ export default function ModifyAccountCategoriesModal({
               <X
                 size={20}
                 className="cursor-pointer"
-                onClick={() => setIsOpen(false)}
+                onClick={() => onClose}
               />
             </div>
             <form className="flex flex-col w-full gap-2">
