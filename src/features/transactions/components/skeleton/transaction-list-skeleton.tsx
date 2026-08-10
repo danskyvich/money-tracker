@@ -1,8 +1,8 @@
 import Skeleton from "@/components/layout/skeleton/skeleton-file";
 
-export default function AccountListSkeleton() {
+export default function TransactionListSkeleton() {
   return (
-    <div className="flex flex-col h-80dvh xl:h-full w-full gap-5 p-5">
+    <div className="flex flex-col h-full w-full gap-5 p-5">
       <div className="flex flex-1 w-[60%] xl:h-full gap-5">
         <Skeleton className="flex w-20 h-full" />
         <Skeleton className="flex w-35 h-full" />

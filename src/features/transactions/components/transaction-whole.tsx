@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import ErrorModal from "@/components/layout/error-modal";
+import TransactionListSkeleton from "./skeleton/transaction-list-skeleton";
 
 export default function WholeTransactionList() {
   // fetch data & error
@@ -26,7 +27,7 @@ export default function WholeTransactionList() {
   // modals
   const [openModal, setOpenModal] = useState(false);
   const [selectedTransaction, setSelectedTransaction] =
-  useState<Transaction | null>(null);  
+    useState<Transaction | null>(null);
 
   // pagination --> edit # of items calculations on lib/data/overview.ts
   // calculation here is purely for pagination purposes
@@ -43,11 +44,11 @@ export default function WholeTransactionList() {
     const result = await FetchTransaction(currentPage, 9);
 
     if (!result || !result.success) {
-      setTransactionsError(result?.error ?? "Transaction fetch failed.")
+      setTransactionsError(result?.error ?? "Transaction fetch failed.");
     }
 
     setTransactionsData(result?.data);
-    setTotalNumberOfItems(result?.totalItems)
+    setTotalNumberOfItems(result?.totalItems);
     setPending(false);
   };
 
@@ -71,156 +72,163 @@ export default function WholeTransactionList() {
   ];
 
   return (
-    <div className="grid grid-cols-1 grid-rows-[auto_1fr_auto] h-full border border-(--color-border-default) rounded-lg">
-      
-      {/* Filter Bar */}
-      <div className="flex w-full h-full px-5 py-2 gap-3 ">
-      
-        <FilterModal content={transactionItems} />
+    <>
+      {pending ? (
+        <TransactionListSkeleton />
+      ) : (
+        <div className="grid grid-cols-1 grid-rows-[auto_1fr_auto] h-full border border-(--color-border-default) rounded-lg">
+          {/* Filter Bar */}
+          <div className="flex w-full h-full px-5 py-2 gap-3 ">
+            <FilterModal content={transactionItems} />
 
-        {/* Date range */}
-        <div className="flex w-fit h-full border border-(--color-border-default) font-display text-[0.8rem] py-1 px-3 rounded-lg gap-2 items-center justify-center">
-          <Calendar size={15} />
-          <p className="whitespace-nowrap hidden lg:block">Date range</p>
-          <ChevronDown size={20} />
-        </div>
-
-        {/* Search field */}
-        <div className="px-3 py-1 flex w-fit h-full border border-(--color-border-default) rounded-md items-center gap-2">
-          <Search size={15} className="flex" />
-          <input
-            placeholder="Search..."
-            className="flex flex-3 decorations-none placeholder:text-[0.8rem] focus:outline-none focus:ring-0 focus:border-transparent text-[0.8rem]"
-          />
-        </div>
-      </div>
-
-      {/* Transaction Table */}
-      <div className="flex flex-col w-full h-full mt-3">
-        {/** Transaction headers */}
-        <div className="grid grid-cols-[repeat(6,1fr)] gap-4 font-mono text-[0.9rem] py-1 px-5 pt-1 font-display border-b border-(--color-border-default)">
-          <div className="line-clamp-1">Date & time</div>
-          <div>Type</div>
-          <div>Description</div>
-          <div>Category</div>
-          <div>Account</div>
-          <div className="text-left">Amount</div>
-        </div>
-
-        <div className="flex relative w-full h-full overflow-hidden">
-          {transactionsData ? (
-            <div className="flex flex-col w-full h-fit">
-              {transactionsData.map((transaction, key) => (
-                <div
-                  className="grid grid-cols-[repeat(6,1fr)] gap-4 font-display text-[0.9rem] px-5 py-5 font-display w-full h-fit cursor-pointer hover:bg-(--color-bg-subtle) border-b border-(--color-border-subtle)"
-                  key={key}
-                  onClick={() => handleOpenModal(true, transaction)}
-                >
-                  <div className="flex w-full items-center">
-                    <p className="line-clamp-1">
-                      {ConvertTimestampToDateTime(transaction.date_time)}
-                    </p>
-                  </div>
-                  <div className="flex w-full items-center text-(--color-text-secondary)">
-                    <p className="capitalize line-clamp-1">
-                      {transaction.type}
-                    </p>
-                  </div>
-                  <div className="flex w-full items-center">
-                    <p className="line-clamp-1">{transaction.description}</p>
-                  </div>
-                  <div className="flex w-full items-center">
-                    <p className="line-clamp-1">
-                      {transaction.categories?.name}
-                    </p>
-                  </div>
-                  <div className="flex w-full items-center">
-                    {transaction.toAccount?.name ? (
-                      <p className="line-clamp-1">
-                        {transaction.fromAccount?.name} to{" "}
-                        {transaction.toAccount?.name}
-                      </p>
-                    ) : (
-                      <p>{transaction.fromAccount?.name}</p>
-                    )}
-                  </div>
-                  <div
-                    className={`flex w-full items-center font-mono ${transaction.type === "income" ? "text-emerald-500" : transaction.type === "expense" ? "text-red-500" : "text-(--color-text-primary)"}`}
-                  >
-                    <p className="line-clamp-1">{transaction.amount}</p>
-                  </div>
-                </div>
-              ))}
+            {/* Date range */}
+            <div className="flex w-fit h-full border border-(--color-border-default) font-display text-[0.8rem] py-1 px-3 rounded-lg gap-2 items-center justify-center">
+              <Calendar size={15} />
+              <p className="whitespace-nowrap hidden lg:block">Date range</p>
+              <ChevronDown size={20} />
             </div>
-          ) : (
-            <div className="flex w-full h-full items-center justify-center text-[1rem]">
-              <p>You have no transactions.</p>
+
+            {/* Search field */}
+            <div className="px-3 py-1 flex w-fit h-full border border-(--color-border-default) rounded-md items-center gap-2">
+              <Search size={15} className="flex" />
+              <input
+                placeholder="Search..."
+                className="flex flex-3 decorations-none placeholder:text-[0.8rem] focus:outline-none focus:ring-0 focus:border-transparent text-[0.8rem]"
+              />
             </div>
-          )}
-
-          {pending && (
-            <></>
-          )}
-
-          {transactionsError && (
-            <ErrorModal
-              message={transactionsError}
-            />
-          )}
-        </div>
-      </div>
-
-      {/* Footer */}
-      <div className="flex text-[0.9rem] w-full h-full px-5 py-2 font-display justify-between text-(--color-text-secondary) gap-2 items-center">
-        {/* Show num of items */}
-        <div className="flex w-fit h-full items-center">
-          <p>Show data</p>
-
-          <div className="flex border border-(--color-border-default) text-(--color-text-secondary) px-3 py-2 mx-2 rounded-lg shadow-sm">
-            <p>{totalPages}</p>
           </div>
 
-          <p>of {totalNumberOfItems}</p>
-        </div>
-
-        {/* Pagination */}
-        <div className="flex w-fit h-full items-center gap-2 mx-3">
-          {/* Left */}
-          {windowStart > 0 && (
-            <div
-              className="px-3 py-2 border border-(--color-border-default) rounded-lg shadow-md cursor-pointer hover:bg-(--color-bg-subtle)"
-              onClick={() => setWindowStart((prev) => Math.max(0, prev - 5))}
-            >
-              <ChevronLeft size={15} />
+          {/* Transaction Table */}
+          <div className="flex flex-col w-full h-full mt-3">
+            {/** Transaction headers */}
+            <div className="grid grid-cols-[repeat(6,1fr)] gap-4 font-mono text-[0.9rem] py-1 px-5 pt-1 font-display border-b border-(--color-border-default)">
+              <div className="line-clamp-1">Date & time</div>
+              <div>Type</div>
+              <div>Description</div>
+              <div>Category</div>
+              <div>Account</div>
+              <div className="text-left">Amount</div>
             </div>
-          )}
 
-          {/* window slice (-5, windowStart, +5) */}
-          {visiblePages.map((item, key) => (
-            <div
-              className={`px-3 py-2 border border-(--color-border-default) rounded-lg shadow-md hover:bg-(--color-bg-subtle) cursor-pointer ${currentPage === item ? "bg-(--color-brand-green) text-black hover:bg-(--color-brand-green)" : null}`}
-              key={key}
-              onClick={() => setCurrentPage(item)}
-            >
-              <p>{item}</p>
-            </div>
-          ))}
-
-          {/* Right */}
-          {windowStart + 5 < paginationArray.length && (
-            <div
-              className="px-3 py-2 border border-(--color-border-default) rounded-lg shadow-md"
-              onClick={() =>
-                setWindowStart((prev) =>
-                  Math.min(paginationArray.length - 5, prev + 5),
+            <div className="flex flex-col relative w-full h-full overflow-hidden items-center justify-center">
+              {transactionsData && (
+                <div className="flex flex-col w-full h-fit">
+                  {transactionsData.map((transaction, key) => (
+                    <div
+                      className="grid grid-cols-[repeat(6,1fr)] gap-4 font-display text-[0.9rem] px-5 py-5 font-display w-full h-fit cursor-pointer hover:bg-(--color-bg-subtle) border-b border-(--color-border-subtle)"
+                      key={key}
+                      onClick={() => handleOpenModal(true, transaction)}
+                    >
+                      <div className="flex w-full items-center">
+                        <p className="line-clamp-1">
+                          {ConvertTimestampToDateTime(transaction.date_time)}
+                        </p>
+                      </div>
+                      <div className="flex w-full items-center text-(--color-text-secondary)">
+                        <p className="capitalize line-clamp-1">
+                          {transaction.type}
+                        </p>
+                      </div>
+                      <div className="flex w-full items-center">
+                        <p className="line-clamp-1">
+                          {transaction.description}
+                        </p>
+                      </div>
+                      <div className="flex w-full items-center">
+                        <p className="line-clamp-1">
+                          {transaction.categories?.name}
+                        </p>
+                      </div>
+                      <div className="flex w-full items-center">
+                        {transaction.toAccount?.name ? (
+                          <p className="line-clamp-1">
+                            {transaction.fromAccount?.name} to{" "}
+                            {transaction.toAccount?.name}
+                          </p>
+                        ) : (
+                          <p>{transaction.fromAccount?.name}</p>
+                        )}
+                      </div>
+                      <div
+                        className={`flex w-full items-center font-mono ${transaction.type === "income" ? "text-emerald-500" : transaction.type === "expense" ? "text-red-500" : "text-(--color-text-primary)"}`}
+                      >
+                        <p className="line-clamp-1">{transaction.amount}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {
+                transactionsError && (
+                  <p className=""></p>
                 )
               }
-            >
-              <ChevronRight size={15} />
+
+              {transactionsData?.length === 0 && (
+                <p className="text-[0.9rem]">
+                  You have no lodged transactions.
+                </p>
+              )}
+
+              {transactionsError && <ErrorModal message={transactionsError} />}
             </div>
-          )}
+          </div>
+
+          {/* Footer */}
+          <div className="flex text-[0.9rem] w-full h-full px-5 py-2 font-display justify-between text-(--color-text-secondary) gap-2 items-center">
+            {/* Show num of items */}
+            <div className="flex w-fit h-full items-center">
+              <p>Show data</p>
+
+              <div className="flex border border-(--color-border-default) text-(--color-text-secondary) px-3 py-2 mx-2 rounded-lg shadow-sm">
+                <p>{totalPages}</p>
+              </div>
+
+              <p>of {totalNumberOfItems}</p>
+            </div>
+
+            {/* Pagination */}
+            <div className="flex w-fit h-full items-center gap-2 mx-3">
+              {/* Left */}
+              {windowStart > 0 && (
+                <div
+                  className="px-3 py-2 border border-(--color-border-default) rounded-lg shadow-md cursor-pointer hover:bg-(--color-bg-subtle)"
+                  onClick={() =>
+                    setWindowStart((prev) => Math.max(0, prev - 5))
+                  }
+                >
+                  <ChevronLeft size={15} />
+                </div>
+              )}
+
+              {/* window slice (-5, windowStart, +5) */}
+              {visiblePages.map((item, key) => (
+                <div
+                  className={`px-3 py-2 border border-(--color-border-default) rounded-lg shadow-md hover:bg-(--color-bg-subtle) cursor-pointer ${currentPage === item ? "bg-(--color-brand-green) text-black hover:bg-(--color-brand-green)" : null}`}
+                  key={key}
+                  onClick={() => setCurrentPage(item)}
+                >
+                  <p>{item}</p>
+                </div>
+              ))}
+
+              {/* Right */}
+              {windowStart + 5 < paginationArray.length && (
+                <div
+                  className="px-3 py-2 border border-(--color-border-default) rounded-lg shadow-md"
+                  onClick={() =>
+                    setWindowStart((prev) =>
+                      Math.min(paginationArray.length - 5, prev + 5),
+                    )
+                  }
+                >
+                  <ChevronRight size={15} />
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 }

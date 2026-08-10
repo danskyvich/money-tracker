@@ -58,13 +58,13 @@ export async function InsertAccountCategoryName(name: string) {
     
     const user = await getUser(); // user_id
 
-    const { data, error } = await supabase
+    const { error } = await supabase
         .from('account_categories')
         .insert({ name, user_id: user?.id })
     
     if (error) return { success: false, error: error.message}
 
-    return { success: true, data }
+    return { success: true }
 }
 
 

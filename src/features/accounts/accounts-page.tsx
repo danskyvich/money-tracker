@@ -3,13 +3,14 @@
 import WholeAccountsList from "@/features/accounts/components/accounts-whole";
 import { createClient } from "@/lib/supabase/clients/client";
 import {
-  CircleAlert,
+  Book,
   Pencil,
   Plus,
 } from "lucide-react";
-import { useEffect, useState } from "react";
-import AddAccountCategoryModal from "./components/account-category-add";
-import ModifyAccountCategoriesModal from "./components/modify-account-categories-modal";
+import { useEffect, useRef, useState } from "react";
+import AccountCategoryListSkeleton from "./components/skeleton/account-categories-list-skeleton";
+import Modal from "@/components/layout/modal";
+import { InsertAccountCategoryName, UpdateAccountCategoryName } from "@/lib/supabase/actions/database";
 
 export default function Accounts() {
   useEffect(() => {
@@ -17,21 +18,22 @@ export default function Accounts() {
   }, []);
 
   // data
-  const [categories, setCategories] = useState<any[] | null>(null);
+  const [accountCategories, setAccountCategories] = useState<any[] | null>(null);
 
   // modals
-  const [categoriesLoading, setCategoriesLoading] = useState(false);
-  const [fetchCategoriesError, setFetchCategoriesError] = useState<
+  const [loading, setLoading] = useState(false);
+  const [accountCategoriesError, setAccountCategoriesError] = useState<
     string | null
   >(null);
   const [totalNumberOfCategories, setTotalNumberOfCategories] = useState<
     number | null
   >(0); // use totalNumber if needed
   
-  const [toggle, setToggle] = useState<boolean>(false);
+  const [toggle, setToggle] = useState<string | null>(null);
   const [accountCategoryToBeUpdated, setAccountCategoryToBeUpdated] =
-    useState<string>("");
-  const [uuidToBeTargeted, setUuidToBeTargeted] = useState<string>("");
+    useState<string | null>(null);
+  const [newAccountCategoryName, setNewAccountCategoryName] = useState<string | null>(null);
+  const [uuidToBeTargeted, setUuidToBeTargeted] = useState<string | null>(null);
 
   // fetch account_categories data
   useEffect(() => {
@@ -39,58 +41,109 @@ export default function Accounts() {
   }, []);
 
   const fetchCategories = async () => {
-    setCategoriesLoading(true);
-    const { data, count, error } = await (await createClient())
+    setLoading(true);
+
+     const supabase = await createClient();
+     const { data, error } = await supabase 
       .from("account_categories")
-      .select(`id, name`, { count: "exact" }); // select columns to be query, count # of rows
-
+      .select(`id, name`);
+    
     if (error) {
-      setFetchCategoriesError("Error: " + error.message);
-      setCategories(null);
-      setCategoriesLoading(false);
+      setAccountCategoriesError("Error: " + error.message);
+      setLoading(false);
+      return;
     }
-
-    if (data) {
-      setCategories(data);
-      setFetchCategoriesError(null);
-      setTotalNumberOfCategories(count);
-      setCategoriesLoading(false);
-    }
-
-    setCategoriesLoading(false);
+    setAccountCategories(data);
+    setLoading(false);
   };
 
-  // handles the fetch of the category name to be updated
-  const handleAccountCategoryNameUpdateOpenModal = (
-    name: string,
-    uuid: string,
-  ) => {
-    setToggle(true);
-    setAccountCategoryToBeUpdated(name);
-    setUuidToBeTargeted(uuid);
-  };
+  // handle adding a new account category
+  const handleAddAccountCategory = async (name: string) => {
+    setLoading(true);
+
+    const result = await InsertAccountCategoryName(name);
+    if (result.error || !result.success) {
+      setAccountCategoriesError("Error: " + result.error);
+      setLoading(false);
+      return;
+    }
+    setLoading(false);
+
+  }
+
+  // handle updating account categories
+  const handleModifyAccountCategory = async (name: string) => {
+    if (uuidToBeTargeted === null) return;
+
+    const result = await UpdateAccountCategoryName(name, uuidToBeTargeted);
+    if (!result.success || result.error) {
+      setAccountCategoriesError("Error: " + result?.error);
+      setAccountCategoryToBeUpdated(null);
+      setUuidToBeTargeted(null);
+      setLoading(false);
+    }
+    setLoading(false);
+  }
 
   return (
-    <div className="flex relative flex-col w-full h-full gap-5">
-      
-      {/* Modify existing account category */}
-      <ModifyAccountCategoriesModal
-       fetch={fetchCategories} 
-       onOpen={() => setToggle(true)}
-       open={toggle}
-       onClose={() => setToggle(false)}
-       setAccountCategoryName={setAccountCategoryToBeUpdated}
-       accountCategoryName={accountCategoryToBeUpdated}
-       uuid={uuidToBeTargeted}
-       />
-
-      {/* Insert new account_category */}
-      <AddAccountCategoryModal
-        fetch={fetchCategories}
-        open={toggle}
-        onOpen={() => setToggle(true)}
-        onClose={() => setToggle(false)}
-      />
+    <div className="flex flex-col w-full h-full gap-5">
+      {toggle === "add-account-category" && (
+        <div className="absolute z-50 inset-0 flex w-full h-full bg-black/50 items-center justify-center">
+          <Modal
+            open
+            onOpen={() => setToggle(null)}
+            onCancel={() => setToggle(null)}
+            onConfirm={() =>handleAddAccountCategory(newAccountCategoryName ?? "")}
+            loading={loading}
+            icon={<Book size={20} />}
+            header="Add an account category"
+            noButtonText="No"
+            yesButtonText="Add account category"
+          >
+            <div className="flex w-full h-full flex-col gap-2">
+              <label htmlFor="account_category" className="text-[1rem]">
+                Enter a new name:
+              </label>
+              <input
+                className="flex border rounded-md border-(--color-border-default) px-5 py-1 mb-5 placeholder:text-[0.9rem] text-[0.9rem] outline-none focus:border-(--color-border-strong)"
+                type="text"
+                id="account_category"
+                placeholder="ex. Investments"
+                onChange={(e) => setNewAccountCategoryName(e.target.value)}
+              />
+            </div>
+          </Modal>
+        </div>
+      )}
+      {toggle === "modify-account-category" && (
+        <div className="absolute z-50 inset-0 flex w-dvw h-dvh bg-black/50 items-center justify-center">
+          <Modal
+            open
+            onOpen={() => setToggle(null)}
+            onCancel={() => setToggle(null)}
+            onConfirm={() => handleModifyAccountCategory(accountCategoryToBeUpdated ?? "")}
+            loading={loading}
+            icon={<Book size={20} />}
+            header="Modify an account category"
+            noButtonText="No"
+            yesButtonText="Apply changes"
+          >
+            <div className="flex w-full h-full flex-col gap-2">
+              <label htmlFor="account_category" className="text-[1rem]">
+                Enter a new name:
+              </label>
+              <input
+                className="flex border rounded-md border-(--color-border-default) px-5 py-1 mb-5 placeholder:text-[0.9rem] text-[0.9rem] outline-none focus:border-(--color-border-strong)"
+                type="text"
+                value={accountCategoryToBeUpdated ?? ""}
+                id="account_category"
+                placeholder="ex. Investments"
+                onChange={(e) => setAccountCategoryToBeUpdated(e.target.value)}
+              />
+            </div>
+          </Modal>
+        </div>
+      )}
 
       <p className="text-3xl font-semibold">Accounts</p>
 
@@ -105,7 +158,7 @@ export default function Accounts() {
 
             <div
               className="flex w-fit h-fit items-center gap-1 cursor-pointer text-white px-3 py-2 text-[0.9rem] font-display bg-(--color-brand-gold) rounded-lg shadow-md hover:bg-yellow-600 duration-100 transition-all"
-              onClick={() => setToggle(true)}
+              onClick={() => setToggle("add-account-category")}
             >
               <Plus size={20} />
               <p className="text-[0.9rem]">Add a category</p>
@@ -114,35 +167,28 @@ export default function Accounts() {
 
           {/* Category tables */}
           <div className="flex relative flex-col w-full h-110 xl:h-full overflow-y-auto overflow-x-hidden items-center justify-center">
-            {
-              fetchCategoriesError && (
-                <p className="text-[0.9rem]">{fetchCategoriesError}</p>
-              )
-            }
-            {
-              categoriesLoading && (
-                <p className="text-[0.9rem]">Loading categories...</p>
-              )
-            }
-            {categories && categories.length > 0 ? (
-              categories?.map((category, key) => (
+            {accountCategoriesError && (
+              <p className="text-[0.9rem]">{accountCategoriesError}</p>
+            )}
+            {loading && <AccountCategoryListSkeleton />}
+            {accountCategories && accountCategories.length > 0 ? (
+              accountCategories?.map((category, key) => (
                 <div
                   className="flex w-full h-fit px-5 py-2 border-(--color-border-subtle) border-b items-center justify-between hover:bg-(--color-bg-subtle) active:bg-(--color-bg-secondary) cursor-pointer"
                   key={key}
-                  onClick={() => 
-                    handleAccountCategoryNameUpdateOpenModal(
-                      category.name,
-                      category.id,
-                    )
-                  }
+                  onClick={() => {
+                    setToggle("modify-account-category");
+                    setUuidToBeTargeted(category.uuid);
+                    setAccountCategoryToBeUpdated(category.name);
+                  }}
                 >
                   <p className="text-[0.9rem] font-display">{category.name}</p>
                   <Pencil size={15} />
                 </div>
-              ))) : (
-                <p className="text-[0.9rem]">You have no categories.</p>
-              )             
-            }
+              ))
+            ) : (
+              <p className="text-[0.9rem]">You have no categories.</p>
+            )}
           </div>
         </div>
       </div>

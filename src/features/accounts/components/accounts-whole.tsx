@@ -102,7 +102,7 @@ export default function WholeAccountsList() {
   const { open, openModal, closeModal, draft, setField, apply, clear, activeCount } = useFilterModal(fields);
 
   return (
-    <div className="flex xl:w-full h-80dvh xl:h-full border border-(--color-border-default) rounded-lg">
+    <div className="flex relative xl:w-full h-80dvh xl:h-full border border-(--color-border-default) rounded-lg">
       {accountsLoading ? (
         <AccountListSkeleton />
       ) : (
