@@ -12,7 +12,7 @@ export default function ErrorModal({ message }: ErrorModalProps) {
   useEffect(() => {
     if (!message) return;
     setVisible(true);
-    const timer = setTimeout(() => setVisible(false), 5000);
+    const timer = setTimeout(() => setVisible(false), 10000);
     message = null;
     return () => clearTimeout(timer);
   }, [message]);

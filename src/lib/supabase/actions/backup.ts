@@ -104,6 +104,34 @@ export function validateImportShape(parsed: Record<string, unknown>): boolean {
     return EXPECTED_TABLES.every((table) => Array.isArray(parsed[table]));
 }
 
+export async function parseZipToTables(file: File): Promise<Record<string, any[]>> {
+    const zip = await JSZip.loadAsync(file);
+    const parsed: Record<string, any[]> = {};
+
+    for (const filename of Object.keys(zip.files)) {
+        const tableName = filename.replace('.csv', '');
+        const csvText = await zip.files[filename].async('string');
+
+        const result = Papa.parse(csvText, {
+            header: true,
+            skipEmptyLines: true,
+        }); // since dynamicTyping is removed, columns are now non-coerced.
+        // be careful on comparisons for non-numeric columns.
+
+        // this section resolves null columns
+        const rows = (result.data as Record<string, any>[]).map((row) => {
+            const cleaned: Record<string, any[]> = {};
+            for (const key in row) {
+                cleaned[key] = row[key] === '' ? null : row[key];
+            }
+            return cleaned;
+        })
+        parsed[tableName] = rows;
+    }
+    return parsed;
+}
+
+// IMPORT from JSON
 export async function ImportFromJSON(parsed: Record<string, any[]>) {
     const supabase = await createClient();
     
@@ -114,5 +142,19 @@ export async function ImportFromJSON(parsed: Record<string, any[]>) {
         p_transactions: parsed.transactions ?? [],
     });
 
-    if (error) throw new Error(`Import failed: ${error.message}`);
+    if (error) throw new Error(`Import from JSON failed: ${error.message}`);
+}
+
+// IMPORT from CSV
+export async function ImportFromCSV(parsed: Record<string, any[]>) {
+    const supabase = await createClient();
+
+    const { error } = await supabase.rpc("import_money_tracker_data_from_json", {
+        p_account_categories: parsed.account_categories ?? [],
+        p_accounts: parsed.accounts ?? [],
+        p_categories: parsed.categories ?? [],
+        p_transactions: parsed.transactions ?? [],
+    });
+
+    if (error) throw new Error(`Import from CSV failed: ${error.message}`);
 }

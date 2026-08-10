@@ -3,9 +3,10 @@
 import ErrorModal from "@/components/layout/error-modal";
 import LoadingModal from "@/components/layout/loading-modal";
 import Modal from "@/components/layout/modal";
-import { exportAllTablesCsv, ExportAllTablesToJSON, ImportFromJSON, validateImportShape } from "@/lib/supabase/actions/backup";
+import { exportAllTablesCsv, ExportAllTablesToJSON, ImportFromCSV, ImportFromJSON, parseZipToTables, validateImportShape } from "@/lib/supabase/actions/backup";
 import { ArrowRight, FileSpreadsheet, MoveDownLeft, MoveUpRight } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
+import JSZip from "jszip";
 
 export default function BackupPage() {
     useEffect(() => {
@@ -26,25 +27,25 @@ export default function BackupPage() {
     const backup = [
       {
         item: "Export data to JSON",
-        value: "Export to JSON",
+        value: "Export as a JSON file",
         icon: <MoveUpRight size={15} />,
         onClick: () => setActiveItem("json"),
       },
       {
         item: "Export data to Excel",
-        value: "Export to Excel",
+        value: "Export data as a CSV file",
         icon: <MoveUpRight size={15} />,
         onClick: () => setActiveItem("csv"),
       },
       {
         item: "Import from an Excel file",
-        value: "Import from excel",
+        value: "Import a CSV file",
         icon: <MoveDownLeft size={15} />,
         onClick: () => setActiveItem("csv-import"),
       },
       {
         item: "Import from a JSON file",
-        value: "Import from JSON",
+        value: "Import a JSON file",
         icon: <MoveDownLeft size={15} />,
         onClick: () => setActiveItem("json-import"),
       },
@@ -72,6 +73,7 @@ export default function BackupPage() {
         });
       } catch (err) {
         setExportError(String(err));
+        setLoading(false);
       } finally {
         setLoading(false);
       }
@@ -89,6 +91,7 @@ export default function BackupPage() {
         });
       } catch (err) {
         setExportError(String(err));
+        setLoading(false);
       } finally {
         setLoading(false);
       }
@@ -110,6 +113,27 @@ export default function BackupPage() {
         setActiveItem(null);
       } catch (err) {
         setExportError(String(err));
+        setLoading(false);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    const handleImportFromCSV = async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      setLoading(true);
+
+      try {
+         const parsed = await parseZipToTables(file);
+         
+         if (!validateImportShape(parsed)) throw new Error("File is missing expected tables");
+         await ImportFromCSV(parsed);
+         setActiveItem(null);
+      } catch (err) {
+        setExportError(String(err));
+        setLoading(false);
       } finally {
         setLoading(false);
       }
@@ -266,6 +290,8 @@ export default function BackupPage() {
                 />
               </Modal>
             )}
+
+            {/* Import from CSV */}
             {activeItem === "csv-import" && (
               <Modal
                 open
@@ -273,14 +299,17 @@ export default function BackupPage() {
                 message="Import your CSV file from a spreadsheet app to restore your previous data to Money Tracker"
                 header="Import a CSV file"
                 onCancel={() => setActiveItem(null)}
-                onConfirm={() => {
-                  setActiveItem(null);
-                }}
                 icon={<FileSpreadsheet size={20} />}
-                yesButtonText="Import data"
-                noButtonText="No, don't import"
+                noButtonText="No, go back"
                 loading={loading}
-              ></Modal>
+              >
+                <input
+                  onChange={handleImportFromCSV}
+                  type="file"
+                  accept=".zip"
+                  className="flex w-full h-fit border border-(--color-border-subtle) cursor-pointer hover:bg-(--color-bg-subtle) rounded-lg px-3 py-1"
+                  />
+              </Modal>
             )}
           </div>
         )}
