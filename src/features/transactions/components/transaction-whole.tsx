@@ -10,6 +10,7 @@ import {
   Search,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import ErrorModal from "@/components/layout/error-modal";
 
 export default function WholeTransactionList() {
   // fetch data & error
@@ -107,7 +108,7 @@ export default function WholeTransactionList() {
         </div>
 
         <div className="flex relative w-full h-full overflow-hidden">
-          {transactionsData && (
+          {transactionsData ? (
             <div className="flex flex-col w-full h-fit">
               {transactionsData.map((transaction, key) => (
                 <div
@@ -151,26 +152,20 @@ export default function WholeTransactionList() {
                 </div>
               ))}
             </div>
+          ) : (
+            <div className="flex w-full h-full items-center justify-center text-[1rem]">
+              <p>You have no transactions.</p>
+            </div>
           )}
 
           {pending && (
-            <div className="absolute flex inset-0 w-full h-full bg-black/50 items-center justify-center">
-              <div className="flex border border-(--color-border-default) bg-(--color-bg-secondary) w-fit h-fit px-5 py-1 rounded-lg shadow-md">
-                <p className="font-mono text-[0.9rem]">
-                  Loading transactions...
-                </p>
-              </div>
-            </div>
+            <></>
           )}
 
           {transactionsError && (
-            <div className="absolute z-50 flex inset-0 w-full h-full bg-black/50 items-center justify-center">
-              <div className="flex border border-(--color-border-default) bg-(--color-bg-secondary) w-fit h-fit px-5 py-1 rounded-lg shadow-md">
-                <p className="font-display text-[0.9rem]">
-                  Error: {transactionsError}
-                </p>
-              </div>
-            </div>
+            <ErrorModal
+              message={transactionsError}
+            />
           )}
         </div>
       </div>

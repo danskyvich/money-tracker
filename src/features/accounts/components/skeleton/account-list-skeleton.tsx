@@ -2,52 +2,17 @@ import Skeleton from "@/components/layout/skeleton/skeleton-file"
 
 export default function AccountListSkeleton() {
     return (
-      <div className="flex flex-col xl:w-full h-80dvh xl:h-full border border-(--color-border-default) h-full w-full rounded-lg">
-        <div className="flex flex-1 w-full h-fit">
-          {/** Top Bar */}
-          <div className="flex w-full h-fit px-5 py-2 gap-2">
-            <Skeleton className="w-25 h-5" />
-            <Skeleton className="w-25 h-5" />
-            <Skeleton className="w-35 h-5" />
-          </div>
+      <div className="flex flex-col h-80dvh xl:h-full w-full rounded-lg gap-5 p-5">
+        <div className="flex w-[60%] h-full gap-5">
+          <Skeleton className="flex w-20 h-full" />
+          <Skeleton className="flex w-20 h-full" />
+          <Skeleton className="flex w-20 h-full" />
         </div>
-
-        {/* Accounts table */}
-        <div className="flex flex-col flex-1 w-full h-full px-5">
-          <div className="flex w-full h-full px-3 py-2 gap-5">
-            <Skeleton className="flex w-full"/>
-            <Skeleton className="flex w-full"/>
-            <Skeleton className="flex w-full"/>
-            <Skeleton className="flex w-full"/>
-          </div>
-
-          <div className="flex flex-col flex-3 w-full h-full gap-5 xl:h-full">
-            <Skeleton className="flex flex-1 w-full h-full" />
-            <Skeleton className="flex flex-1 w-full h-full" />
-            <Skeleton className="flex flex-1 w-full h-full" />
-            <Skeleton className="flex flex-1 w-full h-full" />
-            <Skeleton className="flex flex-1 w-full h-full" />
-            <Skeleton className="flex flex-1 w-full h-full" />
-            <Skeleton className="flex flex-1 w-full h-full" />
-            <Skeleton className="flex flex-1 w-full h-full" />
-            <Skeleton className="flex flex-1 w-full h-full" />
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="flex flex-1 h-fit justify-between w-full px-5 py-2">
-          <div className="flex w-full items-center gap-2">
-            <Skeleton className="flex h-5 w-20" />
-            <Skeleton className="flex h-5 w-5" />
-            <Skeleton className="flex h-5 w-23" />
-          </div>
-
-          <div className="flex w-fit h-full gap-2 items-center justify-end">
-            <Skeleton className="flex h-5 w-15" />
-            <Skeleton className="flex h-5 w-25" />
-            <Skeleton className="flex h-5 w-15" />
-          </div>
-        </div>
+        <Skeleton className="flex w-full h-full" />
+        <Skeleton className="flex w-full h-full" />
+        <Skeleton className="flex w-full h-full" />
+        <Skeleton className="flex w-full h-full" />
+        <Skeleton className="flex w-full h-full" />
       </div>
     );
 }
