@@ -11,15 +11,17 @@ import { useEffect, useState } from "react";
 import AccountDetailsModal from "./accounts-details-modal";
 import AccountListSkeleton from "@/features/accounts/components/skeleton/account-list-skeleton";
 import FilterModal from "@/components/layout/filter-modal";
-import { FetchAccounts } from "@/lib/supabase/actions/database";
+import { FetchAccounts, InsertAccount } from "@/lib/supabase/actions/database";
 import { FilterField } from "../types/types";
 import { useFilterModal } from "@/hooks/useUrlFilters";
+import ErrorModal from "@/components/layout/error-modal";
 
 const numberOfItemsToBeDisplayed = 9;
 
 export default function WholeAccountsList() {
   // general states
-  const [accountsLoading, setAccountsLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [listLoading, setListLoading] = useState<boolean>(false)
   const [fetchAccountError, setFetchAccountError] = useState<string | null>(
     null,
   );
@@ -28,9 +30,9 @@ export default function WholeAccountsList() {
   const [totalNumberOfItems, setTotalNumberOfItems] = useState<number | null | undefined>(undefined,);
 
   // for modals
-  const [accountModalOpen, setAccountModalOpen] = useState(false);
   const [chosenAccount, setChosenAccount] = useState<any | null>(null);
   const [toggle, setToggle] = useState<string | null>(null);
+  const [insertAccountError, setInsertAccountError] = useState<string | null>(null);
 
   // for pagination only
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -66,44 +68,56 @@ export default function WholeAccountsList() {
 
   // fetch accounts & account categories
   const fetchAccounts = async () => {
-    setAccountsLoading(true);
+    setListLoading(true);
 
     const result = await FetchAccounts(
       currentPage,
       numberOfItemsToBeDisplayed,
     );
-    if (!result || !result.success) {
-      setFetchAccountError(result?.error ?? "Something went wrong.")
-      setAccountsLoading(false)
+    if (result?.error || !result?.success) {
+      setFetchAccountError(result?.error ?? "Accounts fetch failed");
+      setListLoading(false);
       return;
     }
 
-    const accountTypeOptions = Array.from(
-      new Set(result.accountsData?.map((a) => a.name))
-    ).map((name) => ({label: name, value: name}))
-
-    const accountCategoriesOptions = result.accountCategoriesData?.map((c) => ({
-      label: c.name,
-      value: c.id,
-    }));
-
     setAccounts(result.accountsData)
-    setAccountCategories(result.accountCategoriesData)
+    setAccountCategories(result.accountCategoriesData);
     setTotalNumberOfItems(result.totalItems)
 
-    setAccountsLoading(false);
+    setListLoading(false);
   };
 
-  // handle close account details modal
-  const handleCloseAccountDetailsModal = () => {
-    setAccountModalOpen(false);
-  };
+  // Add account
+  const handleAddAccount = async (name: string, description: string, categoryId: string | undefined) => {
+    setLoading(true);
+    if (!categoryId || !name ) {
+      setInsertAccountError("Fill out all required fields");
+      setToggle("add-account"); 
+    } else {
+      const { data, error } = await InsertAccount(name, description, categoryId);
+
+      if (!data || error) {
+        setInsertAccountError(error);
+        setLoading(false);
+        return;
+      } else {
+        setLoading(false);
+        fetchAccounts();
+        setToggle(null);
+      }
+    }
+  }
 
   const { open, openModal, closeModal, draft, setField, apply, clear, activeCount } = useFilterModal(fields);
 
   return (
     <div className="flex relative xl:w-full h-80dvh xl:h-full border border-(--color-border-default) rounded-lg">
-      {accountsLoading ? (
+      {
+        insertAccountError && (
+          <ErrorModal message={insertAccountError} />
+        )
+      }
+      {listLoading ? (
         <AccountListSkeleton />
       ) : (
         <>
@@ -112,15 +126,16 @@ export default function WholeAccountsList() {
               accountCategoriesData={accountCategories}
               open
               onOpen={() => setToggle(null)}
-              onClose={() => setToggle(null)}
-              refresh={fetchAccounts}
+              onConfirm={handleAddAccount}
+              loading={loading}
             />
           )}
           {toggle === "account-details" && (
             <AccountDetailsModal
               accountData={chosenAccount}
-              toggle={accountModalOpen}
-              onClose={handleCloseAccountDetailsModal}
+              toggle
+              onToggle={() => setToggle(null)}
+              onClose={() => setToggle(null)}
               refresh={fetchAccounts}
             />
           )}
@@ -128,7 +143,7 @@ export default function WholeAccountsList() {
           <div className="flex flex-col w-full h-full">
             <div className="flex flex-1 w-full max-h-[10%] py-2 px-2 gap-3 mb-3">
               <div
-                className="flex w-fit h-full gap-2 border border-(--color-brand-green) rounded-md px-5 py-2 items-center bg-transparent text-(--color-text-primary) hover:text-white hover:bg-emerald-600 cursor-pointer transition-all duration-200 active:bg-emerald-700"
+                className="flex w-fit h-full gap-2 border border-(--color-brand-green) rounded-md px-5 py-1 items-center bg-transparent text-(--color-text-primary) hover:text-white hover:bg-emerald-600 cursor-pointer transition-all duration-200 active:bg-emerald-700"
                 onClick={() => setToggle("add-account")}
               >
                 <Plus size={15} />
@@ -138,7 +153,7 @@ export default function WholeAccountsList() {
               {/* Filter by */}
               <button
                 onClick={openModal}
-                className="flex w-fit h-full gap-2 border border-(--color-border-default) rounded-md px-5 py-2 items-center bg-transparent text-(--color-text-primary) cursor-pointer"
+                className="flex w-fit h-full gap-2 border border-(--color-border-default) rounded-md px-5 py-1 items-center bg-transparent text-(--color-text-primary) cursor-pointer"
               >
                 <Filter size={15} />
                 <p className="text-[0.9rem] hidden lg:block">
@@ -156,7 +171,7 @@ export default function WholeAccountsList() {
               />
 
               {/* Search field */}
-              <div className="flex px-5 py-2 w-75 border border-(--color-border-default) rounded-md items-center gap-2">
+              <div className="flex px-5 py-1 w-75 border border-(--color-border-default) rounded-md items-center gap-2">
                 <Search size={15} className="flex" />
                 <input
                   placeholder="Search..."
@@ -174,13 +189,20 @@ export default function WholeAccountsList() {
                 <div>Balance</div>
               </div>
 
-              <div className="flex relative w-full h-100 xl:h-full overflow-hidden">
+              <div className="flex flex-col relative w-full h-100 xl:h-full overflow-hidden">
+                {
+                  accounts?.length === 0 && (
+                    <div className="flex w-full h-full items-center justify-center text-[0.9rem]">
+                      <p>You have no accounts</p>
+                    </div>
+                  )
+                }
                 {accounts ? (
                   <div className="flex relative w-full overflow-hidden">
                     <div className="flex flex-col w-full">
                       {accounts?.map((account, id) => (
                         <div
-                          className="grid grid-cols-[repeat(4,1fr)] w-full h-12 px-5 py-3 border-b border-(--color-border-subtle) text-[0.9rem] hover:bg-(--color-bg-subtle) cursor-pointer"
+                          className="grid grid-cols-[repeat(4,1fr)] w-full h-12 px-5 py-3 border-b border-(--color-border-subtle) text-[0.9rem] gap-x-2 hover:bg-(--color-bg-subtle) cursor-pointer"
                           onClick={() => setToggle("account-details")}
                           key={id}
                         >
@@ -188,8 +210,8 @@ export default function WholeAccountsList() {
                           <div className="line-clamp-1">
                             {account.account_categories?.name}
                           </div>
-                          <div className="line-clamp-1">
-                            {account.description}
+                          <div className="line-clamp-1 text-(--color-text-secondary) whitespace-nowrap">
+                            {account.description === "" ? "-" : account.description }
                           </div>
                           <div className="line-clamp-1 font-mono">
                             {account.balance}
@@ -211,7 +233,7 @@ export default function WholeAccountsList() {
               <div className={`${accounts?.length === 0 || fetchAccountError && "hidden"} flex w-full text-[0.9rem] text-(--color-text-secondary) items-center gap-2`}>
                 <p>Show data</p>
                 <div className="flex py-2 px-3 border border-(--color-border-default) rounded-md">
-                  <p>{}</p>
+                  <p>{accounts?.length === 0 ? "0" : totalPages}</p>
                 </div>
                 <p>of {totalNumberOfItems === 0 ? 0 : totalNumberOfItems}</p>
               </div>
@@ -231,7 +253,7 @@ export default function WholeAccountsList() {
                   <div
                     className={`border border-(--color-border-default) rounded-lg px-3 py-2 hover:cursor-pointer ${currentPage === item ? "bg-(--color-brand-green) text-white hover:bg-(--color-brand-green)" : null}`}
                     key={index}
-                    onClick={() => setWindowStart(item)}
+                    onClick={() => setCurrentPage(item)}
                   >
                     <p>{item}</p>
                   </div>

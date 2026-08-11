@@ -18,7 +18,7 @@ export default function FilterModal({open, onClose, fields, values, onChange, on
   return (
     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center w-full h-full">
       {/* Card */}
-      <div className="flex flex-col w-100 xl:w-125 lg:w-115 h-fit bg-(--color-bg-subtle) border border-(--color-border-default) rounded-xl shadow-xl ">
+      <div className="flex flex-col w-100 xl:w-125 lg:w-115 h-fit bg-(--color-bg-secondary) border border-(--color-border-default) rounded-xl shadow-xl ">
         {/* Header */}
         <div className="flex items-center border-b border-(--color-border-default) mb-0 w-full h-fit justify-between px-5 py-2">
           <Filter size={15} />

@@ -25,16 +25,11 @@ export default function AccountsList({
   const [windowStart, setWindowStart] = useState(0);
   const visiblePages = paginationArray.slice(windowStart, windowStart + 5);
 
-  const sendCurrentPageToParent = (page: number) => {
-    setCurrentPage(page);
-    pressedCurrentPage(page);
-  };
-
   if (loading) return <OverviewAccountsSkeleton />;
 
   return (
     <div className="flex flex-col w-full h-100 2xl:h-full">
-      {accountsData?.length !== 0 ? (
+      {accountsData?.length === 0 ? (
         <div className="flex w-full h-full items-center justify-center text-[0.9rem]">
           <p>You have no accounts.</p>
         </div>
@@ -85,7 +80,7 @@ export default function AccountsList({
                 <div
                   className={`px-3 py-2 border border-(--color-border-default) rounded-lg shadow-md hover:bg-(--color-bg-subtle) cursor-pointer ${currentPage === item ? "bg-(--color-brand-green) text-black hover:bg-(--color-brand-green)" : null}`}
                   key={key}
-                  onClick={() => sendCurrentPageToParent(item)}
+                  onClick={() => setCurrentPage(item)}
                 >
                   <p>{item}</p>
                 </div>

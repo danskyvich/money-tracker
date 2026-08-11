@@ -18,13 +18,17 @@ import TransactionList from "../transactions/components/transactions-list";
 import AccountsList from "./components/accounts-partial";
 import OverviewHeader from "./components/icon-and-name";
 import AddAccountModal from "../accounts/components/add-account-modal";
-import { FetchAccounts, FetchTransaction } from "@/lib/supabase/actions/database";
+import {
+  FetchAccounts,
+  FetchTransaction,
+  InsertAccount,
+} from "@/lib/supabase/actions/database";
 import { Transaction } from "@/lib/types/database";
 import OverviewTransactionSkeleton from "./components/skeleton/overview-transaction-skeleton";
 import TransactionWrapper from "./components/transaction-wrapper";
+import QuickActionsSkeleton from "./components/skeleton/quick-action-skeleton";
 
 export default function OverviewPage() {
-
   // variables - general
   const [toggle, setToggle] = useState<string | null>(null);
   const [totalNumberOfItems, setTotalNumberOfItems] = useState<
@@ -37,52 +41,62 @@ export default function OverviewPage() {
     { name: "Income", key: "income" as const },
     { name: "Expenses", key: "expense" as const },
   ];
-  const [chosenPage, setChosenPage] = useState<"income" | "expense">("income")
+  const [chosenPage, setChosenPage] = useState<"income" | "expense">("income");
 
   // fetch data
-  const [transactionData, setTransactionData] = useState<Transaction[] | null>(null);
-  const [accounts, setAccounts] = useState<any[] | null | undefined>(null)
-  const [transactionError, setTransactionError] = useState<string | null>(null)
+  const [transactionData, setTransactionData] = useState<Transaction[] | null>(
+    null,
+  );
+  const [accounts, setAccounts] = useState<any[] | null | undefined>(null);
+  const [transactionError, setTransactionError] = useState<string | null>(null);
   const [accountError, setAccountError] = useState<string | null>(null);
   const [accountCategoriesData, setAccountCategoriesData] = useState<
     any[] | undefined
-  >(undefined); 
-  const [loadingTransactions, setLoadingTransactions] = useState(false); 
-  const [loadingAccounts, setLoadingAccounts] = useState(false); 
+  >(undefined);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [loadingTransactions, setLoadingTransactions] = useState(false);
+  const [loadingAccounts, setLoadingAccounts] = useState(false);
 
   // sixmonthsbarchart
   const [xAxisLabels, setXAxisLabels] = useState<string[] | never[]>();
   const [inflowData, setInflowData] = useState<number[] | never[]>();
   const [outflowData, setOutflowData] = useState<number[] | never[]>();
 
+  //declare page title
+  useEffect(() => {
+    document.title = "Dashboard";
+  }, []);
+
   // main fetchData() function
   const fetchData = async () => {
-    setLoadingTransactions(true)
-    setLoadingAccounts(true)
+    setLoadingTransactions(true);
+    setLoadingAccounts(true);
 
     const result = await FetchAccounts(currentPage, 9);
     if (!result?.success) {
       setAccountError(result?.error ?? "Fetching data failed.");
       setLoadingAccounts(false);
     }
-    
+
     setAccounts(result?.accountsData);
-    setAccountCategoriesData(result?.accountCategoriesData)
-    setTotalNumberOfItems(result?.totalItems)
+    setAccountCategoriesData(result?.accountCategoriesData);
+    setTotalNumberOfItems(result?.totalItems);
 
     const transactionResult = await FetchTransaction(currentPage, 9);
-    if (!transactionResult?.success) { 
-      setTransactionError(transactionResult?.error ?? "Fetching transactions failed.")
+    if (!transactionResult?.success) {
+      setTransactionError(
+        transactionResult?.error ?? "Fetching transactions failed.",
+      );
       setLoadingTransactions(false);
     }
 
     const sortedTransactions = [...(transactionData ?? [])].sort((a, b) =>
       b.date_time.localeCompare(a.date_time),
-    ); 
+    );
     setTransactionData(sortedTransactions);
-      
-    setLoadingAccounts(false)
-    setLoadingTransactions(false)
+
+    setLoadingAccounts(false);
+    setLoadingTransactions(false);
   };
 
   // call fetchData()
@@ -90,24 +104,45 @@ export default function OverviewPage() {
     fetchData();
   }, [currentPage]);
 
-  // handle currentPage from AccountsList.tsx
-  const handleChildCurrentPage = (page: number) => {
-    setCurrentPage(page)
-  }
-
   // inflows and outflows
   useEffect(() => {
-    getMonthlyInflowOutflow().then(({ xAxisLabels, inflowData, outflowData}) => {
-      setXAxisLabels(xAxisLabels);
-      setInflowData(inflowData);
-      setOutflowData(outflowData);
-    })
-  }, [])
-
-  //declare page title
-  useEffect(() => {
-    document.title = "Dashboard";
+    getMonthlyInflowOutflow().then(
+      ({ xAxisLabels, inflowData, outflowData }) => {
+        setXAxisLabels(xAxisLabels);
+        setInflowData(inflowData);
+        setOutflowData(outflowData);
+      },
+    );
   }, []);
+
+  // Add account
+  const handleAddAccount = async (
+    name: string,
+    description: string,
+    categoryId: string | undefined,
+  ) => {
+    setLoading(true);
+    if (!categoryId || !name) {
+      setAccountError("Fill out all required fields");
+      setToggle("add-account");
+    } else {
+      const { data, error } = await InsertAccount(
+        name,
+        description,
+        categoryId,
+      );
+
+      if (!data || error) {
+        setAccountError(error);
+        setLoading(false);
+        return;
+      } else {
+        setLoading(false);
+        fetchData();
+        setToggle(null);
+      }
+    }
+  };
 
   return (
     <div className="flex flex-col w-full h-full gap-5">
@@ -124,10 +159,11 @@ export default function OverviewPage() {
       )}
       {toggle === "add-account" && (
         <AddAccountModal
-          toggle
+          open
+          onOpen={() => setToggle(null)}
+          onConfirm={() => handleAddAccount}
+          loading={loading}
           accountCategoriesData={accountCategoriesData}
-          onClose={() => setToggle(null)}
-          refresh={() => fetchData()}
         />
       )}
 
@@ -148,8 +184,14 @@ export default function OverviewPage() {
 
           {/* Summary */}
           <div className="flex flex-col md:flex-row w-full h-fit gap-5">
-            <Snippet type="income" />
-            <Snippet type="expense" />
+            {loading ? (
+              <QuickActionsSkeleton />
+            ) : (
+              <>
+                <Snippet type="income" />
+                <Snippet type="expense" />
+              </>
+            )}
 
             {/* Quick actions */}
             <div className="flex flex-col flex-2 border border-(--color-border-default) rounded-lg shadow-md w-full h-full p-5 gap-2">
@@ -298,7 +340,7 @@ export default function OverviewPage() {
               accountsError={accountError}
               loading={loadingAccounts}
               totalNumberOfItems={totalNumberOfItems}
-              pressedCurrentPage={(page) => handleChildCurrentPage(page)}
+              pressedCurrentPage={(page) => setCurrentPage(page)}
             />
           </Card>
         </div>

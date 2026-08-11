@@ -45,10 +45,12 @@ export default function WholeTransactionList() {
 
     if (!result || !result.success) {
       setTransactionsError(result?.error ?? "Transaction fetch failed.");
+    } else {
+      setTransactionsError(null);
+      setTransactionsData(result.data);
+      setTotalNumberOfItems(result.totalItems);
     }
 
-    setTransactionsData(result?.data);
-    setTotalNumberOfItems(result?.totalItems);
     setPending(false);
   };
 
