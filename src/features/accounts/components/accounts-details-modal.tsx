@@ -11,6 +11,7 @@ import Modal from "@/components/layout/modal";
 
 interface AccountDetailsModalProps {
   toggle: boolean;
+  onToggle: () => void;
   accountData: any | null;
   onClose: (value: boolean) => void;
   refresh: () => void;
@@ -23,7 +24,6 @@ export default function AccountDetailsModal({
   refresh,
 }: AccountDetailsModalProps) {
   const [loading, setLoading] = useState<boolean>(false);
-  const [listLoading, setListLoading] = useState<boolean>(false);
   const [deleteAccountError, setDeleteAccountError] = useState<string | null>(
     "",
   );
@@ -71,7 +71,7 @@ export default function AccountDetailsModal({
   };
 
   const fetchTransactionsOfAccount = async (id: string) => {
-    setListLoading(true);
+    setLoading(true);
     const { data, error, count } = await SelectTransactionsFromChosenAccount(
       id,
       currentPage,
@@ -81,7 +81,7 @@ export default function AccountDetailsModal({
     if (!data) setAccountTransactionsError(error);
     setAccountTransactions(data);
     setTotalNumberOfItems(count ?? 0);
-    setListLoading(false);
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -102,6 +102,7 @@ export default function AccountDetailsModal({
             message="Are you sure you want to delete this account?"
             onConfirm={handleConfirmDelete}
             onCancel={() => onClose(true)}
+            loading={loading}
             noButtonText="No"
             yesButtonText="Delete account"
           />
@@ -114,7 +115,11 @@ export default function AccountDetailsModal({
             <div className="flex w-full h-fit items-center justify-between px-5 py-2">
               <PiggyBank size={20} />
               <p className="text-2xl font-semibold">{accountData?.name}</p>
-              <X onClick={() => onClose(false)} size={20} className="cursor-pointer" />
+              <X
+                onClick={() => onClose(false)}
+                size={20}
+                className="cursor-pointer"
+              />
             </div>
 
             {/* Filter bar */}
@@ -143,7 +148,7 @@ export default function AccountDetailsModal({
                 <p className="linear-clamp-1">Amount</p>
               </div>
 
-              {listLoading ? (
+              {loading ? (
                 <div className="flex w-full h-full">
                   <AccountListSkeleton />
                 </div>

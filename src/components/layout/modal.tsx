@@ -4,8 +4,8 @@ import Spinner from "./spinner";
 interface ModalProps {
     onOpen: (value: boolean) => void,
     open: boolean,
-    header: string,
-    message: React.ReactNode,
+    header?: string,
+    message?: React.ReactNode,
     icon: React.ReactNode,
     onConfirm?: () => void;
     onCancel: () => void;

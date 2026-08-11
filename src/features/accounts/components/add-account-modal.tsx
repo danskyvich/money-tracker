@@ -2,56 +2,43 @@ import { AccountCategories } from "@/lib/types/database";
 import { InsertAccount } from "@/lib/supabase/actions/database";
 import { ChevronDown, ChevronUp, PiggyBank, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import Spinner from "@/components/layout/spinner";
 
 interface AddAccountProps {
   open: boolean;
   accountCategoriesData: AccountCategories[] | undefined;
-  onClose: () => void;
-  refresh: () => void;
   onOpen: () => void;
+  onConfirm: (name: string, description: string, categoryId: string | undefined) => void;
+  loading: React.ReactNode;
 }
 
 export default function AddAccountModal({
   open,
+  onOpen,
   accountCategoriesData,
-  onClose,
-  refresh,
+  onConfirm,
+  loading,
 }: AddAccountProps) {
+  if (!open) return null;
+
+  // states
   const [accountDropdownClicked, setAccountDropdownClicked] = useState(false);
-  const [chosenAccountType, setChosenAccountType] = useState<AccountCategories | null>(
+  const [newAccountType, setNewAccountType] = useState<AccountCategories | null>(
     null,
   );
-  const [chosenAccount, setChosenAccount] = useState<string>("");
+  const [newAccountName, setNewAccountName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-  const [insertAccountError, setInsertAccountError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
 
-  // close dropdown
-  const handleCloseDropdown = (chosenAccount: AccountCategories) => {
+  // close dropdown and set values to states
+  const handleCloseDropdown = (account: AccountCategories) => {
     setAccountDropdownClicked(false);
-    setChosenAccountType(chosenAccount);
+    setNewAccountType(account);
   };
 
-  // handle submit
-  const handleSubmit = async () => {
-    setLoading(true);
-    if (!chosenAccountType) return;
-
-    const { data, error } = await InsertAccount(
-      chosenAccount,
-      description,
-      chosenAccountType.id,
-    )
-
-    if (!data) return setInsertAccountError(error), setLoading(false);
-
-    setLoading(false)
-    refresh();
-  }
-
+  // populate account category dropdown
   useEffect(() => {
-    if (!chosenAccountType && accountCategoriesData?.length) setChosenAccountType(accountCategoriesData[0])
-  }, [chosenAccountType, accountCategoriesData])
+    if (!newAccountType && accountCategoriesData?.length) setNewAccountType(accountCategoriesData[0])
+  }, [newAccountType, accountCategoriesData])
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center shadow-md bg-black/50">
@@ -62,27 +49,27 @@ export default function AddAccountModal({
           <p className="font-semibold text-xl whitespace-nowrap">
             Add an account
           </p>
-          <X size={20} onClick={() => onClose()} className="cursor-pointer" />
+          <X size={20} onClick={() => onOpen()} className="cursor-pointer" />
         </div>
 
         {/* Content */}
         <div className="flex-col relative flex w-full h-full my-5">
           <div className="grid grid-cols-[1fr_2fr] w-full h-full text-[0.9rem] gap-y-3 gap-2 items-center">
-            <label htmlFor="nameInput">Name</label>
+            <label htmlFor="nameInput">Name<span className="text-red-500">*</span></label>
             <input
               id="nameInput"
               className="focus:outline-none border border-(--color-border-default) rounded-lg px-3 py-1"
               placeholder="Enter acccount name..."
               aria-placeholder="Enter account name..."
-              onChange={(e) => setChosenAccount(e.target.value)}
+              onChange={(e) => setNewAccountName(e.target.value)}
             />
 
-            <p>Type</p>
+            <p>Type<span className="text-red-500">*</span></p>
             <div
               className="relative flex w-full justify-between border border-(--color-border-default) items-center px-3 py-1 rounded-lg hover:bg-(--color-bg-subtle) cursor-pointer"
               onClick={() => setAccountDropdownClicked((prev) => !prev)}
             >
-              <p>{chosenAccountType?.name}</p>
+              <p>{newAccountType?.name}</p>
               {accountDropdownClicked ? (
                 <ChevronUp size={20} />
               ) : (
@@ -92,7 +79,7 @@ export default function AddAccountModal({
 
             {accountDropdownClicked && (
               <div className="flex flex-col h-fit absolute top-21 z-50 left-32 w-40 border border-(--color-border-default) rounded-lg bg-(--color-bg-secondary)">
-                {accountCategoriesData?.map((item, id) => (
+                {accountCategoriesData?.map((item) => (
                   <div
                     className="flex w-full text-[0.9rem] h-fit px-5 py-1 cursor-pointer border-b border-(--color-border-subtle) hover:bg-(--color-bg-subtle)"
                     key={item.id}
@@ -119,11 +106,11 @@ export default function AddAccountModal({
         <div className="flex w-full pt-7">
           <button
             className="flex bg-(--color-brand-green) rounded-lg shadow-md hover:bg-(--color-brand-green-accent) active:bg-emerald-700 items-center justify-center px-5 py-1 w-full cursor-pointer"
-            onClick={() => handleSubmit()}
+            onClick={() => onConfirm(newAccountName, description, newAccountType?.id)}
             type="submit"
           >
             <p className="text-[0.9rem]">
-              {loading ? "Adding account" : "Add account"}
+              {loading ? <Spinner/> : "Add account"}
             </p>
           </button>
         </div>

@@ -59,12 +59,6 @@ export default function ProfilePage({
       icon: <X size={15} />,
       onClick: () => setActiveModal("delete"),
     },
-    {
-      item: "View all enrolled devices",
-      value: "View",
-      icon: <Eye size={15} />,
-      onClick: () => alert("Coming Soon"),
-    },
   ];
 
   const handleOpenModalMFA = () => {
@@ -89,6 +83,7 @@ export default function ProfilePage({
             noButtonText="No, go back"
             message={"Are you sure you want to sign out of your account?"}
             header="Sign out"
+            loading={loading}
           />
         </div>
       )}
@@ -108,6 +103,7 @@ export default function ProfilePage({
               "Are you sure you want to delete your account? This will delete everything including your data and existing configurations."
             }
             header="Delete your account"
+            loading={loading}
           />
         </div>
       )}
@@ -122,7 +118,7 @@ export default function ProfilePage({
             yesButtonText="Disable MFA"
             noButtonText="No"
             header="Disable your MFA"
-            message=""
+            loading={loading}            
           />
         </div>
       )}

@@ -6,7 +6,7 @@ import { createClient } from "../clients/server"
 // <------------------ accounts ---------------------------------->
 
 // INSERT
-export async function InsertAccount(name: string, description: string, categoryId: string) {
+export async function InsertAccount(name: string, description: string, categoryId: string | undefined) {
 
     const user = await getUser();
 
@@ -32,7 +32,7 @@ export async function DeleteAccount(id: string) {
 // <------------------ account_categories ------------------------>
 
 // UPDATE
-export async function UpdateAccountCategoryName(name: string, uuid: string) {
+export async function UpdateAccountCategoryName(name: string, uuid: string | null) {
     const { data, error } = await (await createClient())
         .from('account_categories')
         .update({ name })
@@ -58,13 +58,13 @@ export async function InsertAccountCategoryName(name: string) {
     
     const user = await getUser(); // user_id
 
-    const { data, error } = await supabase
+    const { error } = await supabase
         .from('account_categories')
         .insert({ name, user_id: user?.id })
     
     if (error) return { success: false, error: error.message}
 
-    return { success: true, data }
+    return { success: true }
 }
 
 
@@ -113,9 +113,12 @@ export async function FetchAccounts(currentPage: number, numberOfItems: number) 
           }));
         }
     
-        if (merged.length > 0) return {
-            success: true, accountsData: merged, totalItems: count ?? 0, accountCategoriesData: accountCategoriesData
-         } 
+        return {
+            success: true,
+            accountsData: merged,
+            totalItems: count ?? 0,
+            accountCategoriesData: accountCategoriesData,
+        }
 }
 
 // <-----------------Transactions --------------------------->
