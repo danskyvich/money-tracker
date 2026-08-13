@@ -2,7 +2,6 @@ import AddAccountModal from "@/features/accounts/components/add-account-modal";
 import { AccountCategories } from "@/lib/types/database";
 import {  
   ChevronLeft,
-  CircleAlert,
   Filter,
   Plus,
   Search,
@@ -20,8 +19,7 @@ const numberOfItemsToBeDisplayed = 9;
 
 export default function WholeAccountsList() {
   // general states
-  const [loading, setLoading] = useState<boolean>(false);
-  const [listLoading, setListLoading] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(false)
   const [fetchAccountError, setFetchAccountError] = useState<string | null>(
     null,
   );
@@ -32,7 +30,6 @@ export default function WholeAccountsList() {
   // for modals
   const [chosenAccount, setChosenAccount] = useState<any | null>(null);
   const [toggle, setToggle] = useState<string | null>(null);
-  const [insertAccountError, setInsertAccountError] = useState<string | null>(null);
 
   // for pagination only
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -68,56 +65,32 @@ export default function WholeAccountsList() {
 
   // fetch accounts & account categories
   const fetchAccounts = async () => {
-    setListLoading(true);
+    setLoading(true);
 
-    const result = await FetchAccounts(
-      currentPage,
-      numberOfItemsToBeDisplayed,
-    );
-    if (result?.error || !result?.success) {
-      setFetchAccountError(result?.error ?? "Accounts fetch failed");
-      setListLoading(false);
+    const { accountsData, accountCategoriesData, totalItems, error } = await FetchAccounts(currentPage, numberOfItemsToBeDisplayed);
+    
+    if (error) {
+      setFetchAccountError(error ?? "Fetch accounts failed");
+      setLoading(false);
       return;
+    } else {
+      setAccounts(accountsData);
+      setAccountCategories(accountCategoriesData);
+      setTotalNumberOfItems(totalItems);
+      setLoading(false);
     }
-
-    setAccounts(result.accountsData)
-    setAccountCategories(result.accountCategoriesData);
-    setTotalNumberOfItems(result.totalItems)
-
-    setListLoading(false);
   };
 
-  // Add account
-  const handleAddAccount = async (name: string, description: string, categoryId: string | undefined) => {
-    setLoading(true);
-    if (!categoryId || !name ) {
-      setInsertAccountError("Fill out all required fields");
-      setToggle("add-account"); 
-    } else {
-      const { data, error } = await InsertAccount(name, description, categoryId);
-
-      if (!data || error) {
-        setInsertAccountError(error);
-        setLoading(false);
-        return;
-      } else {
-        setLoading(false);
-        fetchAccounts();
-        setToggle(null);
-      }
-    }
+  // Delete account
+  const handleDeleteAccount = async () => {
+    const id = chosenAccount
   }
 
   const { open, openModal, closeModal, draft, setField, apply, clear, activeCount } = useFilterModal(fields);
 
   return (
     <div className="flex relative xl:w-full h-80dvh xl:h-full border border-(--color-border-default) rounded-lg">
-      {
-        insertAccountError && (
-          <ErrorModal message={insertAccountError} />
-        )
-      }
-      {listLoading ? (
+      {loading ? (
         <AccountListSkeleton />
       ) : (
         <>
@@ -126,16 +99,15 @@ export default function WholeAccountsList() {
               accountCategoriesData={accountCategories}
               open
               onOpen={() => setToggle(null)}
-              onConfirm={handleAddAccount}
-              loading={loading}
+              fetch={fetchAccounts}
             />
           )}
           {toggle === "account-details" && (
             <AccountDetailsModal
               accountData={chosenAccount}
-              toggle
-              onToggle={() => setToggle(null)}
-              onClose={() => setToggle(null)}
+              open
+              onOpen={() => setToggle(null)}
+              onDelete={() => handleDeleteAccount}
               refresh={fetchAccounts}
             />
           )}
@@ -190,28 +162,31 @@ export default function WholeAccountsList() {
               </div>
 
               <div className="flex flex-col relative w-full h-100 xl:h-full overflow-hidden">
-                {
-                  accounts?.length === 0 && (
-                    <div className="flex w-full h-full items-center justify-center text-[0.9rem]">
-                      <p>You have no accounts</p>
-                    </div>
-                  )
-                }
+                {accounts?.length === 0 && (
+                  <div className="flex w-full h-full items-center justify-center text-[0.9rem]">
+                    <p>You have no accounts</p>
+                  </div>
+                )}
                 {accounts ? (
                   <div className="flex relative w-full overflow-hidden">
                     <div className="flex flex-col w-full">
                       {accounts?.map((account, id) => (
                         <div
                           className="grid grid-cols-[repeat(4,1fr)] w-full h-12 px-5 py-3 border-b border-(--color-border-subtle) text-[0.9rem] gap-x-2 hover:bg-(--color-bg-subtle) cursor-pointer"
-                          onClick={() => setToggle("account-details")}
+                          onClick={() => {
+                            setToggle("account-details");
+                            setChosenAccount(account);
+                          }}
                           key={id}
                         >
                           <div className="line-clamp-1">{account.name}</div>
                           <div className="line-clamp-1">
-                            {account.account_categories?.name}
+                            {account.category_id?.name}
                           </div>
                           <div className="line-clamp-1 text-(--color-text-secondary) whitespace-nowrap">
-                            {account.description === "" ? "-" : account.description }
+                            {account.description === ""
+                              ? "-"
+                              : account.description}
                           </div>
                           <div className="line-clamp-1 font-mono">
                             {account.balance}
@@ -230,7 +205,9 @@ export default function WholeAccountsList() {
 
             {/* Footer */}
             <div className="flex flex-1 h-fit justify-between w-full px-5 py-2">
-              <div className={`${accounts?.length === 0 || fetchAccountError && "hidden"} flex w-full text-[0.9rem] text-(--color-text-secondary) items-center gap-2`}>
+              <div
+                className={`${accounts?.length === 0 || (fetchAccountError && "hidden")} flex w-full text-[0.9rem] text-(--color-text-secondary) items-center gap-2`}
+              >
                 <p>Show data</p>
                 <div className="flex py-2 px-3 border border-(--color-border-default) rounded-md">
                   <p>{accounts?.length === 0 ? "0" : totalPages}</p>

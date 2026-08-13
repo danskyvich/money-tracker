@@ -8,31 +8,34 @@ import ConvertTimestampToDateTime from "@/utils/convertToDateTime";
 import { ChevronLeft, ChevronRight, Filter, PiggyBank, Trash, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import Modal from "@/components/layout/modal";
+import ErrorModal from "@/components/layout/error-modal";
+import Spinner from "@/components/layout/spinner";
 
 interface AccountDetailsModalProps {
-  toggle: boolean;
-  onToggle: () => void;
+  open: boolean;
+  onOpen: () => void;
   accountData: any | null;
-  onClose: (value: boolean) => void;
   refresh: () => void;
+  onDelete: () => void;
 }
 
 export default function AccountDetailsModal({
-  toggle,
+  open,
+  onOpen,
   accountData,
-  onClose,
   refresh,
+  onDelete,
 }: AccountDetailsModalProps) {
+
+  // modals
+  const [toggle, setToggle] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [deleteAccountError, setDeleteAccountError] = useState<string | null>(
-    "",
-  );
-  const [accountTransactions, setAccountTransactions] = useState<
-    Transaction[] | null
-  >(null);
-  const [accountTransactionsError, setAccountTransactionsError] = useState<
-    string | null
-  >(null);
+  const [process, setProcess] = useState<boolean>(false);
+
+  // fetch data and errors
+  const [deleteAccountError, setDeleteAccountError] = useState<string | null>("");
+  const [accountTransactions, setAccountTransactions] = useState<Transaction[] | null>(null);
+  const [accountTransactionsError, setAccountTransactionsError] = useState<string | null>(null);
   
   //pagination
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -42,34 +45,7 @@ export default function AccountDetailsModal({
   const paginationArray = Array.from({ length: totalPages }, (_, i) => i + 1);
   const visiblePages = paginationArray.slice(windowStart, windowStart + 5);
 
-  // confirmation modal
-  const [isAccountDeletionModal, setIsAccountDeletionModal] =
-    useState<boolean>(false);
-
-  const handleDeleteAccountClick = () => {
-    setIsAccountDeletionModal(true);
-    onClose(false);
-  };
-
-  const handleConfirmDelete = async () => {
-    if (!accountData?.id) return;
-
-    setIsAccountDeletionModal(false); // close confirmation dialog
-    setLoading(true);
-
-    const { error } = await DeleteAccount(accountData.id);
-
-    if (error) {
-      setDeleteAccountError(error);
-      setLoading(false);
-      return;
-    }
-
-    setLoading(false);
-    onClose(false); // close AccountDetailsModal since the account no longer exists
-    refresh(); // note: was `refresh;` before — that referenced the function without calling it
-  };
-
+  // fetch transactions of the account
   const fetchTransactionsOfAccount = async (id: string) => {
     setLoading(true);
     const { data, error, count } = await SelectTransactionsFromChosenAccount(
@@ -90,33 +66,49 @@ export default function AccountDetailsModal({
     setLoading(false);
   }, [accountData?.id, currentPage]);
 
+  // handle delete account
+  const openConfirmAccountDeletion = async () => {
+    setProcess(true);
+    setToggle("confirm-deletion");
+  } 
+
+  const handleAccountDeletion = async (id: string) => {
+    
+    setProcess(false);
+  }
+
   return (
     <>
-      {isAccountDeletionModal && (
-        <div className="fixed z-50 inset-0 flex w-full h-full bg-black/50 items-center justify-center">
+      {
+        (accountTransactionsError || deleteAccountError) && <ErrorModal message={accountTransactionsError || deleteAccountError}/>
+      }
+      {toggle === "confirm-deletion" && (
+        <div className="fixed flex inset-0 z-50 bg-black/50 w-full h-full items-center justify-center">
           <Modal
-            onOpen={setIsAccountDeletionModal}
-            open={isAccountDeletionModal}
-            header="Delete account"
-            icon={<Trash size={15} />}
-            message="Are you sure you want to delete this account?"
-            onConfirm={handleConfirmDelete}
-            onCancel={() => onClose(true)}
-            loading={loading}
+            open
+            onOpen={() => setToggle(null)}
+            onCancel={() => setToggle("")}
+            onConfirm={() => handleAccountDeletion(accountData?.id)}
             noButtonText="No"
-            yesButtonText="Delete account"
-          />
+            icon={<Trash size={15} className="min-w-20 h-auto"/>}
+            loading={process}
+            yesButtonText={`Yes, delete ${accountData?.name}`}
+            header="Delete account"
+            message="Are you sure you want to delete this account?"
+          >
+
+          </Modal>
         </div>
       )}
-      {toggle && (
+      {open && (
         <div className="fixed flex inset-0 z-50 bg-black/50 w-full h-full items-center justify-center">
-          <div className="flex flex-col xl:w-275 md:w-250 w-150 h-165 bg-(--color-bg-secondary) border border-(--color-border-default) rounded-lg shadow-md justify-between">
+          <div className="flex flex-col xl:w-275 md:w-250 w-150 mx-10 md:mx-0 h-165 bg-(--color-bg-secondary) border border-(--color-border-default) rounded-lg shadow-md justify-between">
             {/* Header */}
             <div className="flex w-full h-fit items-center justify-between px-5 py-2">
               <PiggyBank size={20} />
               <p className="text-2xl font-semibold">{accountData?.name}</p>
               <X
-                onClick={() => onClose(false)}
+                onClick={() => onOpen()}
                 size={20}
                 className="cursor-pointer"
               />
@@ -139,7 +131,7 @@ export default function AccountDetailsModal({
 
             {/* Body */}
             <div className="flex flex-col w-full h-full">
-              <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr] h-fit text-[0.9rem] px-5 pb-1 pt-4 border-b border-(--color-border-subtle)">
+              <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr] gap-x-3 md:gap-x-5 h-fit text-[0.9rem] px-5 pb-1 pt-4 border-b border-(--color-border-subtle)">
                 <p className="linear-clamp-1">Date & time</p>
                 <p className="linear-clamp-1">Type</p>
                 <p className="linear-clamp-1">Description</p>
@@ -153,42 +145,53 @@ export default function AccountDetailsModal({
                   <AccountListSkeleton />
                 </div>
               ) : (
-                <div className="flex flex-col w-full h-full">
-                  {accountTransactions?.map((item, key) => (
-                    <div
-                      className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr] border-b border-(--color-border-subtle) text-[0.9rem] px-5 py-2"
-                      key={key}
-                    >
-                      <div className="line-clamp-1">
-                        {ConvertTimestampToDateTime(item?.date_time)}
-                      </div>
-                      <div className="line-clamp-1 capitalize text-(--color-text-secondary)">
-                        {item?.type}
-                      </div>
-                      <div className="line-clamp-1">{item.description}</div>
-                      <div className="line-clamp-1">
-                        {item.categories?.name}
-                      </div>
-                      <div className="line-clamp-1">
-                        {item.toAccount?.name ? (
-                          <p className="line-clamp-1">
-                            {item.fromAccount?.name} to {item.toAccount?.name}
-                          </p>
-                        ) : (
-                          <p>{item.fromAccount?.name}</p>
-                        )}
-                      </div>
-                      <div className="line-clamp-1 font-mono">
-                        {item?.amount}
-                      </div>
+                <>
+                  {accountTransactions?.length === 0 ? (
+                    <div className="flex w-full h-full items-center justify-center">
+                      <p className="text-[0.9rem]">
+                        You have no lodged transactions in this account.
+                      </p>
                     </div>
-                  ))}
-                </div>
+                  ) : (
+                    <div className="flex flex-col w-full h-full">
+                      {accountTransactions?.map((item, key) => (
+                        <div
+                          className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr] border-b border-(--color-border-subtle) text-[0.9rem] px-5 py-2"
+                          key={key}
+                        >
+                          <div className="line-clamp-1">
+                            {ConvertTimestampToDateTime(item?.date_time)}
+                          </div>
+                          <div className="line-clamp-1 capitalize text-(--color-text-secondary)">
+                            {item?.type}
+                          </div>
+                          <div className="line-clamp-1">{item.description}</div>
+                          <div className="line-clamp-1">
+                            {item.categories?.name}
+                          </div>
+                          <div className="line-clamp-1">
+                            {item.toAccount?.name ? (
+                              <p className="line-clamp-1">
+                                {item.fromAccount?.name} to{" "}
+                                {item.toAccount?.name}
+                              </p>
+                            ) : (
+                              <p>{item.fromAccount?.name}</p>
+                            )}
+                          </div>
+                          <div className="line-clamp-1 font-mono">
+                            {item?.amount}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
               )}
             </div>
 
             {/* Pagination */}
-            <div className="flex w-full h-fit justify-between px-5 py-1 text-[0.9rem] gap-3">
+            <div className="flex flex-0 w-full h-full justify-between px-5 py-1 text-[0.9rem] gap-3 items-center">
               <div className="flex w-full h-fit">
                 <p>
                   Show{" "}
@@ -199,7 +202,7 @@ export default function AccountDetailsModal({
                 </p>
               </div>
 
-              <div className="flex w-full h-fit justify-end">
+              <div className="flex w-full h-fit justify-end gap-3 ">
                 {windowStart > 0 && (
                   <div
                     className="px-3 py-2 border border-(--color-border-default) rounded-lg shadow-md cursor-pointer hover:bg-(--color-bg-subtle)"
@@ -247,10 +250,10 @@ export default function AccountDetailsModal({
               <button
                 type="button"
                 className="flex cursor-pointer border border-(--color-border-default) rounded-lg bg-transparent hover:bg-(--color-brand-green) active:bg-emerald-600 w-full items-center justify-center py-1 duration-100 transition-all"
-                onClick={handleDeleteAccountClick}
+                onClick={() => openConfirmAccountDeletion()}
               >
                 <p className="text-[0.9rem]">
-                  {loading ? "Deleting account..." : "Delete account"}
+                  {process ? <Spinner/> : "Delete account"}
                 </p>
               </button>
             </div>

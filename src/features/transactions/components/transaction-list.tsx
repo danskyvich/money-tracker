@@ -22,9 +22,6 @@ export default function WholeTransactionList() {
   const [transactionsData, setTransactionsData] = useState<any[] | undefined>(
     undefined,
   );
-  const [totalNumberOfItems, setTotalNumberOfItems] = useState<
-    number | undefined | null
-  >(null);
   const [loading, setLoading] = useState<boolean>(false);
 
   // modals
@@ -33,10 +30,11 @@ export default function WholeTransactionList() {
 
   // pagination --> edit # of items calculations on lib/data/overview.ts
   // calculation here is purely for pagination purposes
-  const [currentPage, setCurrentPage] = useState<number>(1); // dynamic, comes from page number the user clicks to navigate
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [windowStart, setWindowStart] = useState(0);
+  const [totalNumberOfItems, setTotalNumberOfItems] = useState<number>(0);
   const totalPages = totalNumberOfItems ? Math.ceil(totalNumberOfItems / 9) : 0;
   const paginationArray = Array.from({ length: totalPages }, (_, i) => i + 1);
-  const [windowStart, setWindowStart] = useState(0);
   const visiblePages = paginationArray.slice(windowStart, windowStart + 5);
 
   // main fetch function
@@ -50,7 +48,7 @@ export default function WholeTransactionList() {
     } else {
       setTransactionsError(null);
       setTransactionsData(result.data);
-      setTotalNumberOfItems(result.totalItems);
+      setTotalNumberOfItems(Number(result.totalItems));
       setLoading;
       false;
     }
@@ -153,7 +151,9 @@ export default function WholeTransactionList() {
                       <div
                         className="grid grid-cols-[repeat(6,1fr)] gap-4 font-display text-[0.9rem] px-5 py-5 font-display w-full h-fit cursor-pointer hover:bg-(--color-bg-subtle) border-b border-(--color-border-subtle)"
                         key={key}
-                        onClick={() => handleGetTransactionToBeModified(transaction)}
+                        onClick={() =>
+                          handleGetTransactionToBeModified(transaction)
+                        }
                       >
                         <div className="flex w-full items-center">
                           <p className="line-clamp-1">
@@ -220,7 +220,7 @@ export default function WholeTransactionList() {
               <p>Show data</p>
 
               <div className="flex border border-(--color-border-default) text-(--color-text-secondary) px-3 py-2 mx-2 rounded-lg shadow-sm">
-                <p>{totalPages}</p>
+                <p>{transactionsData?.length}</p>
               </div>
 
               <p>of {totalNumberOfItems}</p>
