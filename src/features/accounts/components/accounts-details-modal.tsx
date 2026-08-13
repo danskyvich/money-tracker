@@ -16,7 +16,6 @@ interface AccountDetailsModalProps {
   onOpen: () => void;
   accountData: any | null;
   refresh: () => void;
-  onDelete: () => void;
 }
 
 export default function AccountDetailsModal({
@@ -24,13 +23,10 @@ export default function AccountDetailsModal({
   onOpen,
   accountData,
   refresh,
-  onDelete,
 }: AccountDetailsModalProps) {
 
   // modals
-  const [toggle, setToggle] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [process, setProcess] = useState<boolean>(false);
 
   // fetch data and errors
   const [deleteAccountError, setDeleteAccountError] = useState<string | null>("");
@@ -54,7 +50,12 @@ export default function AccountDetailsModal({
       10,
     );
 
-    if (!data) setAccountTransactionsError(error);
+    if (!data) {
+      setAccountTransactionsError(error);
+      setLoading(false);
+      return;
+    };
+
     setAccountTransactions(data);
     setTotalNumberOfItems(count ?? 0);
     setLoading(false);
@@ -63,42 +64,32 @@ export default function AccountDetailsModal({
   useEffect(() => {
     if (!accountData?.id) return;
     fetchTransactionsOfAccount(accountData?.id);
-    setLoading(false);
   }, [accountData?.id, currentPage]);
 
-  // handle delete account
-  const openConfirmAccountDeletion = async () => {
-    setProcess(true);
-    setToggle("confirm-deletion");
-  } 
-
+  // handle account deletion
   const handleAccountDeletion = async (id: string) => {
-    
-    setProcess(false);
+    setLoading(true);
+    try {
+      const { data, error } = await DeleteAccount(id);
+      if (!data || error ) {
+        setDeleteAccountError(error);
+        return;
+      }
+    } catch (err) {
+      setDeleteAccountError("Account deletion failed.");
+    } finally {
+      setLoading(false);
+      refresh();
+      onOpen();
+    }
   }
+
+  if (!open) return null;
 
   return (
     <>
-      {
-        (accountTransactionsError || deleteAccountError) && <ErrorModal message={accountTransactionsError || deleteAccountError}/>
-      }
-      {toggle === "confirm-deletion" && (
-        <div className="fixed flex inset-0 z-50 bg-black/50 w-full h-full items-center justify-center">
-          <Modal
-            open
-            onOpen={() => setToggle(null)}
-            onCancel={() => setToggle("")}
-            onConfirm={() => handleAccountDeletion(accountData?.id)}
-            noButtonText="No"
-            icon={<Trash size={15} className="min-w-20 h-auto"/>}
-            loading={process}
-            yesButtonText={`Yes, delete ${accountData?.name}`}
-            header="Delete account"
-            message="Are you sure you want to delete this account?"
-          >
-
-          </Modal>
-        </div>
+      {(accountTransactionsError || deleteAccountError) && (
+        <ErrorModal message={accountTransactionsError || deleteAccountError} />
       )}
       {open && (
         <div className="fixed flex inset-0 z-50 bg-black/50 w-full h-full items-center justify-center">
@@ -242,19 +233,12 @@ export default function AccountDetailsModal({
             </div>
 
             <div className="flex flex-col w-full h-fit px-5 pb-5 pt-2">
-              {/*}
-              <p className="text-red-500 text-[0.9rem]">
-                {deleteAccountError} {accountTransactionsError}
-              </p>
-              */}
               <button
                 type="button"
-                className="flex cursor-pointer border border-(--color-border-default) rounded-lg bg-transparent hover:bg-(--color-brand-green) active:bg-emerald-600 w-full items-center justify-center py-1 duration-100 transition-all"
-                onClick={() => openConfirmAccountDeletion()}
+                className="flex cursor-pointer border border-(--color-border-default) rounded-lg bg-transparent text-[0.9rem] hover:bg-(--color-brand-green) active:bg-emerald-600 w-full items-center justify-center py-1 duration-100 transition-all"
+                onClick={() => handleAccountDeletion(accountData?.id)}
               >
-                <p className="text-[0.9rem]">
-                  {process ? <Spinner/> : "Delete account"}
-                </p>
+                {loading ? <Spinner /> : "Delete account"}
               </button>
             </div>
           </div>

@@ -24,7 +24,7 @@ export default function AddAccountModal({
 
   const initialValues = {
     accountName: '',
-    accountType: accountCategoriesData?.[0]?.name,
+    accountType: accountCategoriesData?.[0]?.id,
     description: '',
   }
 
@@ -64,12 +64,11 @@ export default function AddAccountModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center shadow-md bg-black/50">
-      {
-        error !== null && (
-          <ErrorModal message={error}/>
-        )
-      }
-      <form className="p-5 w-50 transform:translate(-50, -50%) bg-(--color-bg-secondary) md:w-100 border border-(--color-border-default) rounded-lg shadow-md" onSubmit={handleSubmit}>
+      {error !== null && <ErrorModal message={error} />}
+      <form
+        className="p-5 w-50 transform:translate(-50, -50%) bg-(--color-bg-secondary) md:w-100 border border-(--color-border-default) rounded-lg shadow-md"
+        onSubmit={handleSubmit}
+      >
         {/* Header */}
         <div className="flex w-full justify-between items-center">
           <PiggyBank size={20} />
@@ -132,12 +131,10 @@ export default function AddAccountModal({
         {/* Footer - button */}
         <div className="flex w-full pt-7">
           <button
-            className="flex bg-(--color-brand-green) focus:outline-1 focus:outline-(--color-brand-green) rounded-lg shadow-md hover:bg-(--color-brand-green-accent) active:bg-emerald-700 items-center justify-center px-5 py-1 w-full cursor-pointer"
+            className="flex bg-(--color-brand-green) focus:outline-1 focus:outline-(--color-brand-green) rounded-lg shadow-md hover:bg-(--color-brand-green-accent) text-[0.9rem] active:bg-emerald-700 items-center justify-center px-5 py-1 w-full cursor-pointer"
             type="submit"
           >
-            <p className="text-[0.9rem]">
-              {loading ? <Spinner /> : "Add account"}
-            </p>
+            {loading ? <Spinner /> : "Add account"}
           </button>
         </div>
       </form>
