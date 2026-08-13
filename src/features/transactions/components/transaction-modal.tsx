@@ -7,7 +7,7 @@ import { InsertTransaction, UpdateTransaction } from "@/lib/supabase/actions/dat
 import { createClient } from "@/lib/supabase/clients/client";
 import { Transaction } from "@/lib/types/database";
 import { Coins } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import TransactionModalSkeleton from "./skeleton/transaction-modal-skeleton";
 
 interface AddTransactionModalProps {
@@ -27,30 +27,21 @@ export default function TransactionModal({
   onCancel,
   fetch,
 }: AddTransactionModalProps) {
+
   const [accounts, setAccounts] = useState<any[] | null>(null);
   const [categories, setCategories] = useState<any[] | null>(null);
-
   const [loading, setLoading] = useState<boolean>(false);
-  const [process, setProcess] = useState<boolean>(false);
-  const [account, setAccount] = useState<string>("");
-  const [accountTo, setAccountTo] = useState<string | null>("");
-  const [amount, setAmount] = useState<number>(0);
-  const [type, setType] = useState<string>("");
-  const [category, setCategory] = useState<string>("");
-  const [description, setDescription] = useState<string | null>(null);
-  const [dateTime, setDateTime] = useState<string>("");
-
   const [transactionError, setTransactionError] = useState<string | null>(
     null,
   );
-  const [chosenTransaction, setChosenTransaction] = useState<string>("");
+  const transactionTypes: string[] = ["income", "expense", "transfer"];
 
   // fetch accounts and categories
   const fetchData = async () => {
     setLoading(true);
-    setAmount(0.00);
-    setChosenTransaction(transaction?.id ?? "");
-    const [accountsResult, categoriesResult] = await Promise.all([
+
+    try {
+      const [accountsResult, categoriesResult] = await Promise.all([
       (await createClient()).from("accounts").select(`id, name`),
       (await createClient()).from("categories").select(`id, name`),
     ]);
@@ -58,26 +49,19 @@ export default function TransactionModal({
     const { data: accountsData, error: accountsError } = accountsResult;
     const { data: categoriesData, error: categoriesError } = categoriesResult;
 
+    setAccounts(accountsData);
+    setCategories(categoriesData);
+
     if (accountsError || categoriesError) {
       setTransactionError("Fetching data failed");
       setLoading(false);
       return;
     }
-    setAccounts(accountsData);
-    setCategories(categoriesData);
-    setAccount(transaction?.fromAccount?.id ?? accountsData?.[0]?.id ?? null);
-    setAccountTo(transaction?.toAccount?.id ?? accountsData?.[0]?.id ?? null);
-    setCategory(transaction?.categories?.id ?? categoriesData?.[0]?.id ?? null);
-    {
-      modalType === "modify"
-        ? setType(transaction?.type ?? "")
-        : setType(transactionTypes[0]);
+    } catch (err) {
+      setTransactionError("Fetching transaction failed");
+    } finally {
+      setLoading(false);
     }
-    setAmount(Number(transaction?.amount) ?? 0);
-    setDescription(transaction?.description ?? "");
-    setDateTime(transaction?.date_time ?? "");
-
-    setLoading(false);
   };
 
   // set data to all fields
@@ -85,134 +69,92 @@ export default function TransactionModal({
     fetchData();
   }, []);
 
-  interface TransactionParams {
-    account: string;
-    amount: number;
+  // interface for submitting the form
+  interface TransactionPayload {
     type: string;
-    category: string;
-    dateTime: string;
-    description: string | null;
-    accountTo: string | null;
+    date_time: string;
+    amount: number;
+    category_id: string;
+    account_id: string;
+    to_account_id: string | null;
+    description: string;
   }
 
-  // add transaction
-  const handleAddTransaction = async ({
-    account,
-    amount,
-    type,
-    category,
-    dateTime,
-    description,
-    accountTo,
-  }: TransactionParams) => {
-    setProcess(true);
-
-    // check in fields are populated
-    if (!account || !amount || !type || !category || !dateTime) {
-      setTransactionError("Form error: fill up all required fields");
-      setProcess(false);
-      return;
-    }
-
-    if (type === "income" || type === "expense") {
-      setAccountTo(null);
-    }
-
-    if (accounts?.length === 0 || categories?.length === 0) {
-      setTransactionError(
-        "You need either a single account or transaction category to begin.",
-      );
-      setProcess(false);
-      return;
-    }
-
-    // get user_id
-    const user = await getUser();
-    if (!user) {
-      setTransactionError("User is not authenticated");
-      setProcess(false);
-      return;
-    }
-    const user_id = user?.id;
-
-    // insert transaction to db
-    const { data, error } = await InsertTransaction([
-      {
-        account_id: account,
-        amount,
-        category_id: category,
-        description: description ?? null,
-        user_id,
-        to_account_id: accountTo ?? null,
-        date_time: dateTime,
-        type,
-      },
-    ]);
-
-    // error checks
-    if (error) {
-      setTransactionError(error.message);
-      setProcess(false);
-      return;
-    }
-
-    onOpen();
-    fetch();
-    setProcess(false);
+  // set the initial values of all fields
+  const initialValues: TransactionPayload = {
+    type:
+      modalType === "modify"
+        ? (transaction?.type ?? transactionTypes[0])
+        : transactionTypes[0],
+    date_time:
+      modalType === "modify"
+        ? (transaction?.date_time ?? "")
+        : new Date().toISOString().slice(0, 16),
+    amount: modalType === "modify" ? Number(transaction?.amount) ?? 0.00 : 0.00,
+    category_id:
+      modalType === "modify" ? (transaction?.categories?.id ?? "") : "",
+    account_id:
+      modalType === "modify" ? (transaction?.fromAccount?.id ?? "") : "",
+    to_account_id:
+      modalType === "modify" ? (transaction?.toAccount?.id ?? "") : "",
+    description: modalType === "modify" ? (transaction?.description ?? "") : "",
   };
 
-  // modify transaction
-  const handleModifyTransaction = async ({
-    account,
-    amount,
-    type,
-    category,
-    dateTime,
-    description,
-    accountTo,
-  }: TransactionParams) => {
-    setProcess(true);
+  const [formValues, setFormValues] = useReducer(
+    (currentValues, nextValues) => ({...currentValues, ...nextValues}), initialValues
+  )
 
-    if (!account || !amount || !type || !category || !dateTime) {
-      setTransactionError("Form error: fill up all required fields");
-      setProcess(false);
-      return;
-    }
+  // handle changes to useReducer
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value} = e.target;
+    setFormValues({ [name]: value});
+  }
+
+  // submit
+  const handleSubmit = async () => {
+    setLoading(true);
+    if (!transaction) return;
 
     const user = await getUser();
     if (!user) {
-      setTransactionError("User is not authenticated");
-      setProcess(false);
-      return;
-    }
-    const user_id = user.id;
-
-    const { data, error } = await UpdateTransaction(chosenTransaction, [
-      {
-        account_id: account,
-        amount,
-        category_id: category,
-        description: description ?? null,
-        user_id,
-        to_account_id: accountTo ?? null,
-        date_time: dateTime,
-        type,
-      },
-    ]);
-
-    // error checks
-    if (error) {
-      setTransactionError(String(error));
-      setProcess(false);
+      setTransactionError("User not authenticated.");
       return;
     }
 
-    onOpen();
-    fetch();
-    setProcess(false);
-  };;
+    //congregate all inputs
+    try {
+      const payload = {
+        type: formValues.type,
+        date_time: formValues.date_time,
+        amount: formValues.amount,
+        category_id: formValues.category_id,
+        account_id: formValues.account_id,
+        to_account_id: formValues.type === "transfer" ? formValues.to_account_id : null,
+        description: formValues.description ?? null,
+        user_id: user.id,
+      };
 
-  const transactionTypes: string[] = ["income", "expense", "transfer"];
+      const { data, error } = 
+        modalType === "modify"
+        ? await UpdateTransaction(transaction.id, [payload])
+        : await InsertTransaction([payload])
+
+      if (!data || error ) {
+        setTransactionError("Error: " + error);
+        setLoading(false);
+      }
+
+      setLoading(false);
+      fetch();
+      onOpen();
+
+    } catch (err) {
+      setTransactionError("Fetching transaction failed")
+      return;
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (!open) return null;
 
@@ -225,30 +167,10 @@ export default function TransactionModal({
         <Modal
           open
           onOpen={onOpen}
-          loading={process}
+          loading={loading}
           onCancel={onCancel}
+          onConfirm={handleSubmit}
           icon={<Coins size={20} />}
-          onConfirm={() => {
-            modalType === "add"
-              ? handleAddTransaction({
-                  account,
-                  amount,
-                  type,
-                  category,
-                  dateTime,
-                  description,
-                  accountTo,
-                })
-              : handleModifyTransaction({
-                  account,
-                  amount,
-                  type,
-                  category,
-                  dateTime,
-                  description,
-                  accountTo,
-                });
-          }}
           header={
             modalType === "add" ? "Add a transaction" : "Modify the transaction"
           }
@@ -258,9 +180,9 @@ export default function TransactionModal({
           <div className="flex w-full h-fit gap-5 mb-3" role="group">
             {transactionTypes.map((item, key) => (
               <div
-                className={`flex ${type === item && "bg-(--color-brand-green) hover:bg-emerald-600"} flex-1 w-full h-fit border border-(--color-border-default) rounded-lg items-center justify-center py-1 hover:bg-(--color-border-subtle) cursor-pointer active:bg-(--color-brand-green-accent)`}
-                onClick={() => setType(item)}
+                className={`flex ${formValues.type === item && "bg-(--color-brand-green) hover:bg-emerald-600"} flex-1 w-full h-fit border border-(--color-border-default) rounded-lg items-center justify-center py-1 hover:bg-(--color-border-subtle) cursor-pointer active:bg-(--color-brand-green-accent)`}
                 key={key}
+                onClick={(e) => setFormValues({ type: item})}
               >
                 <p className="line-clamp-1 text-[0.9rem] font-mono">{item}</p>
               </div>
@@ -270,30 +192,33 @@ export default function TransactionModal({
             <label htmlFor="date-time">Date and time</label>
             <input
               id="date-time"
-              value={dateTime}
+              value={formValues.date_time}
+              name="dateTime"
               type="datetime-local"
               className="border border-(--color-border-default) rounded-lg px-3 py-1"
-              onChange={(e) => setDateTime(e.target.value)}
+              onChange={handleChange}
             />
             <label htmlFor="amount">Amount</label>
             <input
               id="amount"
-              value={amount ?? 0.00}
+              name="amount"
+              value={formValues.amount}
               type="text"
-              onChange={(e) => setAmount(Number(e.target.value))}
+              onChange={handleChange}
               className="border border-(--color-border-default) rounded-lg px-3 py-1"
               placeholder="50.00"
             />
             <label htmlFor="category">Category</label>
             <select
               id="category"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
+              name="category"
+              value={formValues.category_id}
+              onChange={handleChange}
               className="border border-(--color-border-default) rounded-lg px-3 py-1"
             >
-              {categories?.map((c) => (
+              {categories?.map((c, id) => (
                 <option
-                  key={c.id}
+                  key={id}
                   value={c.id}
                   className="bg-(--color-bg-secondary)"
                 >
@@ -304,13 +229,14 @@ export default function TransactionModal({
             <label htmlFor="account-from">Source account</label>
             <select
               id="account-from"
-              value={account}
-              onChange={(e) => setAccount(e.target.value)}
+              name="accountFrom"
+              value={formValues.account_id ?? ""}
+              onChange={handleChange}
               className="border border-(--color-border-default) rounded-lg px-3 py-1"
             >
-              {accounts?.map((a) => (
+              {accounts?.map((a, id) => (
                 <option
-                  key={a.id}
+                  key={id}
                   value={a.id}
                   className="bg-(--color-bg-secondary)"
                 >
@@ -318,13 +244,14 @@ export default function TransactionModal({
                 </option>
               ))}
             </select>
-            {type === "transfer" && (
+            {formValues.type === "transfer" && (
               <>
                 <label htmlFor="account-to">Destination account</label>
                 <select
                   id="account-to"
-                  value={accountTo ?? undefined}
-                  onChange={(e) => setAccountTo(e.target.value)}
+                  name="accountTo"
+                  value={formValues.to_account_id ?? ""}
+                  onChange={handleChange}
                   className="border border-(--color-border-default) rounded-lg px-3 py-1"
                 >
                   {accounts?.map((a) => (
@@ -342,8 +269,9 @@ export default function TransactionModal({
             <label htmlFor="description">Description</label>
             <textarea
               id="description"
-              value={description ?? ""}
-              onChange={(e) => setDescription(e.target.value)}
+              name="description"
+              value={formValues.description}
+              onChange={handleChange}
               className="border border-(--color-border-default) rounded-lg px-3 py-1 resize-none"
               placeholder="e.g Transferred 50.00..."
             />
