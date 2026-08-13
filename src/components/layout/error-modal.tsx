@@ -26,7 +26,7 @@ export default function ErrorModal({ message }: ErrorModalProps) {
           exit={{ opacity: 0, y: -5 }}
           transition={{ duration: 0.3 }}
         >
-          <InfoIcon size={15} />
+          <InfoIcon size={20} className="min-w-5 h-auto"/>
           <p className="font-sans text-[0.9rem]">{message}</p>
         </motion.div>
       )}

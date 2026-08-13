@@ -14,7 +14,7 @@ import ExpenseBreakdownPage from "@/features/overview/components/breakdown-expen
 import SixMonthsRef from "../../components/charts/BarChart";
 import { getMonthlyInflowOutflow } from "@/features/overview/api/fetchChartData";
 import Snippet from "./components/snippet-income-expense";
-import TransactionList from "../transactions/components/transactions-list";
+import TransactionList from "../transactions/components/transaction-partial";
 import AccountsList from "./components/accounts-partial";
 import OverviewHeader from "./components/icon-and-name";
 import AddAccountModal from "../accounts/components/add-account-modal";
@@ -25,8 +25,9 @@ import {
 } from "@/lib/supabase/actions/database";
 import { Transaction } from "@/lib/types/database";
 import OverviewTransactionSkeleton from "./components/skeleton/overview-transaction-skeleton";
-import TransactionWrapper from "./components/transaction-wrapper";
 import QuickActionsSkeleton from "./components/skeleton/quick-action-skeleton";
+import OverviewAccountsSkeleton from "./components/skeleton/overview-account-skeleton";
+import TransactionModal from "../transactions/components/transaction-modal";
 
 export default function OverviewPage() {
   // variables - general
@@ -44,15 +45,13 @@ export default function OverviewPage() {
   const [chosenPage, setChosenPage] = useState<"income" | "expense">("income");
 
   // fetch data
-  const [transactionData, setTransactionData] = useState<Transaction[] | null>(
-    null,
-  );
+  const [transactionData, setTransactionData] = useState<any[] | null>(null);
   const [accounts, setAccounts] = useState<any[] | null | undefined>(null);
   const [transactionError, setTransactionError] = useState<string | null>(null);
   const [accountError, setAccountError] = useState<string | null>(null);
-  const [accountCategoriesData, setAccountCategoriesData] = useState<
-    any[] | undefined
-  >(undefined);
+  const [accountCategoriesData, setAccountCategoriesData] = useState<any[] | undefined>(undefined);
+
+  // loading states
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingTransactions, setLoadingTransactions] = useState(false);
   const [loadingAccounts, setLoadingAccounts] = useState(false);
@@ -72,32 +71,42 @@ export default function OverviewPage() {
     setLoadingTransactions(true);
     setLoadingAccounts(true);
 
-    const result = await FetchAccounts(currentPage, 9);
-    if (!result?.success) {
-      setAccountError(result?.error ?? "Fetching data failed.");
-      setLoadingAccounts(false);
+    const [accountsResult, transactionResult] = await Promise.all([
+      FetchAccounts(currentPage, 4),
+      FetchTransaction(currentPage, 9),
+    ]);
+
+    const {
+      accountCategoriesData,
+      accountsData,
+      error: accountsError,
+      totalItems,
+    } = accountsResult;
+    const { data: transactionsData, error: transactionsError } =
+      transactionResult;
+
+    // --- accounts handling ---
+    if (accountCategoriesData === null || accountsData === null) {
+      setAccountError(accountsError ?? "Fetching accounts failed");
+    } else {
+      setTotalNumberOfItems(totalItems);
+      setAccounts(accountsData);
+      setAccountCategoriesData(accountCategoriesData);
     }
-
-    setAccounts(result?.accountsData);
-    setAccountCategoriesData(result?.accountCategoriesData);
-    setTotalNumberOfItems(result?.totalItems);
-
-    const transactionResult = await FetchTransaction(currentPage, 9);
-    if (!transactionResult?.success) {
-      setTransactionError(
-        transactionResult?.error ?? "Fetching transactions failed.",
-      );
-      setLoadingTransactions(false);
-    }
-
-    const sortedTransactions = [...(transactionData ?? [])].sort((a, b) =>
-      b.date_time.localeCompare(a.date_time),
-    );
-    setTransactionData(sortedTransactions);
-
     setLoadingAccounts(false);
+
+    // --- transactions handling ---
+    if (transactionsData === null) {
+      setTransactionError(transactionsError);
+    }
+
+    const sortedTransactions = [...(transactionsData ?? [])].sort((a, b) =>
+      new Date(b.date_time).getTime() - new Date(a.date_time).getTime()
+    );
+
+    setTransactionData(sortedTransactions);
     setLoadingTransactions(false);
-  };
+  };;
 
   // call fetchData()
   useEffect(() => {
@@ -147,15 +156,15 @@ export default function OverviewPage() {
   return (
     <div className="flex flex-col w-full h-full gap-5">
       {toggle === "add-transaction" && (
-        <TransactionWrapper
-          toggle
-          currentPage={currentPage}
-          selectedTransaction={null}
-          onClose={() => setToggle(null)}
-          accountsData={accounts}
-          categoryData={accountCategoriesData}
-          onTransactionSaved={() => setToggle(null)}
-        />
+        <div className="fixed z-50 inset-0 bg-black/50 flex w-full h-full items-center justify-center">
+          <TransactionModal
+            modalType="add"
+            open
+            onOpen={() => setToggle(null)}
+            onCancel={() => setToggle(null)}
+            fetch={fetchData}
+          />
+        </div>
       )}
       {toggle === "add-account" && (
         <AddAccountModal
@@ -197,12 +206,12 @@ export default function OverviewPage() {
             <div className="flex flex-col flex-2 border border-(--color-border-default) rounded-lg shadow-md w-full h-full p-5 gap-2">
               <p className="text-xl font-semibold">Quick Actions</p>
               <div className="flex w-full h-full gap-5 flex-col md:flex-row">
-                <div className="flex flex-1 bg-(--color-brand-green) text-white rounded-lg shadow-md items-center justify-center text-[0.9rem] gap-1 py-2 cursor-pointer hover:bg-(--color-brand-green-accent) duration-100 transition-all active:bg-emerald-600">
+                <div
+                  className="flex flex-1 bg-(--color-brand-green) text-white rounded-lg shadow-md items-center justify-center text-[0.9rem] gap-1 py-2 cursor-pointer hover:bg-(--color-brand-green-accent) duration-100 transition-all active:bg-emerald-600"
+                  onClick={() => setToggle("add-transaction")}
+                >
                   <Plus size={20} />
-                  <p
-                    className="hidden lg:block whitespace-nowrap"
-                    onClick={() => setToggle("add-transaction")}
-                  >
+                  <p className="hidden lg:block whitespace-nowrap">
                     Add a transaction
                   </p>
                 </div>
@@ -264,15 +273,15 @@ export default function OverviewPage() {
               subheader="Most recent transactions"
               linkText="View transactions"
             >
-              {transactionError && <p>{transactionError}</p>}
-              {loadingTransactions ? (
-                <OverviewTransactionSkeleton />
+              {transactionError ? (
+                <div className="flex w-full h-full items-center justify-center text-[0.9rem]">
+                  <p>{transactionError}</p>
+                </div>
               ) : (
                 <TransactionList
                   transactionData={transactionData}
                   transactionError={transactionError}
                   loading={loadingTransactions}
-                  onLoading={() => setLoadingTransactions(true)}
                 />
               )}
             </Card>
@@ -335,13 +344,16 @@ export default function OverviewPage() {
               </div>
             </div>
 
-            <AccountsList
-              accountsData={accounts}
-              accountsError={accountError}
-              loading={loadingAccounts}
-              totalNumberOfItems={totalNumberOfItems}
-              pressedCurrentPage={(page) => setCurrentPage(page)}
-            />
+            {loadingAccounts ? (
+              <OverviewAccountsSkeleton />
+            ) : (
+              <AccountsList
+                accountsData={accounts}
+                accountsError={accountError}
+                totalNumberOfItems={totalNumberOfItems}
+                pressedCurrentPage={(page) => setCurrentPage(page)}
+              />
+            )}
           </Card>
         </div>
       </div>

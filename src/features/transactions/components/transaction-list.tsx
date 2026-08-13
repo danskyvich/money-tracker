@@ -1,5 +1,4 @@
 import FilterModal from "@/components/layout/filter-modal";
-import { Transaction } from "@/lib/types/database";
 import { FetchTransaction } from "@/lib/supabase/actions/database";
 import ConvertTimestampToDateTime from "@/utils/convertToDateTime";
 import {
@@ -7,13 +6,17 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  Plus,
   Search,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import ErrorModal from "@/components/layout/error-modal";
 import TransactionListSkeleton from "./skeleton/transaction-list-skeleton";
+import TransactionModal from "./transaction-modal";
+import { Transaction } from "@/lib/types/database";
 
 export default function WholeTransactionList() {
+
   // fetch data & error
   const [transactionsError, setTransactionsError] = useState<string | null>("");
   const [transactionsData, setTransactionsData] = useState<any[] | undefined>(
@@ -22,12 +25,11 @@ export default function WholeTransactionList() {
   const [totalNumberOfItems, setTotalNumberOfItems] = useState<
     number | undefined | null
   >(null);
-  const [pending, setPending] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   // modals
-  const [openModal, setOpenModal] = useState(false);
-  const [selectedTransaction, setSelectedTransaction] =
-    useState<Transaction | null>(null);
+  const [toggle, setToggle] = useState<string | null>(null);
+  const [chosenTransaction, setChosenTransaction] = useState<Transaction | null>(null)
 
   // pagination --> edit # of items calculations on lib/data/overview.ts
   // calculation here is purely for pagination purposes
@@ -39,7 +41,7 @@ export default function WholeTransactionList() {
 
   // main fetch function
   const fetchData = async () => {
-    setPending(true);
+    setLoading(true);
 
     const result = await FetchTransaction(currentPage, 9);
 
@@ -49,22 +51,21 @@ export default function WholeTransactionList() {
       setTransactionsError(null);
       setTransactionsData(result.data);
       setTotalNumberOfItems(result.totalItems);
+      setLoading;
+      false;
     }
-
-    setPending(false);
+    setLoading(false);
   };
 
   useEffect(() => {
     fetchData();
   }, [currentPage]);
 
-  const handleOpenModal = (
-    toggle: boolean,
-    selectedTransaction: Transaction | null,
-  ) => {
-    setOpenModal(toggle);
-    setSelectedTransaction(selectedTransaction);
-  };
+  // get the transaction to be modified
+  const handleGetTransactionToBeModified = (transaction: Transaction) => {
+    setToggle("modify-transaction")
+    setChosenTransaction(transaction);
+  }
 
   const transactionItems: FilterItems[] = [
     { origin: "transactions", item: "No filter" },
@@ -75,13 +76,43 @@ export default function WholeTransactionList() {
 
   return (
     <>
-      {pending ? (
-        <TransactionListSkeleton />
-      ) : (
+      {toggle === "add-transaction" && (
+        <div className="fixed inset-0 z-50 flex w-full h-full items-center justify-center bg-black/50">
+          <TransactionModal
+            open
+            onOpen={() => setToggle(null)}
+            onCancel={() => setToggle(null)}
+            fetch={() => fetchData()}
+            modalType="add"
+          />
+        </div>
+      )}
+      {toggle === "modify-transaction" && (
+        <div className="fixed inset-0 z-50 flex w-full h-full items-center justify-center bg-black/50">
+          <TransactionModal
+            transaction={chosenTransaction ?? undefined}
+            modalType="modify"
+            open
+            onOpen={() => setToggle(null)}
+            onCancel={() => setToggle(null)}
+            fetch={() => fetchData()}
+          />
+        </div>
+      )}
+      <>
         <div className="grid grid-cols-1 grid-rows-[auto_1fr_auto] h-full border border-(--color-border-default) rounded-lg">
-          {/* Filter Bar */}
+          {/* Table header*/}
           <div className="flex w-full h-full px-5 py-2 gap-3 ">
-            <FilterModal content={transactionItems} />
+            {/** Add transaction */}
+            <div
+              className="flex w-fit h-fit border items-center gap-2 border-(--color-border-default) rounded-lg p-2 bg-(--color-brand-green) cursor-pointer hover:bg-emerald-600 active:bg-emerald-700"
+              onClick={() => setToggle("add-transaction")}
+            >
+              <Plus size={15} />
+              <p className="text-[0.9rem] hidden lg:block">Add a transaction</p>
+            </div>
+
+            {/* Filter */}
 
             {/* Date range */}
             <div className="flex w-fit h-full border border-(--color-border-default) font-display text-[0.8rem] py-1 px-3 rounded-lg gap-2 items-center justify-center">
@@ -112,68 +143,74 @@ export default function WholeTransactionList() {
               <div className="text-left">Amount</div>
             </div>
 
-            <div className="flex flex-col relative w-full h-full overflow-hidden items-center justify-center">
-              {transactionsData && (
-                <div className="flex flex-col w-full h-fit">
-                  {transactionsData.map((transaction, key) => (
-                    <div
-                      className="grid grid-cols-[repeat(6,1fr)] gap-4 font-display text-[0.9rem] px-5 py-5 font-display w-full h-fit cursor-pointer hover:bg-(--color-bg-subtle) border-b border-(--color-border-subtle)"
-                      key={key}
-                      onClick={() => handleOpenModal(true, transaction)}
-                    >
-                      <div className="flex w-full items-center">
-                        <p className="line-clamp-1">
-                          {ConvertTimestampToDateTime(transaction.date_time)}
-                        </p>
-                      </div>
-                      <div className="flex w-full items-center text-(--color-text-secondary)">
-                        <p className="capitalize line-clamp-1">
-                          {transaction.type}
-                        </p>
-                      </div>
-                      <div className="flex w-full items-center">
-                        <p className="line-clamp-1">
-                          {transaction.description}
-                        </p>
-                      </div>
-                      <div className="flex w-full items-center">
-                        <p className="line-clamp-1">
-                          {transaction.categories?.name}
-                        </p>
-                      </div>
-                      <div className="flex w-full items-center">
-                        {transaction.toAccount?.name ? (
-                          <p className="line-clamp-1">
-                            {transaction.fromAccount?.name} to{" "}
-                            {transaction.toAccount?.name}
-                          </p>
-                        ) : (
-                          <p>{transaction.fromAccount?.name}</p>
-                        )}
-                      </div>
+            {loading ? (
+              <TransactionListSkeleton />
+            ) : (
+              <div className="flex flex-col relative w-full h-full overflow-hidden">
+                {transactionsData && (
+                  <div className="flex flex-col w-full h-fit">
+                    {transactionsData.map((transaction, key) => (
                       <div
-                        className={`flex w-full items-center font-mono ${transaction.type === "income" ? "text-emerald-500" : transaction.type === "expense" ? "text-red-500" : "text-(--color-text-primary)"}`}
+                        className="grid grid-cols-[repeat(6,1fr)] gap-4 font-display text-[0.9rem] px-5 py-5 font-display w-full h-fit cursor-pointer hover:bg-(--color-bg-subtle) border-b border-(--color-border-subtle)"
+                        key={key}
+                        onClick={() => handleGetTransactionToBeModified(transaction)}
                       >
-                        <p className="line-clamp-1">{transaction.amount}</p>
+                        <div className="flex w-full items-center">
+                          <p className="line-clamp-1">
+                            {ConvertTimestampToDateTime(transaction.date_time)}
+                          </p>
+                        </div>
+                        <div className="flex w-full items-center text-(--color-text-secondary)">
+                          <p className="capitalize line-clamp-1">
+                            {transaction.type}
+                          </p>
+                        </div>
+                        <div className="flex w-full items-center">
+                          <p className="line-clamp-1">
+                            {transaction.description}
+                          </p>
+                        </div>
+                        <div className="flex w-full items-center">
+                          <p className="line-clamp-1">
+                            {transaction.categories?.name}
+                          </p>
+                        </div>
+                        <div className="flex w-full items-center">
+                          {transaction.toAccount?.name ? (
+                            <p className="line-clamp-1">
+                              {transaction.fromAccount?.name} to{" "}
+                              {transaction.toAccount?.name}
+                            </p>
+                          ) : (
+                            <p>{transaction.fromAccount?.name}</p>
+                          )}
+                        </div>
+                        <div
+                          className={`flex w-full items-center font-mono ${transaction.type === "income" ? "text-emerald-500" : transaction.type === "expense" ? "text-red-500" : "text-(--color-text-primary)"}`}
+                        >
+                          <p className="line-clamp-1">{transaction.amount}</p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {
-                transactionsError && (
-                  <p className=""></p>
-                )
-              }
+                    ))}
+                  </div>
+                )}
+                {transactionsError && (
+                  <div className="flex w-full h-full items-center justify-center text-[0.9rem]">
+                    {transactionsError}
+                  </div>
+                )}
 
-              {transactionsData?.length === 0 && (
-                <p className="text-[0.9rem]">
-                  You have no lodged transactions.
-                </p>
-              )}
+                {transactionsData?.length === 0 && (
+                  <div className="flex w-full h-full items-center justify-center text-[0.9rem]">
+                    <p>You have no lodged transactions</p>
+                  </div>
+                )}
 
-              {transactionsError && <ErrorModal message={transactionsError} />}
-            </div>
+                {transactionsError && (
+                  <ErrorModal message={transactionsError} />
+                )}
+              </div>
+            )}
           </div>
 
           {/* Footer */}
@@ -230,7 +267,7 @@ export default function WholeTransactionList() {
             </div>
           </div>
         </div>
-      )}
+      </>
     </>
   );
 }

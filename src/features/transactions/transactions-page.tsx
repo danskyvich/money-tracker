@@ -1,6 +1,6 @@
 "use client";
 
-import WholeTransactionList from "./components/transaction-whole";
+import WholeTransactionList from "./components/transaction-list";
 
 export default function TransactionsPage() {
   return (
