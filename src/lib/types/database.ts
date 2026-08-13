@@ -6,7 +6,7 @@ export interface Transaction {
     description: string,
     amount: string,
     type: string,
-    categories: { id: string, name: string} | null,
+    categories: { id: string, name: string},
     fromAccount: { id: string, name: string} | null,
     toAccount: {id: string, name: string} | null,
 }
