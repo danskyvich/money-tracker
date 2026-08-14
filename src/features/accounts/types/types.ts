@@ -1,14 +1,8 @@
-export type FilterOption = { label: string; value: string };
+export type FilterOptions = { name: string, value: string };
 
-export type FilterField =
-  | {
-      type: 'select';
-      key: string;
-      label: string;
-      options: FilterOption[];
-    }
-  | {
-      type: 'date';
-      key: string;
-      label: string;
-    };
+export interface FilterAccountField {
+    key: string,
+    label: string,
+    type: "select" | "dateRange" | "text"
+    options: FilterOptions[],
+}

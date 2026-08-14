@@ -18,6 +18,10 @@ export interface Accounts {
     description: string,
 }
 
+export type AccountsWithBalance = Accounts & {
+    balance: number | string;
+}
+
 export interface AccountBalance {
     account_id: string,
     balance: string,

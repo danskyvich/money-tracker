@@ -1,11 +1,9 @@
-import FilterModal from "@/components/layout/filter-modal";
 import { FetchTransaction } from "@/lib/supabase/actions/database";
 import ConvertTimestampToDateTime from "@/utils/convertToDateTime";
 import {
-  Calendar,
-  ChevronDown,
   ChevronLeft,
   ChevronRight,
+  Filter,
   Plus,
   Search,
 } from "lucide-react";
@@ -14,6 +12,8 @@ import ErrorModal from "@/components/layout/error-modal";
 import TransactionListSkeleton from "./skeleton/transaction-list-skeleton";
 import TransactionModal from "./transaction-modal";
 import { Transaction } from "@/lib/types/database";
+import FilterModal from "@/components/layout/filter-modal";
+import { FilterTransactionField } from "../types/types";
 
 export default function WholeTransactionList() {
 
@@ -65,15 +65,30 @@ export default function WholeTransactionList() {
     setChosenTransaction(transaction);
   }
 
-  const transactionItems: FilterItems[] = [
-    { origin: "transactions", item: "No filter" },
-    { origin: "transactions", item: "Type" },
-    { origin: "transactions", item: "Category" },
-    { origin: "transactions", item: "Account" },
-  ];
+  const TransactionFields: FilterTransactionField[] = [
+    {
+      key: "order",
+      label: "Order by",
+      type: "select",
+      options: [{name: "ascending", value: "ascending"}, {name: "descending", value: "descending"}],
+    },
+   
+  ]
 
   return (
     <>
+      {
+        toggle === "filter-modal" && (
+          <div className="fixed inset-0 z-50 flex w-full h-full items-center justify-center bg-black/50">
+            <FilterModal
+              open
+              onOpen={() => setToggle(null)}
+              onConfirm={() => ""}
+              fields={TransactionFields}
+            />
+          </div>
+        )
+      }
       {toggle === "add-transaction" && (
         <div className="fixed inset-0 z-50 flex w-full h-full items-center justify-center bg-black/50">
           <TransactionModal
@@ -111,12 +126,9 @@ export default function WholeTransactionList() {
             </div>
 
             {/* Filter */}
-
-            {/* Date range */}
-            <div className="flex w-fit h-full border border-(--color-border-default) font-display text-[0.8rem] py-1 px-3 rounded-lg gap-2 items-center justify-center">
-              <Calendar size={15} />
-              <p className="whitespace-nowrap hidden lg:block">Date range</p>
-              <ChevronDown size={20} />
+            <div className="flex w-fit h-fit border border-(--color-border-default) rounded-lg gap-2 items-center p-2 hover:bg-(--color-border-subtle) active:bg-(--color-brand-green) cursor-pointer duration-100 transition-all" onClick={() => setToggle("filter-modal")}>
+              <Filter size={15}/>
+              <p className="text-[0.9rem] hidden lg:block">Filter</p>
             </div>
 
             {/* Search field */}

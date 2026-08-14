@@ -2,6 +2,7 @@
 
 import { getUser } from "./auth";
 import { createClient } from "../clients/server"
+import { Accounts, AccountsWithBalance } from "@/lib/types/database";
 
 // <------------------ accounts ---------------------------------->
 
@@ -100,7 +101,7 @@ export async function FetchAccounts(currentPage: number, numberOfItems: number) 
     
         if (accountsError || balancesError || accountCategoriesError) return { success: false, error: "Database error"}
     
-        let merged: any[] = [];
+        let merged: AccountsWithBalance[] = [];
     
         if (accountsData && balancesData) {
           const balancesMap = new Map(
@@ -228,3 +229,16 @@ export async function DeleteUserData() {
 
     return { success: true};
 }
+
+// SEARCH ACCOUNTS
+export async function SearchAccounts(term: string): Promise<{success: true; data: AccountsWithBalance[]} | {success: false, error: string}> {
+    if (!term.trim()) return { success: true, data: []};
+    
+    const supabase = await createClient();
+    const { data, error } = await supabase
+        .rpc('search_accounts', { search_term: term })
+
+    if (!data || error ) return { success: false, error: error?.message ?? "Unknown error."};
+
+    return { success: true, data};
+} 

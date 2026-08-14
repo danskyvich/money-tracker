@@ -181,7 +181,7 @@ export default function Accounts() {
             <WholeAccountsList />
 
             {/* Account categories */}
-            <div className="flex xl:w-full flex-col w-full xl:h-full border border-(--color-border-default) rounded-lg shadow-md">
+            <div className="flex flex-1 xl:w-full flex-col w-full xl:h-full border border-(--color-border-default) rounded-lg shadow-md">
               {loading ? (
                 <AccountCategoryListSkeleton />
               ) : (
