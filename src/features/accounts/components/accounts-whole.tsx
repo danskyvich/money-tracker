@@ -1,16 +1,15 @@
 import AddAccountModal from "@/features/accounts/components/add-account-modal";
-import { AccountCategories, Accounts, AccountsWithBalance } from "@/lib/types/database";
 import {  
   ChevronLeft,
-  Filter,
   Plus,
   Search,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import AccountDetailsModal from "./accounts-details-modal";
-import AccountListSkeleton from "@/features/accounts/components/skeleton/account-list-skeleton";
 import { FetchAccounts, SearchAccounts } from "@/lib/supabase/actions/database";
 import { useDebouncedValue } from "@/hooks/useDebounceValue";
+import Spinner from "@/components/layout/spinner";
+import { AccountCategories, AccountsWithBalance } from "@/lib/types/derived";
 
 const numberOfItemsToBeDisplayed = 9;
 
@@ -20,7 +19,7 @@ export default function WholeAccountsList() {
   const [fetchAccountError, setFetchAccountError] = useState<string | null>(
     null,
   );
-  const [accountCategories, setAccountCategories] = useState<AccountCategories[] | undefined>(undefined);
+  const [accountCategories, setAccountCategories] = useState<Pick<AccountCategories, "id" | "name">[] | undefined>(undefined);
   const [totalNumberOfItems, setTotalNumberOfItems] = useState<number | null | undefined>(undefined,);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchError, setSearchError] = useState<string | null>(null);
@@ -149,7 +148,9 @@ export default function WholeAccountsList() {
           </div>
 
           {loading ? (
-            <AccountListSkeleton />
+            <div className="flex w-full h-full items-center justify-center">
+              <Spinner/>
+            </div>
           ) : (
             <div className="flex flex-col relative w-full h-[85%] overflow-hidden">
               {changedAccounts?.length === 0 && (
@@ -171,7 +172,7 @@ export default function WholeAccountsList() {
                       >
                         <div className="line-clamp-1">{account.name}</div>
                         <div className="line-clamp-1">
-                          {account.category_id?.name}
+                          {(account.category_id as {id: string, name: string} | null)?.name}
                         </div>
                         <div className="line-clamp-1 text-(--color-text-secondary) whitespace-nowrap">
                           {account.description === ""

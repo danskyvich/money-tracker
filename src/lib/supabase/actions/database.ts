@@ -2,7 +2,7 @@
 
 import { getUser } from "./auth";
 import { createClient } from "../clients/server"
-import { Accounts, AccountsWithBalance } from "@/lib/types/database";
+import { AccountsWithBalance } from "@/lib/types/derived";
 
 // <------------------ accounts ---------------------------------->
 
@@ -33,7 +33,7 @@ export async function DeleteAccount(id: string) {
 // <------------------ account_categories ------------------------>
 
 // UPDATE
-export async function UpdateAccountCategoryName(name: string, uuid: string | null) {
+export async function UpdateAccountCategoryName(name: string, uuid: string) {
     const { data, error } = await (await createClient())
         .from('account_categories')
         .update({ name })
@@ -71,55 +71,28 @@ export async function InsertAccountCategoryName(name: string) {
 
 // SELECT 
 export async function FetchAccounts(currentPage: number, numberOfItems: number) {
-    const [accountsResult, balancesResult, accountCategoriesResult] =
-        await Promise.all([
-            // use Promise.all to merge both fetches
-            await (
-              await createClient()
-            )
-              .from("accounts")
-              .select(
-                `*, category_id:account_categories(id, name)`,
-                {
-                  count: "exact",
-                },
-              )
-              .range((currentPage - 1) * numberOfItems, (currentPage - 1) * numberOfItems + numberOfItems - 1),
-            await (await createClient())
-              .from("accounts_balances")
-              .select(`account_id, balance::text`),
-            await (await createClient())
-              .from("account_categories")
-              .select(`id, name`),
-          ]);
-    
-        // deconstruct into two sets of variables
-        const { data: accountsData, count, error: accountsError } = accountsResult;
-        const { data: balancesData, error: balancesError } = balancesResult;
-        const { data: accountCategoriesData, error: accountCategoriesError } =
-          accountCategoriesResult;
-    
-        if (accountsError || balancesError || accountCategoriesError) return { success: false, error: "Database error"}
-    
-        let merged: AccountsWithBalance[] = [];
-    
-        if (accountsData && balancesData) {
-          const balancesMap = new Map(
-            balancesData.map((b) => [b.account_id, b.balance]),
-          );
-    
-          merged = accountsData.map((a) => ({
-            ...a,
-            balance: balancesMap.get(a.id) ?? 0,
-          }));
-        }
-    
-        return {
-            success: true,
-            accountsData: merged,
-            totalItems: count ?? 0,
-            accountCategoriesData: accountCategoriesData,
-        }
+    const supabase = await createClient();
+    const [accountsResult, accountCategoriesResult] = await Promise.all([
+        supabase.rpc('fetch_accounts', {
+            page_number: currentPage,
+            page_size: numberOfItems,
+        }),
+        supabase.from("account_categories").select(`id, name`),
+    ]);
+
+    const { data: accountsData, error: accountsError} = accountsResult;
+    const { data: accountCategoriesData, error: accountCategoriesError} = accountCategoriesResult;
+
+    if (accountCategoriesError || accountsError) {
+        return { success: false, error: "Database error"}
+    }
+    const totalItems = accountsData?.[0]?.total_count ?? 0;
+    const cleaned = (accountsData ?? []).map(({ total_count, ...rest }) => rest);    return {
+        success: true,
+        accountsData: cleaned,
+        accountCategoriesData,
+        totalItems,
+    }
 }
 
 // <-----------------Transactions --------------------------->
