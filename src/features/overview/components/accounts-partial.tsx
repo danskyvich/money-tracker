@@ -1,18 +1,21 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
+import OverviewAccountsSkeleton from "./skeleton/overview-account-skeleton";
 
 interface AccountsListProps {
   accountsData: any[] | null | undefined;
   accountsError: string | null;
   totalNumberOfItems: number | null | undefined;
   pressedCurrentPage: (page: number) => void;
+  loading: boolean,
 }
 
-export default function AccountsList({
+export default function AccountsPartialList({
   accountsData,
   accountsError,
   totalNumberOfItems,
   pressedCurrentPage,
+  loading
 }: AccountsListProps) {
 
   // pagination --> edit # of items calculations on lib/aadt / overview.ts;
@@ -37,23 +40,27 @@ export default function AccountsList({
             </div>
           ) : (
             <div className="flex relative flex-2 flex-col w-full h-fit overflow-y-auto">
-              <div className="flex flex-col w-full h-full">
-                {accountsData?.map((item, key) => (
-                  <div
-                    className="grid grid-cols-[1fr_1fr_1fr_1fr] w-full h-15 border-b border-(--color-border-subtle) px-5 py-1 text-[0.9rem] items-center hover:bg-(--color-bg-subtle) cursor-pointer"
-                    key={key}
-                  >
-                    <div className="line-clamp-1">{item.name}</div>
-                    <div className="text-(--color-text-secondary) line-clamp-1">
-                      {item.description}
+              {loading ? (
+                <OverviewAccountsSkeleton />
+              ) : (
+                <div className="flex flex-col w-full h-full">
+                  {accountsData?.map((item, key) => (
+                    <div
+                      className="grid grid-cols-[1fr_1fr_1fr_1fr] w-full h-15 border-b border-(--color-border-subtle) px-5 py-1 text-[0.9rem] items-center hover:bg-(--color-bg-subtle) cursor-pointer"
+                      key={key}
+                    >
+                      <div className="line-clamp-1">{item.name}</div>
+                      <div className="text-(--color-text-secondary) line-clamp-1">
+                        {item.description}
+                      </div>
+                      <div className="line-clamp-1">
+                        {item?.category_id?.name}
+                      </div>
+                      <div className="line-clamp-1">{item.balance}</div>
                     </div>
-                    <div className="line-clamp-1">
-                      {item?.category_id?.name}
-                    </div>
-                    <div className="line-clamp-1">{item.balance}</div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
           <div className="flex flex-0 w-full h-fit px-5 py-3 text-[0.9rem] text-(--color-text-secondary) whitespace-nowrap items-center justify-between">
@@ -85,7 +92,9 @@ export default function AccountsList({
                   className={`px-3 py-2 border border-(--color-border-default) rounded-lg shadow-md hover:bg-(--color-bg-subtle) cursor-pointer ${currentPage === item ? "bg-(--color-brand-green) text-black hover:bg-(--color-brand-green)" : null}`}
                   key={key}
                   onClick={() => {
+                    setCurrentPage(item);
                     pressedCurrentPage(item);
+                    ;
                   }}
                 >
                   <p>{item}</p>

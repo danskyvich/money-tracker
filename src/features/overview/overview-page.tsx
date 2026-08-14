@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Card from "@/components/layout/card";
 import {
   BaggageClaim,
@@ -15,19 +15,15 @@ import SixMonthsRef from "../../components/charts/BarChart";
 import { getMonthlyInflowOutflow } from "@/features/overview/api/fetchChartData";
 import Snippet from "./components/snippet-income-expense";
 import TransactionList from "../transactions/components/transaction-partial";
-import AccountsList from "./components/accounts-partial";
 import OverviewHeader from "./components/icon-and-name";
 import AddAccountModal from "../accounts/components/add-account-modal";
 import {
   FetchAccounts,
   FetchTransaction,
-  InsertAccount,
 } from "@/lib/supabase/actions/database";
-import { Transaction } from "@/lib/types/database";
-import OverviewTransactionSkeleton from "./components/skeleton/overview-transaction-skeleton";
 import QuickActionsSkeleton from "./components/skeleton/quick-action-skeleton";
-import OverviewAccountsSkeleton from "./components/skeleton/overview-account-skeleton";
 import TransactionModal from "../transactions/components/transaction-modal";
+import AccountsPartialList from "./components/accounts-partial";
 
 export default function OverviewPage() {
   // variables - general
@@ -70,42 +66,50 @@ export default function OverviewPage() {
   const fetchData = async () => {
     setLoadingTransactions(true);
     setLoadingAccounts(true);
+    setLoading(true);
 
-    const [accountsResult, transactionResult] = await Promise.all([
-      FetchAccounts(currentPage, 4),
-      FetchTransaction(currentPage, 9),
-    ]);
+    try {
+      const [accountsResult, transactionResult] = await Promise.all([
+        FetchAccounts(currentPage, 4),
+        FetchTransaction(currentPage, 9),
+      ]);
 
-    const {
-      accountCategoriesData,
-      accountsData,
-      error: accountsError,
-      totalItems,
-    } = accountsResult;
-    const { data: transactionsData, error: transactionsError } =
-      transactionResult;
+      const {
+        accountCategoriesData,
+        accountsData,
+        error: accountsError,
+        totalItems,
+      } = accountsResult;
 
-    // --- accounts handling ---
-    if (accountCategoriesData === null || accountsData === null) {
-      setAccountError(accountsError ?? "Fetching accounts failed");
-    } else {
-      setTotalNumberOfItems(totalItems);
-      setAccounts(accountsData);
-      setAccountCategoriesData(accountCategoriesData);
+      const { data: transactionsData, error: transactionsError } = transactionResult;
+
+      if (accountCategoriesData === null || accountsData === null) {
+        setAccountError(accountsError ?? "Fetching accounts failed");
+      } else {
+        setTotalNumberOfItems(totalItems);
+        setAccounts(accountsData);
+        setAccountCategoriesData(accountCategoriesData);
+      }
+      setLoading(false);
+      setLoadingAccounts(false);
+
+      // --- transactions handling ---
+      if (transactionsData === null) {
+        setTransactionError(transactionsError);
+      }
+
+      const sortedTransactions = [...(transactionsData ?? [])].sort((a, b) =>
+        new Date(b.date_time).getTime() - new Date(a.date_time).getTime()
+      );
+
+      setTransactionData(sortedTransactions);
+      setLoadingTransactions(false);
+    } catch (err) {
+    } finally {
+      setLoading(false);
+      setLoadingAccounts(false);
+      setLoadingTransactions(false);
     }
-    setLoadingAccounts(false);
-
-    // --- transactions handling ---
-    if (transactionsData === null) {
-      setTransactionError(transactionsError);
-    }
-
-    const sortedTransactions = [...(transactionsData ?? [])].sort((a, b) =>
-      new Date(b.date_time).getTime() - new Date(a.date_time).getTime()
-    );
-
-    setTransactionData(sortedTransactions);
-    setLoadingTransactions(false);
   };;
 
   // call fetchData()
@@ -124,37 +128,8 @@ export default function OverviewPage() {
     );
   }, []);
 
-  // Add account
-  const handleAddAccount = async (
-    name: string,
-    description: string,
-    categoryId: string | undefined,
-  ) => {
-    setLoading(true);
-    if (!categoryId || !name) {
-      setAccountError("Fill out all required fields");
-      setToggle("add-account");
-    } else {
-      const { data, error } = await InsertAccount(
-        name,
-        description,
-        categoryId,
-      );
-
-      if (!data || error) {
-        setAccountError(error);
-        setLoading(false);
-        return;
-      } else {
-        setLoading(false);
-        fetchData();
-        setToggle(null);
-      }
-    }
-  };
-
   return (
-    <div className="flex flex-col w-full h-full gap-5">
+    <div className="flex flex-col w-full h-full gap-5 overflow-x-hidden">
       {toggle === "add-transaction" && (
         <div className="fixed z-50 inset-0 bg-black/50 flex w-full h-full items-center justify-center">
           <TransactionModal
@@ -170,9 +145,8 @@ export default function OverviewPage() {
         <AddAccountModal
           open
           onOpen={() => setToggle(null)}
-          onConfirm={() => handleAddAccount}
-          loading={loading}
           accountCategoriesData={accountCategoriesData}
+          fetch={fetchData}
         />
       )}
 
@@ -344,16 +318,13 @@ export default function OverviewPage() {
               </div>
             </div>
 
-            {loadingAccounts ? (
-              <OverviewAccountsSkeleton />
-            ) : (
-              <AccountsList
-                accountsData={accounts}
-                accountsError={accountError}
-                totalNumberOfItems={totalNumberOfItems}
-                pressedCurrentPage={(page) => setCurrentPage(page)}
-              />
-            )}
+            <AccountsPartialList
+              accountsData={accounts}
+              accountsError={accountError}
+              totalNumberOfItems={totalNumberOfItems}
+              pressedCurrentPage={(page) => setCurrentPage(page)}
+              loading={loadingAccounts}
+            />
           </Card>
         </div>
       </div>

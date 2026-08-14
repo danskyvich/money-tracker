@@ -59,6 +59,34 @@ export default function AddAccountModal({
     setLoading(false);
     onOpen();
   }
+
+  // Add account
+    const handleAddAccount = async (
+      name: string,
+      description: string,
+      categoryId: string | undefined,
+    ) => {
+      setLoading(true);
+      if (!categoryId || !name) {
+        setError("Fill out all required fields");
+      } else {
+        const { data, error } = await InsertAccount(
+          name,
+          description,
+          categoryId,
+        );
+  
+        if (!data || error) {
+          setError(error);
+          setLoading(false);
+          return;
+        } else {
+          setLoading(false);
+          fetch();
+          onOpen();
+        }
+      }
+    };
   
   if (!open) return null;
 
