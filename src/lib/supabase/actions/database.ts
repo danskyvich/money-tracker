@@ -2,7 +2,7 @@
 
 import { getUser } from "./auth";
 import { createClient } from "../clients/server"
-import { AccountsWithBalance } from "@/lib/types/derived";
+import { AccountsWithBalance, Transactions, TransactionSearchResults } from "@/lib/types/derived";
 
 // <------------------ accounts ---------------------------------->
 
@@ -98,11 +98,11 @@ export async function FetchAccounts(currentPage: number, numberOfItems: number) 
 // <-----------------Transactions --------------------------->
 
 // SELECT
-export async function FetchTransaction(currentPage: number, numberOfItems: number) {
+export async function FetchTransaction(currentPage: number, numberOfItems: number):Promise<{success: true, data: TransactionSearchResults[], totalItems: number | null} | {success: false, error: string}> {
     const supabase = await createClient();
     const { data, error, count } = await supabase
         .from("transactions")
-        .select(`id, date_time, description, amount::text, type, categories!category_id(id, name), fromAccount:accounts!account_id(id, name), toAccount:accounts!to_account_id(id, name)`, {count: "exact"})
+        .select(`id, date_time, description, amount, type, category_id:categories!category_id(id, name), account_id:accounts!account_id(id, name), to_account_id:accounts!to_account_id(id, name)`, {count: "exact"})
         .order("date_time", { ascending: false})
         .range((currentPage - 1) * numberOfItems, (currentPage - 1) * numberOfItems + numberOfItems - 1);
     
@@ -215,3 +215,16 @@ export async function SearchAccounts(term: string): Promise<{success: true; data
 
     return { success: true, data};
 } 
+
+// SEARCH TRANSACTIONS
+export async function SearchTransactions(term: string, currentPage: number): Promise<{success: true; data: TransactionSearchResults[]} | {success: false, error: string}> {
+    if (!term.trim()) return { success: true, data: []};
+
+    const supabase = await createClient();
+    const { data, error } = await supabase
+        .rpc('search_transactions', { search_term: term, page_size: 9, page_number: currentPage})
+    
+    if (!data || error) return { success: false, error: error.message ?? "Unknown error"};
+
+    return { success: true, data: data as unknown as TransactionSearchResults[] };
+}
