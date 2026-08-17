@@ -121,25 +121,23 @@ export function IncomeCategories({open, onOpen}: IncomeCategoriesProps) {
             </Modal>
           </div>
         )}
-        {
-            toggle === "delete-category" && (
-                <div className="flex w-full h-full inset-0 z-50 fixed items-center justify-center bg-black/50">
-                    <Modal
-                        open
-                        onOpen={() => setToggle(null)}
-                        loading={process}
-                        header="Delete the category"
-                        icon={<Trash size={18} className="min-w-3 h-auto"/>}
-                        onConfirm={handleDeleteIncomeCategory}
-                        noButtonText="Return"
-                        yesButtonText="Delete category"
-                        message={`Do you want to delete the category "${name}"?`}
-                        onCancel={() => setToggle(null)}
-                    />
-                </div>
-            )
-        }
-        <div className="flex flex-col w-100 xl:w-125 min-h-100 bg-(--color-bg-secondary) border border-(--color-border-default) rounded-lg">
+        {toggle === "delete-category" && (
+          <div className="flex w-full h-full inset-0 z-50 fixed items-center justify-center bg-black/50">
+            <Modal
+              open
+              onOpen={() => setToggle(null)}
+              loading={process}
+              header="Delete the category"
+              icon={<Trash size={18} className="min-w-3 h-auto" />}
+              onConfirm={handleDeleteIncomeCategory}
+              noButtonText="Return"
+              yesButtonText="Delete category"
+              message={`Do you want to delete the category "${name}"?`}
+              onCancel={() => setToggle(null)}
+            />
+          </div>
+        )}
+        <div className="flex flex-col w-100 xl:w-125 h-100 bg-(--color-bg-secondary) border border-(--color-border-default) rounded-lg">
           {fetchError && <ErrorModal message={fetchError} />}
           {/* header */}
           <div className="flex flex-0 w-full h-fit justify-between px-5 pt-5 pb-2">
@@ -151,42 +149,48 @@ export function IncomeCategories({open, onOpen}: IncomeCategoriesProps) {
           {/* content */}
           <div className="flex flex-2 flex-col w-full h-full overflow-y-auto">
             {loading && (
-              <div className="flex w-full h-full fixed z-50 inset-0 items-center justify-center">
+              <div className="flex w-full h-full items-center justify-center">
                 <Spinner />
               </div>
             )}
-            {incomeCategoriesData?.map((item, id) => (
-              <div
-                className="flex w-full h-full border-y border-(--color-border-subtle) px-5 py-3 items-center justify-between"
-                key={id}
-              >
-                <p className="text-[0.9rem] ">{item.name}</p>
-                <div className="flex w-fit h-fit gap-2">
-                  <Pencil
-                    size={15}
-                    className="min-w-3 h-auto cursor-pointer"
-                    onClick={() => {
-                      setName(item.name);
-                      setId(item.id);
-                      setToggle("name-category");
-                    }}
-                  />
-                  <Trash
-                    size={18}
-                    className="min-w-3 h-auto text-red-400 cursor-pointer"
-                    onClick={() => {
-                      setId(item.id);
-                      setName(item.name)
-                      setToggle("delete-category");
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
-            {incomeCategoriesData?.length === 0 && (
-              <div className="flex w-full h-full items-center justify-center text-[0.9rem]">
-                <p>You don't have any income categories</p>
-              </div>
+            {loading ? (
+              <div className=""></div>
+            ) : (
+              <>
+                {incomeCategoriesData?.map((item, id) => (
+                  <div
+                    className="flex w-full h-full border-y border-(--color-border-subtle) px-5 py-3 items-center justify-between"
+                    key={id}
+                  >
+                    <p className="text-[0.9rem] ">{item.name}</p>
+                    <div className="flex w-fit h-fit gap-2">
+                      <Pencil
+                        size={15}
+                        className="min-w-3 h-auto cursor-pointer"
+                        onClick={() => {
+                          setName(item.name);
+                          setId(item.id);
+                          setToggle("name-category");
+                        }}
+                      />
+                      <Trash
+                        size={18}
+                        className="min-w-3 h-auto text-red-400 cursor-pointer"
+                        onClick={() => {
+                          setId(item.id);
+                          setName(item.name);
+                          setToggle("delete-category");
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+                {incomeCategoriesData?.length === 0 && (
+                  <div className="flex w-full h-full items-center font-mono justify-center text-[0.9rem]">
+                    <p>You don't have any income categories</p>
+                  </div>
+                )}
+              </>
             )}
           </div>
 

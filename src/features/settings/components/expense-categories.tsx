@@ -101,7 +101,7 @@ export default function ExpenseCategories({
 
   if (!open) return null;
   return (
-    <div className="flex flex-col w-100 xl:w-125 min-h-100 bg-(--color-bg-secondary) border border-(--color-border-default) rounded-lg">
+    <div className="flex flex-col w-100 xl:w-125 h-100 bg-(--color-bg-secondary) border border-(--color-border-default) rounded-lg">
       {fetchError && <ErrorModal message={fetchError} />}
       {toggle === "delete-category" && (
         <div className="fixed z-50 inset-0 bg-black/50 flex w-full h-full items-center justify-center">
@@ -186,6 +186,11 @@ export default function ExpenseCategories({
                 </div>
               </div>
             ))}
+            {expenseCategoriesData?.length === 0 && (
+              <div className="flex w-full h-full items-center justify-center text-[0.9rem] font-mono">
+                <p>You have no expense categories</p>
+              </div>
+            )}
           </div>
         )}
       </div>
