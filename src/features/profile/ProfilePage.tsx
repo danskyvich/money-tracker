@@ -26,8 +26,7 @@ export default function ProfilePage({
 }) {
 
   // states
-  const [activeModal, setActiveModal] = useState<string | null>(null);
-  const [toggle, setToggle] = useState<boolean>(false);
+  const [toggle, setToggle] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [factorId, setFactorId] = useState<string | null>(null)
   const [assuranceLevel, setAssuranceLevel] = useState<AuthenticatorAssuranceLevels | null | undefined>(null)
@@ -43,26 +42,27 @@ export default function ProfilePage({
     };
 
     checkUserAssuranceLevel();
-    setToggle(assuranceLevel === "aa1" ? false : true);
-  }, [toggle, ]);
+  }, []);
 
   const profile = [
     {
       item: "Sign out of your account",
       value: "Sign out",
       icon: <LogOutIcon size={15} />,
-      onClick: () => setActiveModal("sign-out"),
+      onClick: () => setToggle("sign-out"),
     },
     {
       item: "Delete your account",
       value: "Delete account",
       icon: <X size={15} />,
-      onClick: () => setActiveModal("delete"),
+      onClick: () => setToggle("delete"),
     },
   ];
 
   const handleOpenModalMFA = () => {
-   assuranceLevel === "aa1" ? router.push("/2fa") : () => setActiveModal("disable-mfa");
+   assuranceLevel === "aa1"
+     ? router.push("/2fa")
+     : () => setToggle("mfa-modal");
   }
 
   const handleMFA = () => {
@@ -71,13 +71,13 @@ export default function ProfilePage({
 
   return (
     <div className="relative flex flex-col w-full h-full">
-      {activeModal === "sign-out" && (
+      {toggle === "sign-out" && (
         <div className="fixed z-50 inset-0 bg-black/50 flex items-center justify-center">
           <Modal
             open
-            onOpen={() => setActiveModal(null)}
+            onOpen={() => setToggle(null)}
             icon={<CircleQuestionMark size={20} />}
-            onCancel={() => setActiveModal(null)}
+            onCancel={() => setToggle(null)}
             onConfirm={signOut}
             yesButtonText="Yes, sign me out"
             noButtonText="No, go back"
@@ -89,13 +89,13 @@ export default function ProfilePage({
       )}
 
       {/* Delete account modal */}
-      {activeModal === "delete" && (
+      {toggle === "delete" && (
         <div className="fixed z-50 inset-0 bg-black/50 flex items-center justify-center">
           <Modal
             open
-            onOpen={() => setActiveModal(null)}
+            onOpen={() => setToggle(null)}
             icon={<CircleQuestionMark size={20} />}
-            onCancel={() => setActiveModal(null)}
+            onCancel={() => setToggle(null)}
             onConfirm={deleteUser}
             yesButtonText="Yes, delete my account"
             noButtonText="No, go back"
@@ -107,18 +107,34 @@ export default function ProfilePage({
           />
         </div>
       )}
-      {activeModal === "disable-mfa" && (
+      {toggle === "disable-mfa" && (
         <div className="fixed z-50 inset-0 bg-black/50 flex items-center justify-center">
           <Modal
             open
-            onOpen={() => setActiveModal(null)}
+            onOpen={() => setToggle(null)}
             icon={<Lock size={20} />}
-            onCancel={() => setActiveModal(null)}
+            onCancel={() => setToggle(null)}
             onConfirm={handleMFA}
             yesButtonText="Disable MFA"
             noButtonText="No"
             header="Disable your MFA"
-            loading={loading}            
+            loading={loading}
+          />
+        </div>
+      )}
+      {toggle === "mfa-modal" && (
+        <div className="fixed z-50 inset-0 bg-black/50 flex items-center justify-center">
+          <Modal
+            open
+            onOpen={() => setToggle(null)}
+            onCancel={() => setToggle(null)}
+            message="Do you want to disable multi-factor authentication on your acocunt?"
+            header="Disable MFA"
+            yesButtonText="Yes, disable MFA"
+            noButtonText="No"
+            icon={<Lock size={18} className="min-w-5 h-auto" />}
+            loading={loading}
+            onConfirm={() => {}}
           />
         </div>
       )}
@@ -134,8 +150,8 @@ export default function ProfilePage({
             <div className="flex w-full h-fit items-center justify-between my-2">
               <p className="text-[0.9rem]">Enable MFA</p>
               <Toggle
-                enable={toggle}
-                onEnable={() => setToggle((prev) => !prev)}
+                enable
+                onEnable={() => setToggle("mfa-modal")}
                 onClick={handleOpenModalMFA}
               />
             </div>
