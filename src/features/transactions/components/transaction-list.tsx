@@ -251,7 +251,7 @@ export default function WholeTransactionList() {
                 )}
 
                 {displayedTransactions?.length === 0 && (
-                  <div className="flex w-full h-full items-center justify-center text-[0.9rem]">
+                  <div className="flex w-full h-full items-center font-mono justify-center text-[0.9rem]">
                     <p>You have no lodged transactions</p>
                   </div>
                 )}

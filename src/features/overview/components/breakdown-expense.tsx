@@ -3,6 +3,7 @@
 import { getCategoryBreakdown } from "@/features/overview/api/fetchChartData";
 import { useEffect, useState } from "react";
 import DoughnutChart from "../../../components/charts/DoughnutChart";
+import Spinner from "@/components/layout/spinner";
 
 export default function ExpenseBreakdownPage() {
   const [chartData, setChartData] = useState<{ name: string; value: number }[]>(
@@ -20,7 +21,7 @@ export default function ExpenseBreakdownPage() {
   if (loading) {
     return (
       <div className="flex w-full h-full items-center justify-center">
-        <p className="text-[0.9rem] font-mono">Loading...</p>
+        <p className="text-[0.9rem] font-mono"><Spinner/></p>
       </div>
     );
   }
@@ -28,7 +29,7 @@ export default function ExpenseBreakdownPage() {
   if (chartData.length === 0) {
     return (
       <div className="flex w-full h-full items-center justify-center">
-        <p className="text-[0.9rem] font-mono">Loading...</p>
+        <p className="text-[0.9rem] font-mono">Data unavailable.</p>
       </div>
     );
   }

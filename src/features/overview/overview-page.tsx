@@ -7,7 +7,6 @@ import {
   CircleDollarSign,
   PiggyBank,
   Plus,
-  X,
 } from "lucide-react";
 import IncomeBreakdownPage from "@/features/overview/components/breakdown-income";
 import ExpenseBreakdownPage from "@/features/overview/components/breakdown-expense";
@@ -21,7 +20,6 @@ import {
   FetchAccounts,
   FetchTransaction,
 } from "@/lib/supabase/actions/database";
-import QuickActionsSkeleton from "./components/skeleton/quick-action-skeleton";
 import TransactionModal from "../transactions/components/transaction-modal";
 import AccountsPartialList from "./components/accounts-partial";
 import { AccountCategories, AccountsWithBalance, TransactionSearchResults } from "@/lib/types/derived";
@@ -160,14 +158,8 @@ export default function OverviewPage() {
 
           {/* Summary */}
           <div className="flex flex-col md:flex-row w-full h-fit gap-5">
-            {loading ? (
-              <QuickActionsSkeleton />
-            ) : (
-              <>
-                <Snippet type="income" />
-                <Snippet type="expense" />
-              </>
-            )}
+            <Snippet type="income" />
+            <Snippet type="expense" />
 
             {/* Quick actions */}
             <div className="flex flex-col flex-2 border border-(--color-border-default) rounded-lg shadow-md w-full h-full p-5 gap-2">

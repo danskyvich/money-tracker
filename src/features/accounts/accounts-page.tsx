@@ -84,6 +84,7 @@ export default function Accounts() {
   const handleModifyAccountCategory = async (name: string) => {
     if (uuidToBeTargeted === null) {
       setAccountCategoriesError("You haven't picked a category. Try again");
+      return;
     }
     setProcess(true);
 
@@ -96,6 +97,7 @@ export default function Accounts() {
       setProcess(false);
       return;
     }
+    setUuidToBeTargeted(null);
     setToggle(null);
     fetchCategories();
     setProcess(false);
@@ -219,7 +221,7 @@ export default function Accounts() {
                       ))
                     ) : (
                       <div className="flex w-full h-full items-center justify-center">
-                        <p className="text-[0.9rem]">You have no categories.</p>
+                        <p className="text-[0.9rem] font-mono">You have no categories.</p>
                       </div>
                     )}
                   </div>

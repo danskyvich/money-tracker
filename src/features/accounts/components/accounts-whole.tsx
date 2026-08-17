@@ -57,15 +57,16 @@ export default function WholeAccountsList() {
     setLoading(true);
 
     try {
-      const { accountsData, accountCategoriesData, totalItems, error } = await FetchAccounts(currentPage, numberOfItemsToBeDisplayed);
-      if (error) {
-        setFetchAccountError(error)
+      const result = await FetchAccounts(currentPage, numberOfItemsToBeDisplayed);
+      if (!result.success) {
+        setFetchAccountError(result.error);
+        setLoading(false);
         return;
       }
-      setUnchangedAccounts(accountsData ?? null);
-      setChangedAccounts(accountsData ?? null);
-      setAccountCategories(accountCategoriesData);
-      setTotalNumberOfItems(totalItems);
+      setUnchangedAccounts(result.accountsData ?? null);
+      setChangedAccounts(result.accountsData ?? null);
+      setAccountCategories(result.accountCategoriesData);
+      setTotalNumberOfItems(result.totalItems);
     } catch (err) {
       setFetchAccountError("Something went wrong while fetching your accounts");
     } finally {
@@ -165,7 +166,7 @@ export default function WholeAccountsList() {
                 {changedAccounts?.length === 0 && (
                   <div className="flex w-full h-full items-center justify-center text-[0.9rem]">
                     <p className="self-center font-mono">
-                      No accounts found for <br />"{searchTerm}"
+                      You have no accounts.
                     </p>
                   </div>
                 )}

@@ -1,10 +1,9 @@
 import OverviewTransactionSkeleton from "@/features/overview/components/skeleton/overview-transaction-skeleton";
-import { Transaction } from "@/lib/types/database";
+import { TransactionSearchResults } from "@/lib/types/derived";
 import ConvertTimestampToDateTime from "@/utils/convertToDateTime";
-import { useEffect } from "react";
 
 interface TransactionListProps {
-  transactionData: Transaction[] | null;
+  transactionData: TransactionSearchResults[] | null;
   transactionError: string | null;
   loading: boolean;
 }
@@ -48,7 +47,7 @@ export default function TransactionPartialList({
               ))}
             </div>
           ) : (
-            <div className="flex flex-col w-full h-full font-sans text-[0.9rem] items-center justify-center gap-1">
+            <div className="flex flex-col w-full h-full font-mono text-[0.9rem] items-center justify-center gap-1">
               <p>You don't have any transactions.</p>
             </div>
           )}
