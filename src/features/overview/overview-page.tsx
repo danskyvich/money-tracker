@@ -24,6 +24,7 @@ import {
 import QuickActionsSkeleton from "./components/skeleton/quick-action-skeleton";
 import TransactionModal from "../transactions/components/transaction-modal";
 import AccountsPartialList from "./components/accounts-partial";
+import { AccountCategories, AccountsWithBalance, TransactionSearchResults } from "@/lib/types/derived";
 
 export default function OverviewPage() {
   // variables - general
@@ -41,12 +42,11 @@ export default function OverviewPage() {
   const [chosenPage, setChosenPage] = useState<"income" | "expense">("income");
 
   // fetch data
-  const [transactionData, setTransactionData] = useState<any[] | null>(null);
-  const [accounts, setAccounts] = useState<any[] | null | undefined>(null);
+  const [transactionData, setTransactionData] = useState<TransactionSearchResults[]>([]);
+  const [accounts, setAccounts] = useState<AccountsWithBalance[] | null | undefined>(null);
   const [transactionError, setTransactionError] = useState<string | null>(null);
   const [accountError, setAccountError] = useState<string | null>(null);
-  const [accountCategoriesData, setAccountCategoriesData] = useState<any[] | undefined>(undefined);
-
+  const [accountCategoriesData, setAccountCategoriesData] = useState<Pick<AccountCategories, "id" | "name">[]>([])
   // loading states
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingTransactions, setLoadingTransactions] = useState(false);
@@ -62,7 +62,7 @@ export default function OverviewPage() {
     document.title = "Dashboard";
   }, []);
 
-  // main fetchData() function
+  // fetch accounts
   const fetchData = async () => {
     setLoadingTransactions(true);
     setLoadingAccounts(true);
@@ -74,35 +74,28 @@ export default function OverviewPage() {
         FetchTransaction(currentPage, 9),
       ]);
 
-      const {
-        accountCategoriesData,
-        accountsData,
-        error: accountsError,
-        totalItems,
-      } = accountsResult;
-
-      const { data: transactionsData, error: transactionsError } = transactionResult;
-
-      if (accountCategoriesData === null || accountsData === null) {
-        setAccountError(accountsError ?? "Fetching accounts failed");
+      if (!accountsResult.success) {
+        setAccountError(accountsResult.error);
+        setLoading(false);
+        return;
       } else {
-        setTotalNumberOfItems(totalItems);
-        setAccounts(accountsData);
-        setAccountCategoriesData(accountCategoriesData);
+        setAccounts(accountsResult.accountsData);
+        setAccountCategoriesData(accountsResult.accountCategoriesData);
+        setTotalNumberOfItems(accountsResult.totalItems);
+        setLoading(false);
       }
-      setLoading(false);
-      setLoadingAccounts(false);
 
       // --- transactions handling ---
-      if (transactionsData === null) {
-        setTransactionError(transactionsError);
+      if (!transactionResult.success) {
+        setTransactionError(transactionResult.error);
+        setLoading(false);
+        return;
+      } else {
+        const sortedTransactions = [...(transactionResult.data ?? [])].sort(
+          (a, b) => new Date(b.date_time).getTime() - new Date(a.date_time).getTime(),
+        );
+        setTransactionData(sortedTransactions);
       }
-
-      const sortedTransactions = [...(transactionsData ?? [])].sort((a, b) =>
-        new Date(b.date_time).getTime() - new Date(a.date_time).getTime()
-      );
-
-      setTransactionData(sortedTransactions);
       setLoadingTransactions(false);
     } catch (err) {
     } finally {
@@ -146,7 +139,7 @@ export default function OverviewPage() {
           open
           onOpen={() => setToggle(null)}
           accountCategoriesData={accountCategoriesData}
-          fetch={fetchData}
+          refresh={fetchData}
         />
       )}
 

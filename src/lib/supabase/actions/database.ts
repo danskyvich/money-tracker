@@ -2,7 +2,7 @@
 
 import { getUser } from "./auth";
 import { createClient } from "../clients/server"
-import { AccountsWithBalance, Transactions, TransactionSearchResults } from "@/lib/types/derived";
+import { AccountCategories, AccountsWithBalance, Categories, Transactions, TransactionSearchResults } from "@/lib/types/derived";
 
 // <------------------ accounts ---------------------------------->
 
@@ -70,7 +70,7 @@ export async function InsertAccountCategoryName(name: string) {
 
 
 // SELECT 
-export async function FetchAccounts(currentPage: number, numberOfItems: number) {
+export async function FetchAccounts(currentPage: number, numberOfItems: number): Promise<{success: false, error: string} | {success: true, accountsData: AccountsWithBalance[], accountCategoriesData: Pick<AccountCategories, "id" | "name">[], totalItems: number}> {
     const supabase = await createClient();
     const [accountsResult, accountCategoriesResult] = await Promise.all([
         supabase.rpc('fetch_accounts', {
@@ -87,7 +87,8 @@ export async function FetchAccounts(currentPage: number, numberOfItems: number) 
         return { success: false, error: "Database error"}
     }
     const totalItems = accountsData?.[0]?.total_count ?? 0;
-    const cleaned = (accountsData ?? []).map(({ total_count, ...rest }) => rest);    return {
+    const cleaned = (accountsData ?? []).map(({ total_count, ...rest }) => rest);    
+    return {
         success: true,
         accountsData: cleaned,
         accountCategoriesData,
@@ -175,6 +176,130 @@ export async function SelectTransactionsFromChosenAccount(id: string, currentPag
         .range(from, to);
     if (!data) return { data: null, error: error.message ?? "Unknown Error", count: null}
     return { data, error: null, count };
+}
+
+// <!-------------------- INCOME & EXPENSE CATEGORIES ------------>
+
+
+// INCOME categories
+export async function FetchIncomeCategories(): Promise<{success: false, error: string} | {success: true, data: Categories[]}> {
+    const supabase = await createClient();
+    const { data, error } = await supabase 
+        .from("categories")
+        .select(`*`)
+        .eq('type', 'Income')
+    if (error) return { success: false, error: error.message }
+    return { success: true, data}
+}
+
+export async function AddIncomeCategory(name: string, id?: string): Promise<{success: false, error: string} | {success: true}> {
+    const supabase = await createClient();
+    const user = await getUser();
+
+    if (!user) return { success: false, error: "User not authenticated"};
+
+    if (!name.trim()) return { success: false, error: "Name is required"};
+
+    if (id) {
+        const { error } = await supabase
+            .from('categories')
+            .update({name: name.trim()})
+            .eq(`id`, id)
+            .eq('user_id', user.id)
+        if (error) {
+            if (error.code === '23505') {
+                return { success: false, error: "Category already exist"};
+            }
+            return { success: false, error: error.message}
+        }
+    } else {
+        const { error } = await supabase
+            .from('categories')
+            .insert({name: name.trim(), user_id: user.id, type: 'Income'});
+        if (error) {
+            if (error.code === '23505') {
+                return { success: false, error: "Category already exist"};
+            }
+            return { success: false, error: error.message}
+        }
+    }
+
+   return { success: true};
+}
+
+export async function DeleteIncomeCategory(id: string): Promise<{success: true} | {success: false, error: string}> {
+    const supabase = await createClient();
+    const user = await getUser();
+    if (!user) return { success: false, error: "Unauthenticated user"};
+    const user_id = user.id;
+
+    const { error } = await supabase
+        .from('categories')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', user_id)
+    if (error) return { success: false, error: error?.message}
+    return { success: true} 
+}
+
+export async function FetchExpenseCategories(): Promise<{success: false, error: string} | {success: true, data: Categories[]}> {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+        .from("categories")
+        .select(`*`)
+        .eq('type', 'Expense')
+    if (error) return { success: false, error: error.message}
+    return { success: true, data}
+}
+
+export async function AddExpenseCategory(name: string, id?: string): Promise<{success: false, error: string} | {success: true}> {
+    const trimmedName = name.trim();
+    const user = await getUser();
+    if (!trimmedName) return { success: false, error: "Name required"}
+    if (!user) return { success: false, error: "Unauthenticated user"}
+    const user_id = user.id;
+
+    const supabase = await createClient();
+
+    if (id) {
+        const { error } = await supabase
+            .from('categories')
+            .update({name: trimmedName})
+            .eq('id', id)
+            .eq('user_id', user_id)
+        if (error) {
+            if (error.code === '23505') {
+                return { success: false, error: "Category already exist"};
+            }
+            return { success: false, error: error.message}
+        }
+    } else {
+        const { error } = await supabase
+            .from('categories')
+            .insert({name: trimmedName, user_id: user_id, type: 'Expense'})
+        if (error) {
+            if (error.code === '23505') {
+                return { success: false, error: 'Category already exist'};
+            }
+            return { success: false, error: error.message}
+        }
+    }
+    return { success: true };
+}
+
+export async function DeleteExpenseCategory(id: string): Promise<{success: false, error: string} | {success: true}> {
+    const supabase = await createClient();
+    const user = await getUser();
+    if (!user) return { success: false, error: "Unauthenticated user"}
+    const user_id = user?.id;
+
+    const { error } = await supabase
+        .from('categories')
+        .delete()
+        .eq('user_id', user_id)
+        .eq('id', id)
+    if (error) return { success: false, error: error.message}
+    return { success: true }
 }
 
 // <!-------------------- SETTINGS / CONFIG -------------------->

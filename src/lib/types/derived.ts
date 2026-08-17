@@ -5,6 +5,7 @@ export type Accounts = Database['public']['Tables']['accounts']['Row'];
 export type AccountCategories = Database['public']['Tables']['account_categories']['Row'];
 export type Transactions = Database['public']['Tables']['transactions']['Row']
 type RawSearchResult = Database['public']['Functions']['search_transactions']['Returns'][number];
+export type Categories = Database['public']['Tables']['categories']['Row']
 
 export type TransactionSearchResults = Omit<RawSearchResult, 'description' | 'to_account_id' | 'account_id' | 'category_id'> & {
   description: string | null;

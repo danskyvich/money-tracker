@@ -1,13 +1,13 @@
-import { AccountCategories } from "@/lib/types/database";
 import { InsertAccount } from "@/lib/supabase/actions/database";
 import { PiggyBank, X } from "lucide-react";
 import React, { useReducer, useState } from "react";
 import Spinner from "@/components/layout/spinner";
 import ErrorModal from "@/components/layout/error-modal";
+import { AccountCategories } from "@/lib/types/derived";
 
 interface AddAccountProps {
   open: boolean;
-  accountCategoriesData: AccountCategories[] | undefined;
+  accountCategoriesData: Pick<AccountCategories, "id"|"name">[] | undefined;
   onOpen: () => void;
   refresh: () => void;
 }

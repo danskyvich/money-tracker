@@ -7,26 +7,30 @@ import { DeleteUserData } from "@/lib/supabase/actions/database";
 import { ChevronDown, Eye, Trash } from "lucide-react";
 import { error } from "node:console";
 import { useState } from "react";
-
-const settings = [
-  { item: "Main currency", value: "Philippine Peso", icon: "₱" },
-  {
-    item: "Modify income categories",
-    value: "Modify",
-    icon: <Eye size={15} />,
-  },
-  {
-    item: "Modify expense categories",
-    value: "Modify",
-    icon: <Eye size={15} />,
-  },
-];
+import { IncomeCategories } from "./components/income-categories";
+import ExpenseCategories from "./components/expense-categories";
 
 export default function SettingsPage() {
   // data deletion modal
   const [loading, setLoading] = useState<boolean>(false);
-  const [isDataDeletionOpen, setIsDataDeletionOpen] = useState<boolean>(false);
   const [dataDeletionError, setDataDeletionError] = useState<string | undefined>(undefined);
+  const [toggle, setToggle] = useState<string | null>(null);
+
+  const settings = [
+    { item: "Main currency", value: "Philippine Peso", icon: "₱" },
+    {
+      item: "Modify income categories",
+      value: "Modify",
+      icon: <Eye size={15} />,
+      link: () => setToggle("income-categories"),
+    },
+    {
+      item: "Modify expense categories",
+      value: "Modify",
+      icon: <Eye size={15} />,
+      link: () => setToggle("expense-categories"),
+    },
+  ];
 
   const handleDataDeletion = async () => {
     setLoading(true);
@@ -45,29 +49,23 @@ export default function SettingsPage() {
 
   return (
     <>
-    {
-      loading && (
+      {loading && (
         <div className="fixed z-50 inset-0 bg-black/50 flex w-full h-full items-center justify-center">
-          <LoadingModal message="Deleting your data..."/>
+          <LoadingModal message="Deleting your data..." />
         </div>
-      )
-    }
+      )}
       <div className="flex flex-col w-full h-full">
-        {
-          dataDeletionError && (
-            <ErrorModal message={dataDeletionError}/>
-          )
-        }
+        {dataDeletionError && <ErrorModal message={dataDeletionError} />}
         <p className="text-3xl font-semibold pb-5">Settings</p>
         <div className="flex flex-col w-full h-full border border-(--color-border-default) rounded-lg shadow-md">
-          {isDataDeletionOpen && (
+          {toggle === "data-deletion" && (
             <div className="absolute inset-0 z-50 flex w-full h-full bg-black/50 items-center justify-center">
               <Modal
-                open={isDataDeletionOpen}
-                onOpen={setIsDataDeletionOpen}
+                open
+                onOpen={() => setToggle(null)}
                 onConfirm={handleDataDeletion}
                 loading={loading}
-                onCancel={() => {}}
+                onCancel={() => setToggle(null)}
                 header="Delete your data"
                 message="Are you really sure you want to delete your data? Data deletion includes all your transactions, accounts, and current configurations. This action is irreversible."
                 icon={<Trash size={15} />}
@@ -76,6 +74,24 @@ export default function SettingsPage() {
               />
             </div>
           )}
+          {toggle === "income-categories" && (
+            <div className="absolute inset-0 z-50 flex w-full h-full bg-black/50 items-center justify-center">
+              <IncomeCategories
+              open
+              onOpen={() => setToggle(null)}
+              />
+            </div>
+          )}
+          {
+            toggle === "expense-categories" && (
+              <div className="absolute inset-0 z-50 flex w-full h-full bg-black/50 items-center justify-center">
+                <ExpenseCategories
+                open
+                onOpen={() => setToggle(null)}
+                />
+              </div>
+            )
+          }
           {settings.map((item, index) => (
             <div
               className="grid grid-cols-[1fr_1fr] w-full h-fit px-5 py-2 items-center cursor-pointer min-h-0"
@@ -83,7 +99,7 @@ export default function SettingsPage() {
             >
               <p className="text-[0.9rem]">{item.item}</p>
 
-              <div className="flex w-fit h-fit ring ring-inset ring-(--color-brand-green) text-[0.9rem] rounded-lg hover:bg-(--color-brand-green) hover:text-white px-5 py-1 items-center justify-center justify-self-end gap-1 duration-100 transition-all">
+              <div className="flex w-fit h-fit ring ring-inset ring-(--color-brand-green) text-[0.9rem] rounded-lg hover:bg-(--color-brand-green) hover:text-white px-5 py-1 items-center justify-center justify-self-end gap-1 duration-100 transition-all" onClick={item.link}>
                 {item.icon === null ? null : item.icon}
                 <p className="text-[0.9rem] whitespace-nowrap">{item.value}</p>
                 {item.item === "Modify income categories" ||
@@ -97,7 +113,7 @@ export default function SettingsPage() {
             <p>Delete data</p>
 
             <button
-              onClick={() => setIsDataDeletionOpen(true)}
+              onClick={() => setToggle("data-deletion")}
               className="flex border border-(--color-brand-green) rounded-lg items-center justify-center px-5 py-1 gap-1 text-[0.9rem] cursor-pointer hover:bg-(--color-brand-green) active:bg-emerald-600 transition-all duration-100"
             >
               <Trash size={15} />
