@@ -5,13 +5,13 @@ import Modal from "@/components/layout/modal";
 import { getUser } from "@/lib/supabase/actions/auth";
 import { InsertTransaction, UpdateTransaction } from "@/lib/supabase/actions/database";
 import { createClient } from "@/lib/supabase/clients/client";
-import { Transaction } from "@/lib/types/database";
+import { Transactions, TransactionSearchResults } from "@/lib/types/derived";
 import { Coins } from "lucide-react";
 import { useEffect, useReducer, useState } from "react";
 import TransactionModalSkeleton from "./skeleton/transaction-modal-skeleton";
 
 interface AddTransactionModalProps {
-  transaction?: Transaction;
+  transaction?: TransactionSearchResults;
   modalType: string;
   open: boolean;
   onOpen: () => void;
@@ -90,14 +90,17 @@ export default function TransactionModal({
       modalType === "modify"
         ? (transaction?.date_time ?? "")
         : new Date().toISOString().slice(0, 16),
-    amount: modalType === "modify" ? Number(transaction?.amount) ?? 0.00 : 0.00,
+    amount: modalType === "modify" ? (Number(transaction) ?? 0.0) : 0.0,
     category_id:
-      modalType === "modify" ? (transaction?.categories?.id ?? "") : "",
+      modalType === "modify" ? (transaction?.category_id?.name ?? "") : "",
     account_id:
-      modalType === "modify" ? (transaction?.fromAccount?.id ?? "") : "",
+      modalType === "modify" ? (transaction?.account_id?.name ?? "") : "",
     to_account_id:
-      modalType === "modify" ? (transaction?.toAccount?.id ?? "") : "",
-    description: modalType === "modify" ? (transaction?.description ?? "") : "",
+      modalType === "modify"
+        ? (transaction?.to_account_id?.name ?? "")
+        : "",
+    description:
+      modalType === "modify" ? (transaction?.description ?? "") : "",
   };
 
   const [formValues, setFormValues] = useReducer(
@@ -136,7 +139,7 @@ export default function TransactionModal({
 
       const { data, error } = 
         modalType === "modify"
-        ? await UpdateTransaction(transaction.id, [payload])
+        ? await UpdateTransaction(transaction?.id, [payload])
         : await InsertTransaction([payload])
 
       if (!data || error ) {
@@ -180,7 +183,7 @@ export default function TransactionModal({
           <div className="flex w-full h-fit gap-5 mb-3" role="group">
             {transactionTypes.map((item, key) => (
               <div
-                className={`flex ${formValues.type === item && "bg-(--color-brand-green) hover:bg-emerald-600"} flex-1 w-full h-fit border border-(--color-border-default) rounded-lg items-center justify-center py-1 hover:bg-(--color-border-subtle) cursor-pointer active:bg-(--color-brand-green-accent)`}
+                className={`flex ${formValues.type === item && "bg-(--color-brand-green) hover:bg-emerald-600 text-white"} flex-1 w-full h-fit border border-(--color-border-default) rounded-lg items-center justify-center py-1 hover:bg-(--color-border-subtle) cursor-pointer active:bg-(--color-brand-green-accent)`}
                 key={key}
                 onClick={(e) => setFormValues({ type: item})}
               >

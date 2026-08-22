@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "../clients/server"
 import { createAdminClient } from "../clients/admin";
-import { User } from "@supabase/supabase-js";
+import { Factor, User } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 
 // Recaptcha
@@ -20,6 +20,7 @@ async function verifyRecaptcha(token: string): Promise<boolean> {
 
 // Passwordless Sign In
 export async function generalSignIn(email: string, rememberMe: boolean, recaptchaToken: string): Promise<{ error?: string | null}> {
+    const supabase = await createClient();
     const result = await sendOtp(email, recaptchaToken)
     if (result.error) return result
     
@@ -28,11 +29,10 @@ export async function generalSignIn(email: string, rememberMe: boolean, recaptch
         httpOnly: true,
         secure: true,
         sameSite: "lax",
-        maxAge: 60* 10,
+        maxAge: 60 * 10,
         path: "/verify/email"
-    })
-
-    redirect("/verify/email");
+    });
+    redirect("verify/email")
 }
 
 // exclusively for sending OTP
@@ -57,7 +57,7 @@ export async function resendOtp(email: string, recaptchaToken: string):Promise<{
 
 // if successful, session will give jwt + refresh token
 export async function verifyOtp(email: string, token: string): Promise<{ error?: string | null}> {
-    if (!token || !/^\d{6}&/.test(token)) {
+    if (!token || !/^\d{6}$/.test(token)) {
         return { error: "Please enter a valid 6-digit code."}
     }
     const cookieStore = await cookies();
@@ -98,7 +98,7 @@ export async function verifyOtp(email: string, token: string): Promise<{ error?:
 
     const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
     
-    if (aal && aal?.currentLevel === "aa2") {
+    if (aal && aal.currentLevel === "aal1" && aal.nextLevel === "aal2") {
         redirect("/verify/mfa")
     }
 
@@ -131,16 +131,13 @@ export async function deleteUser() {
 }
 
 // list all MFA factors of the current logged in account
-export async function listUserMfaFactors() {
+export async function listUserMfaFactors(): Promise<{success: false, error: string} | {success: true, totp: Factor[]}> {
     const supabase = await createClient();
     const { data, error} = await supabase.auth.mfa.listFactors();
 
-    if (error) return { error: error.message}
+    if (error) return { success: false, error: error.message}
 
-    const { data: { user } } = await supabase.auth.getUser();
-    console.log("USER ID:", user?.id);
-
-    return { totp: data.totp }
+    return { success: true, totp: data.totp }
 }
 
 // for multi-factor authentication
@@ -206,8 +203,8 @@ export async function unenrollFactor(factorId: string) {
 
 // get user details
 export async function getUser(): Promise<User | null> {
-    const client = await createClient();
-    const { data: { user }, error } = await client.auth.getUser();
+    const supabase = await createClient();
+    const { data: { user }, error } = await supabase.auth.getUser();
 
     if ( error || !user ) { console.error('Failed to get user', error); return null }
     return user;

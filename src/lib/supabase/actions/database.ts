@@ -353,3 +353,11 @@ export async function SearchTransactions(term: string, currentPage: number): Pro
 
     return { success: true, data: data as unknown as TransactionSearchResults[] };
 }
+
+export async function CalculateTotalEarnings(): Promise<{success: false, error: string} | {success: true, data: any[]}> {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+        .rpc('calculate_monthly_earnings')
+    if (!data || error ) return { success: false, error: error.message}
+    return { success: true, data } 
+}

@@ -3,19 +3,17 @@
 import { useEffect, useState } from "react";
 import {
   CircleQuestionMark,
-  Eye,
   Lock,
-  LockIcon,
   LogOutIcon,
-  VerifiedIcon,
   X,
 } from "lucide-react";
-import { deleteUser, getUser, getUserAuthenticationAssuranceLevel, signOut } from "@/lib/supabase/actions/auth";
+import { deleteUser, getUser, getUserAuthenticationAssuranceLevel, listUserMfaFactors, signOut, unenrollFactor } from "@/lib/supabase/actions/auth";
 import { useRouter } from "next/navigation";
 import { AuthenticatorAssuranceLevels, User } from "@supabase/supabase-js";
 import Modal from "../../components/layout/modal";
 import ProfileHeader from "./components/profile-card";
 import Toggle from "@/components/layout/toggle";
+import ErrorModal from "@/components/layout/error-modal";
 
 export default function ProfilePage({
   user,
@@ -26,58 +24,81 @@ export default function ProfilePage({
 }) {
 
   // states
-  const [activeModal, setActiveModal] = useState<string | null>(null);
-  const [toggle, setToggle] = useState<boolean>(false);
+  const [enable, setEnable] = useState<boolean>(false);
+  const [toggle, setToggle] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [factorId, setFactorId] = useState<string | null>(null)
   const [assuranceLevel, setAssuranceLevel] = useState<AuthenticatorAssuranceLevels | null | undefined>(null)
+  const [mfaError, setMfaError] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
     document.title = "Profile";
 
     const checkUserAssuranceLevel = async () => {
-      const result = await getUserAuthenticationAssuranceLevel();
-      if (!result) return null;
-      setAssuranceLevel(result?.data?.currentLevel);
+      const [assuranceLevelResult, factorIdResult] = await Promise.all([
+        getUserAuthenticationAssuranceLevel(),
+        listUserMfaFactors(),
+      ]);
+      if (!assuranceLevelResult.success || !factorIdResult.success) {
+        setMfaError("Something went wrong");
+        return;
+      }
+      setAssuranceLevel(assuranceLevelResult.data?.nextLevel);
+      setFactorId(factorIdResult.totp[0]?.id);
+      setEnable(
+        assuranceLevelResult.data?.currentLevel === "aal2" || 
+        assuranceLevelResult.data?.nextLevel === "aal2"
+      );
     };
 
     checkUserAssuranceLevel();
-    setToggle(assuranceLevel === "aa1" ? false : true);
-  }, [toggle, ]);
+  }, [assuranceLevel, factorId]);
 
   const profile = [
     {
       item: "Sign out of your account",
       value: "Sign out",
       icon: <LogOutIcon size={15} />,
-      onClick: () => setActiveModal("sign-out"),
+      onClick: () => setToggle("sign-out"),
     },
     {
       item: "Delete your account",
       value: "Delete account",
       icon: <X size={15} />,
-      onClick: () => setActiveModal("delete"),
+      onClick: () => setToggle("delete"),
     },
   ];
 
-  const handleOpenModalMFA = () => {
-   assuranceLevel === "aa1" ? router.push("/2fa") : () => setActiveModal("disable-mfa");
-  }
-
-  const handleMFA = () => {
-
+  const handleDisableMFA = async () => {
+    if (!factorId) {
+      setMfaError("No factor id.");
+      return;
+    }
+    setLoading(true);
+    const result = await unenrollFactor(factorId);
+    if (!result.success) {
+      setMfaError(result.error ?? "Something went wrong");
+      setLoading(false);
+      return;
+    }
+    setLoading(false);
+    window.location.reload();
+    return;
   }
 
   return (
     <div className="relative flex flex-col w-full h-full">
-      {activeModal === "sign-out" && (
+      {
+        mfaError && <ErrorModal message={mfaError}/>
+      }
+      {toggle === "sign-out" && (
         <div className="fixed z-50 inset-0 bg-black/50 flex items-center justify-center">
           <Modal
             open
-            onOpen={() => setActiveModal(null)}
+            onOpen={() => setToggle(null)}
             icon={<CircleQuestionMark size={20} />}
-            onCancel={() => setActiveModal(null)}
+            onCancel={() => setToggle(null)}
             onConfirm={signOut}
             yesButtonText="Yes, sign me out"
             noButtonText="No, go back"
@@ -89,13 +110,13 @@ export default function ProfilePage({
       )}
 
       {/* Delete account modal */}
-      {activeModal === "delete" && (
+      {toggle === "delete" && (
         <div className="fixed z-50 inset-0 bg-black/50 flex items-center justify-center">
           <Modal
             open
-            onOpen={() => setActiveModal(null)}
+            onOpen={() => setToggle(null)}
             icon={<CircleQuestionMark size={20} />}
-            onCancel={() => setActiveModal(null)}
+            onCancel={() => setToggle(null)}
             onConfirm={deleteUser}
             yesButtonText="Yes, delete my account"
             noButtonText="No, go back"
@@ -107,18 +128,19 @@ export default function ProfilePage({
           />
         </div>
       )}
-      {activeModal === "disable-mfa" && (
+      {toggle === "disable-mfa" && (
         <div className="fixed z-50 inset-0 bg-black/50 flex items-center justify-center">
           <Modal
             open
-            onOpen={() => setActiveModal(null)}
+            onOpen={() => setToggle(null)}
             icon={<Lock size={20} />}
-            onCancel={() => setActiveModal(null)}
-            onConfirm={handleMFA}
+            onCancel={() => setToggle(null)}
+            onConfirm={handleDisableMFA}
             yesButtonText="Disable MFA"
             noButtonText="No"
             header="Disable your MFA"
-            loading={loading}            
+            message="Do you want to disable your account's MFA?"
+            loading={loading}
           />
         </div>
       )}
@@ -134,9 +156,15 @@ export default function ProfilePage({
             <div className="flex w-full h-fit items-center justify-between my-2">
               <p className="text-[0.9rem]">Enable MFA</p>
               <Toggle
-                enable={toggle}
-                onEnable={() => setToggle((prev) => !prev)}
-                onClick={handleOpenModalMFA}
+                enable={enable}
+                onEnable={() => {
+                  setEnable(false);
+                }}
+                onClick={
+                  assuranceLevel === "aal2"
+                    ? () => setToggle("disable-mfa")
+                    : () => router.push("./../mfa/components/qr-page.tsx")
+                }
               />
             </div>
 

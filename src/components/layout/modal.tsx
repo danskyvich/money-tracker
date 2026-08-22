@@ -43,7 +43,7 @@ export default function Modal({loading, children, onCancel, noButtonText, yesBut
         {/* Buttons */}
         <div className="grid grid-cols-[1fr_1fr] gap-x-3 mt-3 w-full h-fit">
           <button
-            className={`${!noButtonText && "hidden"} whitespace-nowrap py-1 flex w-full items-center justify-center border border-(--color-brand-green) rounded-lg text-[0.9rem] hover:bg-(--color-brand-green) active:bg-emerald-600 cursor-pointer transition-all duration-100`}
+            className={`${!noButtonText && "hidden"} whitespace-nowrap py-1 flex w-full items-center justify-center hover:text-white border border-(--color-brand-green) rounded-lg text-[0.9rem] hover:bg-(--color-brand-green) active:bg-emerald-600 cursor-pointer transition-all duration-100`}
             onClick={() => {
               onOpen(false);
               onCancel();
@@ -53,7 +53,7 @@ export default function Modal({loading, children, onCancel, noButtonText, yesBut
           </button>
 
           <button
-            className={`${onConfirm === undefined && "hidden"} whitespace-nowrap py-2 flex w-full items-center justify-center rounded-lg text-[0.9rem] bg-(--color-brand-green) hover:bg-emerald-600 active:bg-emerald-700 transition-all duration-100 cursor-pointer`}
+            className={`${onConfirm === undefined && "hidden"} whitespace-nowrap text-white py-2 flex w-full items-center justify-center rounded-lg text-[0.9rem] bg-(--color-brand-green) hover:bg-emerald-600 active:bg-emerald-700 transition-all duration-100 cursor-pointer`}
             onClick={() => {
               onConfirm === undefined ? null : onConfirm();
             }}

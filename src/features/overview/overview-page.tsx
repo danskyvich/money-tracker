@@ -2,12 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Card from "@/components/layout/card";
-import {
-  BaggageClaim,
-  CircleDollarSign,
-  PiggyBank,
-  Plus,
-} from "lucide-react";
+import { BaggageClaim, CircleDollarSign, PiggyBank, Plus } from "lucide-react";
 import IncomeBreakdownPage from "@/features/overview/components/breakdown-income";
 import ExpenseBreakdownPage from "@/features/overview/components/breakdown-expense";
 import SixMonthsRef from "../../components/charts/BarChart";
@@ -17,12 +12,18 @@ import TransactionList from "../transactions/components/transaction-partial";
 import OverviewHeader from "./components/icon-and-name";
 import AddAccountModal from "../accounts/components/add-account-modal";
 import {
+  CalculateTotalEarnings,
   FetchAccounts,
   FetchTransaction,
 } from "@/lib/supabase/actions/database";
 import TransactionModal from "../transactions/components/transaction-modal";
 import AccountsPartialList from "./components/accounts-partial";
-import { AccountCategories, AccountsWithBalance, TransactionSearchResults } from "@/lib/types/derived";
+import {
+  AccountCategories,
+  AccountsWithBalance,
+  TransactionSearchResults,
+} from "@/lib/types/derived";
+import Skeleton from "@/components/layout/skeleton/skeleton-file";
 
 export default function OverviewPage() {
   // variables - general
@@ -40,11 +41,19 @@ export default function OverviewPage() {
   const [chosenPage, setChosenPage] = useState<"income" | "expense">("income");
 
   // fetch data
-  const [transactionData, setTransactionData] = useState<TransactionSearchResults[]>([]);
-  const [accounts, setAccounts] = useState<AccountsWithBalance[] | null | undefined>(null);
+  const [transactionData, setTransactionData] = useState<
+    TransactionSearchResults[]
+  >([]);
+  const [accounts, setAccounts] = useState<
+    AccountsWithBalance[] | null | undefined
+  >(null);
   const [transactionError, setTransactionError] = useState<string | null>(null);
   const [accountError, setAccountError] = useState<string | null>(null);
-  const [accountCategoriesData, setAccountCategoriesData] = useState<Pick<AccountCategories, "id" | "name">[]>([])
+  const [accountCategoriesData, setAccountCategoriesData] = useState<
+    Pick<AccountCategories, "id" | "name">[]
+  >([]);
+  const [calculateError, setCalculateError] = useState<string | null>(null);
+
   // loading states
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingTransactions, setLoadingTransactions] = useState(false);
@@ -54,6 +63,9 @@ export default function OverviewPage() {
   const [xAxisLabels, setXAxisLabels] = useState<string[] | never[]>();
   const [inflowData, setInflowData] = useState<number[] | never[]>();
   const [outflowData, setOutflowData] = useState<number[] | never[]>();
+
+  // page header
+  const [total, setTotal] = useState<number | null>(null);
 
   //declare page title
   useEffect(() => {
@@ -90,18 +102,35 @@ export default function OverviewPage() {
         return;
       } else {
         const sortedTransactions = [...(transactionResult.data ?? [])].sort(
-          (a, b) => new Date(b.date_time).getTime() - new Date(a.date_time).getTime(),
+          (a, b) =>
+            new Date(b.date_time).getTime() - new Date(a.date_time).getTime(),
         );
         setTransactionData(sortedTransactions);
+        setLoading(false);
       }
-      setLoadingTransactions(false);
+
+      // --- retrieve total count ---
+      const result = await CalculateTotalEarnings();
+      if (!result.success) {
+        setCalculateError(result.error ?? "Fetching total earnings failed");
+        setLoading(false);
+        return;
+      } else {
+        const row = result.data?.[0];
+        const total = (
+          Number(row?.total_income ?? 0.0) - Number(row?.total_expense ?? 0.0)
+        ).toFixed(2);
+        setTotal(Number(total));
+        setLoading(false);
+        return;
+      }
     } catch (err) {
     } finally {
       setLoading(false);
       setLoadingAccounts(false);
       setLoadingTransactions(false);
     }
-  };;
+  };
 
   // call fetchData()
   useEffect(() => {
@@ -150,10 +179,17 @@ export default function OverviewPage() {
         <div className="flex flex-1 flex-col w-full h-full gap-5">
           <div className="flex w-full flex-col gap-1">
             <p className="text-[0.8rem]">Total earnings</p>
-            <p className="flex text-5xl font-display font-semibold">
-              <span className="text-3xl self-end mr-2">₱</span>
-              3,100.00
-            </p>
+            {loading ? (
+              <div className="flex gap-3 w-fit h-13">
+                <Skeleton className="flex w-10 h-full" />
+                <Skeleton className="flex w-50 h-full" />
+              </div>
+            ) : (
+              <p className="flex text-5xl font-display font-normal">
+                <span className="text-3xl self-end mr-2 font-display">₱</span>
+                {total?.toLocaleString("en-us", { minimumFractionDigits: 2, maximumFractionDigits: 2})}
+              </p>
+            )}
           </div>
 
           {/* Summary */}

@@ -73,8 +73,8 @@ export default function ExpenseCategories({
     setProcess(false);
     setId(null);
     setName("");
+    setToggle(null);
     fetchData();
-    onOpen();
   };
 
   const handleDeleteExpenseCategory = async () => {
@@ -95,8 +95,8 @@ export default function ExpenseCategories({
     setProcess(false);
     setName("");
     setId(null);
+    setToggle(null);
     fetchData();
-    onOpen();
   };
 
   if (!open) return null;
@@ -160,7 +160,7 @@ export default function ExpenseCategories({
           <div className="flex flex-col w-full h-full">
             {expenseCategoriesData?.map((item, id) => (
               <div
-                className="flex w-full h-full border-y border-(--color-border-subtle) px-5 py-3 items-center justify-between"
+                className="flex flex-0 w-full h-full border-y border-(--color-border-subtle) px-5 py-3 items-start justify-between"
                 key={id}
               >
                 <p className="text-[0.9rem] ">{item.name}</p>

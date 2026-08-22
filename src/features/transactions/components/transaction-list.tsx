@@ -1,6 +1,7 @@
 import { FetchTransaction, SearchTransactions } from "@/lib/supabase/actions/database";
 import ConvertTimestampToDateTime from "@/utils/convertToDateTime";
 import {
+  ArrowRight,
   ChevronLeft,
   ChevronRight,
   Filter,
@@ -15,7 +16,6 @@ import FilterModal from "@/components/layout/filter-modal";
 import { FilterTransactionField } from "../types/types";
 import { useDebouncedValue } from "@/hooks/useDebounceValue";
 import { TransactionSearchResults } from "@/lib/types/derived";
-import { useRouter, useSearchParams } from "next/navigation";
 
 export default function WholeTransactionList() {
 
@@ -25,8 +25,9 @@ export default function WholeTransactionList() {
 
   // modals
   const [toggle, setToggle] = useState<string | null>(null);
-  const [chosenTransaction, setChosenTransaction] =
-    useState<TransactionSearchResults[] | null>(null);
+  const [chosenTransaction, setChosenTransaction] = useState<
+    TransactionSearchResults | undefined
+  >(undefined);
 
   // search feature
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -99,7 +100,7 @@ export default function WholeTransactionList() {
       return;
     }
 
-    setChangedTransactionData(result?.data);
+    setChangedTransactionData(result.data);
     setLoading(false);
     return;
   }
@@ -154,7 +155,7 @@ export default function WholeTransactionList() {
           <div className="flex w-full h-full px-5 py-2 gap-3 ">
             {/** Add transaction */}
             <div
-              className="flex w-fit h-fit border items-center gap-2 border-(--color-border-default) rounded-lg p-2 bg-(--color-brand-green) cursor-pointer hover:bg-emerald-600 active:bg-emerald-700"
+              className="flex w-fit h-fit border text-white items-center gap-2 border-(--color-border-default) rounded-lg p-2 bg-(--color-brand-green) px-5 cursor-pointer hover:bg-emerald-600 active:bg-emerald-700"
               onClick={() => setToggle("add-transaction")}
             >
               <Plus size={15} />
@@ -227,18 +228,21 @@ export default function WholeTransactionList() {
                         </div>
                         <div className="flex w-full items-center">
                           <p className="line-clamp-1">
-                            {transaction?.account_id?.name}
+                            {transaction.category_id?.name}
                           </p>
                         </div>
                         <div className="flex w-full items-center">
-                          {transaction?.to_account_id?.name ? (
-                            <p className="line-clamp-1">
-                              {transaction?.account_id?.name} to{" "}
-                              {transaction?.to_account_id?.name}
-                            </p>
-                          ) : (
-                            <p>{transaction?.account_id.name}</p>
-                          )}
+                          <p className="line-clamp-1">
+                            {transaction?.account_id?.name}
+                          </p>
+                          {
+                            transaction.to_account_id?.name && (
+                              <>
+                                <ArrowRight size={15} className="min-w-3 h-auto"/>
+                                <p>{transaction.to_account_id.name}</p>
+                              </>
+                            )
+                          }
                         </div>
                         <div
                           className={`flex w-full items-center font-mono ${transaction.type === "income" ? "text-emerald-500" : transaction.type === "expense" ? "text-red-500" : "text-(--color-text-primary)"}`}

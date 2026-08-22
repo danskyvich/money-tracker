@@ -120,7 +120,7 @@ export default function WholeAccountsList() {
 
             {/* Add account */}
             <div
-              className="flex w-fit h-fit xl:h-fit gap-2 border border-(--color-brand-green) rounded-md px-5 py-1.5 items-center bg-transparent text-(--color-text-primary) hover:text-white hover:bg-emerald-600 cursor-pointer transition-all duration-200 active:bg-emerald-700"
+              className="flex w-fit h-fit xl:h-fit gap-2 bg-(--color-brand-green) hover:bg-emerald-600 rounded-md px-5 py-1.5 text-white items-center hover:text-white cursor-pointer transition-all duration-200 active:bg-emerald-700"
               onClick={() => setToggle("add-account")}
             >
               <Plus size={15} />
