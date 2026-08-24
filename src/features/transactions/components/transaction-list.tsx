@@ -15,7 +15,7 @@ import TransactionModal from "./transaction-modal";
 import FilterModal from "@/components/layout/filter-modal";
 import { FilterTransactionField } from "../types/types";
 import { useDebouncedValue } from "@/hooks/useDebounceValue";
-import { TransactionSearchResults } from "@/lib/types/derived";
+import { Transactions, TransactionSearchResults } from "@/lib/types/derived";
 
 export default function WholeTransactionList() {
 
@@ -71,8 +71,7 @@ export default function WholeTransactionList() {
       setTransactionsError(null);
       setTransactionsData(result?.data ?? []);
       setTotalNumberOfItems(Number(result.totalItems));
-      setLoading;
-      false;
+      setLoading(false);
     }
     setLoading(false);
   };

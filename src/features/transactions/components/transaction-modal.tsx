@@ -121,6 +121,7 @@ export default function TransactionModal({
     const user = await getUser();
     if (!user) {
       setTransactionError("User not authenticated.");
+      setLoading(false);
       return;
     }
 
@@ -136,6 +137,14 @@ export default function TransactionModal({
         description: formValues.description ?? null,
         user_id: user.id,
       };
+      {
+        (payload.type === "income" || "expense") && payload.account_id === null || payload.amount === null || payload.category_id === null || payload.date_time === null || payload.type === null && (
+          setTransactionError("Missing fields")
+        );
+        (payload.type === "transfer") && payload.to_account_id === "" && (
+          setTransactionError("Missing fields")
+        );
+      }
 
       const { data, error } = 
         modalType === "modify"
@@ -152,7 +161,8 @@ export default function TransactionModal({
       onOpen();
 
     } catch (err) {
-      setTransactionError("Fetching transaction failed")
+      setTransactionError("Fetching transaction failed");
+      setLoading(false);
       return;
     } finally {
       setLoading(false);
