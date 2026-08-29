@@ -1,30 +1,39 @@
 'use client'
 
-import { CircleQuestionMark, Code, NfcIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useActionState, useState } from "react";
-import Input from "../../../components/layout/input";
-import { useForm } from "react-hook-form";
-import { OTPData, OTPSchema } from "@/lib/schemas/OTPSchema";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import Spinner from "@/components/layout/spinner";
+import { verifyUserMfa } from "@/lib/supabase/actions/auth";
+import ErrorModal from "@/components/layout/error-modal";
 
-export default function VerifyQRPage() {
+interface VerifyQRPage {
+  challengeId: string,
+  factorId: string,
+  mode: string,
+}
+
+export default function VerifyQRPage({challengeId, factorId, mode}:VerifyQRPage) {
     const router = useRouter();
-    const [trustDeviceChecked, setTrustDeviceChecked] = useState<boolean>(false)
+    const [trustDeviceChecked, setTrustDeviceChecked] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [code, setCode] = useState<string>("");
+    const [verifyError, setVerifyError] = useState<string | null>(null);
 
-    const [state, formAction, pending] = useActionState(
-        async (_prevState:any, formData: FormData) => {
-            const code = formData.get("secondFactorCode");
-        },
-        null,
-    )
-
-    const { register, formState: { errors }} = useForm<OTPData>({
-        resolver: zodResolver(OTPSchema),
-        mode: "onChange"
-    })
+    const handleSubmit = async() => {
+      setLoading(true);
+      setVerifyError(null);
+      const redirectTo = mode === "enroll" ? "/profile" : "/overview";
+      const result = await verifyUserMfa(factorId, challengeId, code, trustDeviceChecked, redirectTo);
+      setVerifyError(result.error ?? "Verification failed");
+      setLoading(false);
+    }
     return (
       <div className="flex flex-col w-full h-full items-center justify-center gap-10">
+        {
+          verifyError && (
+            <ErrorModal message={verifyError}/>
+          )
+        }
         <div className="flex flex-col w-150 px-15 py-20 bg-(--color-bg-subtle) border border-(--color-border-default) rounded-lg shadow-md gap-2">
           {/* Header */}
           <div className="flex-col gap-1">
@@ -37,27 +46,37 @@ export default function VerifyQRPage() {
             </p>
 
             <p className="text-[0.85rem]/5 font-mono mt-5">
-              Enter the generated one-time, six-digit code from your authenticator app
-              into the input field below
+              Enter the generated one-time, six-digit code from your
+              authenticator app into the input field below
             </p>
           </div>
 
-          <form action={formAction} className="mt-5">
+          <form action={handleSubmit} className="mt-5">
             <div className="flex flex-col">
-              <Input
+              <input
+              type="text"
                 id="otp"
                 name="otp"
                 placeholder="000000"
-                register={register}
-                icon={<Code size={15} />}
+                onChange={(e) => setCode(e.target.value)}
               />
             </div>
-            <div className="flex px-3 gap-2">
-              <input id="trustDeviceForThirtyDays" type="checkbox" onChange={(e) => setTrustDeviceChecked(e.target.checked)} checked={trustDeviceChecked}/>
-              <label htmlFor="trustDeviceForThirtyDays" className="text-[0.9rem] font-light">
-                Trust this device for 30 days?
-              </label>
-            </div>
+            {mode !== "enroll" && (
+              <div className="flex px-3 gap-2">
+                <input
+                  id="trustDeviceForThirtyDays"
+                  type="checkbox"
+                  onChange={(e) => setTrustDeviceChecked(e.target.checked)}
+                  checked={trustDeviceChecked}
+                />
+                <label
+                  htmlFor="trustDeviceForThirtyDays"
+                  className="text-[0.9rem] font-light"
+                >
+                  Trust this device for 30 days?
+                </label>
+              </div>
+            )}
 
             <div className="flex flex-col gap-2 mt-13">
               <button
@@ -70,10 +89,13 @@ export default function VerifyQRPage() {
               <button
                 className="flex cursor-pointer items-center justify-center w-full py-2 bg-(--color-brand-green) hover:bg-emerald-600 active:bg-emerald-700 rounded-lg duration-100 transition-all"
                 type="submit"
+                disabled={loading}
               >
-                <p className="text-[0.9rem]">
-                  {pending ? "Verifying..." : "Verify"}
-                </p>
+                {loading ? (
+                  <Spinner />
+                ) : (
+                  <p className="text-[0.9rem]">Verify</p>
+                )}
               </button>
             </div>
           </form>

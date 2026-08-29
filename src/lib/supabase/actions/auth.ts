@@ -5,6 +5,7 @@ import { createClient } from "../clients/server"
 import { createAdminClient } from "../clients/admin";
 import { Factor, User } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
+import { createHash, randomBytes } from "node:crypto";
 
 // Recaptcha
 async function verifyRecaptcha(token: string): Promise<boolean> {
@@ -20,7 +21,6 @@ async function verifyRecaptcha(token: string): Promise<boolean> {
 
 // Passwordless Sign In
 export async function generalSignIn(email: string, rememberMe: boolean, recaptchaToken: string): Promise<{ error?: string | null}> {
-    const supabase = await createClient();
     const result = await sendOtp(email, recaptchaToken)
     if (result.error) return result
     
@@ -56,7 +56,7 @@ export async function resendOtp(email: string, recaptchaToken: string):Promise<{
 }
 
 // if successful, session will give jwt + refresh token
-export async function verifyOtp(email: string, token: string): Promise<{ error?: string | null}> {
+export async function verifyOtp(email: string, token: string) {
     if (!token || !/^\d{6}$/.test(token)) {
         return { error: "Please enter a valid 6-digit code."}
     }
@@ -94,17 +94,26 @@ export async function verifyOtp(email: string, token: string): Promise<{ error?:
     }    
 
     cookieStore.delete("pending_verification");
-    cookieStore.delete(attemptsKey)
+    cookieStore.delete(attemptsKey);
 
     const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-    
-    if (aal && aal.currentLevel === "aal1" && aal.nextLevel === "aal2") {
-        redirect("/verify/mfa")
+    const { data: factorsData } = await supabase.auth.mfa.listFactors();
+    const needsMfa = aal?.currentLevel === "aal1" && aal?.nextLevel === "aal2" && (factorsData?.totp?.length ?? 0) > 0;
+
+    // if user needs to mfa
+    if (needsMfa) {
+        const { data: {user}} = await supabase.auth.getUser();
+        const deviceTrusted = user ? await isDeviceTrusted() : false;
+
+        if (!deviceTrusted) {
+            redirect("/verify/mfa?mode=challenge");
+        }
     }
 
     redirect("/overview")
 }
 
+// SIGN OUT
 export async function signOut() {
     const supabase = await createClient();
     const { error } = await supabase.auth.signOut();
@@ -116,6 +125,7 @@ export async function signOut() {
     redirect("/login")
 }
 
+// DELETE USER
 export async function deleteUser() {
     const supabase = await createClient();
     const { data } = await supabase.auth.getClaims();
@@ -144,31 +154,36 @@ export async function listUserMfaFactors(): Promise<{success: false, error: stri
 export async function enrollUserMfa() {
     const supabase = await createClient();
 
+    // verify if user exist
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (!user || userError) return { success: false, error: "User not authenticated"};
+
+    // check if the account has mfa enabled 
     const { data: factorsData, error: factorsError } = await supabase.auth.mfa.listFactors();
-    if (factorsError) return { error: factorsError.message }
+    if (factorsError) return { success: false, error: factorsError.message }
 
     const verified = factorsData.totp.filter((f) => f.status === "verified");
     if (verified.length > 0) {
-        return { error: "MFA is already enabled on this account." };
+        return { success: false, error: "MFA is already enabled on this account." };
     }
 
+    // check if any unverified factors are found
     const existingUnverified = factorsData.totp.filter((f) => (f.status as string) === "unverified");
     for (const f of existingUnverified) {
-        await supabase.auth.mfa.unenroll({ factorId: f.id });
+        const { error } = await supabase.auth.mfa.unenroll({factorId: f.id});
+        if (error) return { success: false, error: error.message};
     }
 
+    // enroll mfa
     const { data, error } = await supabase.auth.mfa.enroll({
         factorType: "totp",
         friendlyName: `Authenticator App ${Date.now()}`,
     })
 
-    if (error) return { error: error.message }
-
-    const { data: { user } } = await supabase.auth.getUser();
-    console.log("USER ID:", user?.id);
+    if (error) return { success: false, error: error.message }
 
     const { id, totp } = data;
-    return { factorId: id, qr_code: totp.qr_code, secret: totp.secret, uri: totp.uri }
+    return { success: true, factorId: id, qr_code: totp.qr_code, secret: totp.secret, uri: totp.uri }
 }
 
 export async function challengeUserMfa(factorId: string) {
@@ -182,16 +197,63 @@ export async function challengeUserMfa(factorId: string) {
     return { challengeId: data.id };
 }
 
-export async function verifyUserMfa(factorId: string, challengeId: string, code: string) {
+export async function verifyUserMfa(factorId: string, challengeId: string, code: string, trustedDevice: boolean, redirectTo: string = "/profile") {
     const supabase = await createClient();
 
-    const { data, error } = await supabase.auth.mfa.verify({
+    const user = await getUser();
+    if (!user) return { success: false, error: "User not authenticated"};
+    const user_id = user?.id;
+
+    const { error } = await supabase.auth.mfa.verify({
         factorId, challengeId, code
     });
 
-    if (error) return { error: error.message }
+    if (error) return { success: false, error: error.message }
 
-    redirect("/profile")
+    if (trustedDevice) {
+        const token = randomBytes(32).toString("hex");
+        const tokenHash = createHash("sha256").update(token).digest("hex");
+        const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+
+        await supabase.from("trusted_devices").insert({
+            user_id,
+            device_token_hash: tokenHash,
+            expires_at: expiresAt.toISOString(),
+        });
+
+        const cookieStore = await cookies();
+        cookieStore.set("trusted_devices", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "lax",
+            expires: expiresAt,
+            path: "/",
+        })
+    }
+
+    redirect(redirectTo);
+}
+
+export async function isDeviceTrusted() {
+    const supabase = await createClient();
+    const cookieStore = await cookies();
+    const token = cookieStore.get("trusted_devices")?.value;
+    if (!token) return false;
+
+    const user = await getUser();
+    if (!user) return { success: false, error: "User not authenticated"};
+    const user_id = user.id;
+
+    const tokenHash = createHash("sha256").update(token).digest("hex");
+
+    const { data } = await supabase
+        .from("trusted_devices")
+        .select("id")
+        .eq("user_id", user_id)
+        .eq("device_token_hash", tokenHash)
+        .gte("expires_at", new Date().toISOString())
+        .maybeSingle();
+    return !!data;
 }
 
 export async function unenrollFactor(factorId: string) {

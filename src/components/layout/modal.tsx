@@ -57,6 +57,7 @@ export default function Modal({loading, children, onCancel, noButtonText, yesBut
             onClick={() => {
               onConfirm === undefined ? null : onConfirm();
             }}
+            disabled={loading}
           >
             {
               loading ? <Spinner/> : yesButtonText

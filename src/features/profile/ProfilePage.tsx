@@ -44,7 +44,7 @@ export default function ProfilePage({
         setMfaError("Something went wrong");
         return;
       }
-      setAssuranceLevel(assuranceLevelResult.data?.nextLevel);
+      setAssuranceLevel(assuranceLevelResult.data?.currentLevel);
       setFactorId(factorIdResult.totp[0]?.id);
       setEnable(
         assuranceLevelResult.data?.currentLevel === "aal2" || 
@@ -163,7 +163,7 @@ export default function ProfilePage({
                 onClick={
                   assuranceLevel === "aal2"
                     ? () => setToggle("disable-mfa")
-                    : () => router.push("./../mfa/components/qr-page.tsx")
+                    : () => router.push("/mfa")
                 }
               />
             </div>

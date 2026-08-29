@@ -1,5 +1,4 @@
 import AccountListSkeleton from "@/features/accounts/components/skeleton/account-list-modal-skeleton";
-import { Transaction } from "@/lib/types/database";
 import {
   DeleteAccount,
   SelectTransactionsFromChosenAccount,
@@ -10,6 +9,7 @@ import { useEffect, useState } from "react";
 import Modal from "@/components/layout/modal";
 import ErrorModal from "@/components/layout/error-modal";
 import Spinner from "@/components/layout/spinner";
+import { Transactions } from "@/lib/types/derived";
 
 interface AccountDetailsModalProps {
   open: boolean;
@@ -30,7 +30,7 @@ export default function AccountDetailsModal({
 
   // fetch data and errors
   const [deleteAccountError, setDeleteAccountError] = useState<string | null>("");
-  const [accountTransactions, setAccountTransactions] = useState<Transaction[] | null>(null);
+  const [accountTransactions, setAccountTransactions] = useState<Transactions[] | null>(null);
   const [accountTransactionsError, setAccountTransactionsError] = useState<string | null>(null);
   
   //pagination
@@ -158,16 +158,16 @@ export default function AccountDetailsModal({
                           </div>
                           <div className="line-clamp-1">{item.description}</div>
                           <div className="line-clamp-1">
-                            {item.categories?.name}
+                            {item?.category_name}
                           </div>
                           <div className="line-clamp-1">
-                            {item.toAccount?.name ? (
+                            {item?.account_to_name ? (
                               <p className="line-clamp-1">
-                                {item.fromAccount?.name} to{" "}
-                                {item.toAccount?.name}
+                                {item?.account_from_name} to{" "}
+                                {item?.account_to_name}
                               </p>
                             ) : (
-                              <p>{item.fromAccount?.name}</p>
+                              <p>{item.account_from_name}</p>
                             )}
                           </div>
                           <div className="line-clamp-1 font-mono">

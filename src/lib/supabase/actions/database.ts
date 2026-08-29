@@ -123,24 +123,24 @@ interface InsertTransactionParams {
 }
 
 // INSERT
-export async function InsertTransaction(transaction: InsertTransactionParams[]) {
+export async function InsertTransaction(transaction: InsertTransactionParams[]): Promise<{success: true, data: any} | {success: false, error: string}> {
     const supabase = await createClient(); // initialize client
 
     const { data, error } = await supabase
         .from("transactions")
         .insert(transaction);
 
-    if (!data || error) return { data: null, error };
+    if (error) return { success: false, error: error.message };
     
-    return { error: null }  
+    return { success: true, data }  
 }
 
 // UPDATE
-export async function UpdateTransaction(id: string, transaction: InsertTransactionParams[]) {
+export async function UpdateTransaction(id: string, transaction: InsertTransactionParams[]): Promise<{success: false, error: string} | {success: true, data: any}> {
     const supabase = await createClient();
     const user = await getUser();
 
-    if (!user) return { data: null, error: "Unauthenticated user."}
+    if (!user) return { success: false, error: "Unauthenticated user."}
 
     const { data, error } = await supabase
         .from("transactions")
@@ -150,8 +150,8 @@ export async function UpdateTransaction(id: string, transaction: InsertTransacti
         .select()
         .single();
     
-    if (error) return { data: null, error };
-    return { data, error: null};
+    if (error) return { success: false, error: error.message };
+    return { success: true, data};
 }
 
 // DELETE

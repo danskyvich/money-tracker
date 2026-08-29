@@ -7,6 +7,7 @@ import {
   Filter,
   Plus,
   Search,
+  Trash,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import ErrorModal from "@/components/layout/error-modal";
@@ -16,18 +17,21 @@ import FilterModal from "@/components/layout/filter-modal";
 import { FilterTransactionField } from "../types/types";
 import { useDebouncedValue } from "@/hooks/useDebounceValue";
 import { Transactions, TransactionSearchResults } from "@/lib/types/derived";
+import Modal from "@/components/layout/modal";
 
 export default function WholeTransactionList() {
 
   // fetch data & error
   const [transactionsError, setTransactionsError] = useState<string | null>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const [process, setProcess] = useState<boolean>(false);
 
   // modals
   const [toggle, setToggle] = useState<string | null>(null);
   const [chosenTransaction, setChosenTransaction] = useState<
     TransactionSearchResults | undefined
   >(undefined);
+  const [transactionId, setTransactionId] = useState<string | null>(null);
 
   // search feature
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -104,6 +108,11 @@ export default function WholeTransactionList() {
     return;
   }
 
+  // delete transaction
+  const handleDelete = (id: string) => {
+    setToggle("delete-transaction");
+  }
+
   const TransactionFields: FilterTransactionField[] = [
     {
       key: "order",
@@ -122,6 +131,20 @@ export default function WholeTransactionList() {
             onOpen={() => setToggle(null)}
             onConfirm={() => ""}
             fields={TransactionFields}
+          />
+        </div>
+      )}
+      {toggle === "delete-transaction" && (
+        <div className="fixed inset-0 z-50 flex w-full h-full items-center justify-center bg-black/50">
+          <Modal
+            yesButtonText="Yes, delete transaction"
+            noButtonText="No"
+            icon={<Trash size={15} className="min-w-3 h-auto"/>}
+            header="Delete transaction"
+            onOpen={() => setToggle(null)}
+            open
+            onCancel={() => setToggle(null)}
+            loading={process}
           />
         </div>
       )}
@@ -185,13 +208,14 @@ export default function WholeTransactionList() {
           {/* Transaction Table */}
           <div className="flex flex-col w-full h-full mt-3">
             {/** Transaction headers */}
-            <div className="grid grid-cols-[repeat(6,1fr)] gap-4 font-mono text-[0.9rem] py-1 px-5 pt-1 font-display border-b border-(--color-border-default)">
+            <div className="grid grid-cols-[repeat(6,1fr)_30px] gap-4 font-mono text-[0.9rem] py-1 px-5 pt-1 font-display border-b border-(--color-border-default)">
               <div className="line-clamp-1">Date & time</div>
               <div>Type</div>
               <div>Description</div>
               <div>Category</div>
               <div>Account</div>
               <div className="text-left">Amount</div>
+              <div />
             </div>
 
             {loading ? (
@@ -202,7 +226,7 @@ export default function WholeTransactionList() {
                   <div className="flex flex-col w-full h-fit">
                     {displayedTransactions.map((transaction, key) => (
                       <div
-                        className="grid grid-cols-[repeat(6,1fr)] gap-4 font-display text-[0.9rem] px-5 py-5 font-display w-full h-fit cursor-pointer hover:bg-(--color-bg-subtle) border-b border-(--color-border-subtle)"
+                        className="grid grid-cols-[repeat(6,1fr)_25px] gap-4 font-display text-[0.9rem] px-5 py-5 font-display w-full h-fit cursor-pointer hover:bg-(--color-bg-subtle) border-b border-(--color-border-subtle)"
                         key={key}
                         onClick={() =>
                           handleGetTransactionToBeModified(transaction)
@@ -234,19 +258,30 @@ export default function WholeTransactionList() {
                           <p className="line-clamp-1">
                             {transaction?.account_id?.name}
                           </p>
-                          {
-                            transaction.to_account_id?.name && (
-                              <>
-                                <ArrowRight size={15} className="min-w-3 h-auto"/>
-                                <p>{transaction.to_account_id.name}</p>
-                              </>
-                            )
-                          }
+                          {transaction.to_account_id?.name && (
+                            <>
+                              <ArrowRight
+                                size={15}
+                                className="min-w-3 h-auto"
+                              />
+                              <p>{transaction.to_account_id.name}</p>
+                            </>
+                          )}
                         </div>
                         <div
                           className={`flex w-full items-center font-mono ${transaction.type === "income" ? "text-emerald-500" : transaction.type === "expense" ? "text-red-500" : "text-(--color-text-primary)"}`}
                         >
                           <p className="line-clamp-1">{transaction.amount}</p>
+                        </div>
+                        <div className="flex items-center justify-center">
+                          <Trash
+                            className="min-w-3 max-w-5 h-auto text-red-500 cursor-pointer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete
+                              }
+                            }
+                          />
                         </div>
                       </div>
                     ))}
