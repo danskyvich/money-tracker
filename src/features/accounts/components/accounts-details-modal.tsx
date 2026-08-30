@@ -4,7 +4,7 @@ import {
   SelectTransactionsFromChosenAccount,
 } from "@/lib/supabase/actions/database";
 import ConvertTimestampToDateTime from "@/utils/convertToDateTime";
-import { ChevronLeft, ChevronRight, Filter, PiggyBank, Trash, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Filter, Luggage, Pencil, PiggyBank, Trash, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import Modal from "@/components/layout/modal";
 import ErrorModal from "@/components/layout/error-modal";
@@ -16,11 +16,13 @@ interface AccountDetailsModalProps {
   onOpen: () => void;
   accountData: any | null;
   refresh: () => void;
+  openInfo: () => void;
 }
 
 export default function AccountDetailsModal({
   open,
   onOpen,
+  openInfo,
   accountData,
   refresh,
 }: AccountDetailsModalProps) {
@@ -107,16 +109,17 @@ export default function AccountDetailsModal({
 
             {/* Filter bar */}
             <div className="flex w-full h-fit px-5 pt-3 pb-1">
-              <div className="flex w-full h-fit mt-2 gap-3">
-                <input
-                  type="datetime-local"
-                  name="accountTransactionDateTimeLocalInput"
-                  className="px-3 py-1 flex border border-(--color-border-default) rounded-lg text-[0.9rem]"
-                />
-                <div className="flex w-fit h-fit border border-(--color-border-default) rounded-lg px-3 py-1 gap-2 text-[0.9rem] items-center">
-                  <Filter size={15} />
-                  <p>Filter</p>
-                </div>
+              <div
+                className="flex border border-(--color-border-default) rounded-lg px-3 py-2 gap-2 w-fit h-full cursor-pointer hover:bg-(--color-brand-green) duration-100 transition-all active:bg-emerald-700"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openInfo();
+                }}
+              >
+                <Pencil size={15} className="min-w-3 h-auto" />
+                <p className="hidden xl:block text-[0.9rem]">
+                  Edit account details
+                </p>
               </div>
             </div>
 

@@ -6,6 +6,7 @@ import {
   ChevronRight,
   Filter,
   Plus,
+  RotateCw,
   Search,
   Trash,
 } from "lucide-react";
@@ -18,6 +19,7 @@ import { FilterTransactionField } from "../types/types";
 import { useDebouncedValue } from "@/hooks/useDebounceValue";
 import { Transactions, TransactionSearchResults } from "@/lib/types/derived";
 import Modal from "@/components/layout/modal";
+import Spinner from "@/components/layout/spinner";
 
 export default function WholeTransactionList() {
 
@@ -139,7 +141,7 @@ export default function WholeTransactionList() {
           <Modal
             yesButtonText="Yes, delete transaction"
             noButtonText="No"
-            icon={<Trash size={15} className="min-w-3 h-auto"/>}
+            icon={<Trash size={15} className="min-w-3 h-auto" />}
             header="Delete transaction"
             onOpen={() => setToggle(null)}
             open
@@ -174,35 +176,41 @@ export default function WholeTransactionList() {
       <>
         <div className="grid grid-cols-1 grid-rows-[auto_1fr_auto] h-full border border-(--color-border-default) rounded-lg">
           {/* Table header*/}
-          <div className="flex w-full h-full px-5 py-2 gap-3 ">
-            {/** Add transaction */}
-            <div
-              className="flex w-fit h-fit border text-white items-center gap-2 border-(--color-border-default) rounded-lg p-2 bg-(--color-brand-green) px-5 cursor-pointer hover:bg-emerald-600 active:bg-emerald-700"
-              onClick={() => setToggle("add-transaction")}
-            >
-              <Plus size={15} />
-              <p className="text-[0.9rem] hidden lg:block">Add a transaction</p>
+          <div className="flex w-full h-full px-5 py-2 justify-between">
+            <div className="flex w-full h-full gap-2">
+              {/** Add transaction */}
+              <div
+                className="flex w-fit h-fit border text-white items-center gap-2 border-(--color-border-default) rounded-lg p-2 bg-(--color-brand-green) px-5 cursor-pointer hover:bg-emerald-600 active:bg-emerald-700"
+                onClick={() => setToggle("add-transaction")}
+              >
+                <Plus size={15} />
+                <p className="text-[0.9rem] hidden lg:block">
+                  Add a transaction
+                </p>
+              </div>
+
+              {/* Filter */}
+              <div
+                className="flex w-fit h-fit border border-(--color-border-default) rounded-lg gap-2 items-center p-2 hover:bg-(--color-border-subtle) active:bg-(--color-brand-green) cursor-pointer duration-100 transition-all"
+                onClick={() => setToggle("filter-modal")}
+              >
+                <Filter size={15} />
+                <p className="text-[0.9rem] hidden lg:block">Filter</p>
+              </div>
+
+              {/* Search field */}
+              <div className="px-3 py-1 flex w-fit h-full border border-(--color-border-default) rounded-md items-center gap-2">
+                <Search size={15} className="flex" />
+                <input
+                  type="text"
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search..."
+                  className="flex flex-3 decorations-none placeholder:text-[0.8rem] focus:outline-none focus:ring-0 focus:border-transparent text-[0.8rem]"
+                />
+              </div>
             </div>
 
-            {/* Filter */}
-            <div
-              className="flex w-fit h-fit border border-(--color-border-default) rounded-lg gap-2 items-center p-2 hover:bg-(--color-border-subtle) active:bg-(--color-brand-green) cursor-pointer duration-100 transition-all"
-              onClick={() => setToggle("filter-modal")}
-            >
-              <Filter size={15} />
-              <p className="text-[0.9rem] hidden lg:block">Filter</p>
-            </div>
-
-            {/* Search field */}
-            <div className="px-3 py-1 flex w-fit h-full border border-(--color-border-default) rounded-md items-center gap-2">
-              <Search size={15} className="flex" />
-              <input
-                type="text"
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search..."
-                className="flex flex-3 decorations-none placeholder:text-[0.8rem] focus:outline-none focus:ring-0 focus:border-transparent text-[0.8rem]"
-              />
-            </div>
+            <RotateCw size={20} className="min-w-3 h-auto cursor-pointer" onClick={() => fetchData()}/>
           </div>
 
           {/* Transaction Table */}
@@ -219,7 +227,9 @@ export default function WholeTransactionList() {
             </div>
 
             {loading ? (
-              <TransactionListSkeleton />
+              <div className="flex w-full h-full items-center justify-center">
+                <Spinner/>
+              </div>
             ) : (
               <div className="flex flex-col relative w-full h-full overflow-hidden">
                 {displayedTransactions && (
@@ -278,9 +288,8 @@ export default function WholeTransactionList() {
                             className="min-w-3 max-w-5 h-auto text-red-500 cursor-pointer"
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleDelete
-                              }
-                            }
+                              handleDelete;
+                            }}
                           />
                         </div>
                       </div>
