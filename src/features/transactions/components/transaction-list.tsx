@@ -175,8 +175,8 @@ export default function WholeTransactionList() {
           />
         </div>
       )}
-      <div className="flex xl:flex-row flex-col w-full h-full gap-5">
-        <div className="flex flex-2 grid grid-cols-1 grid-rows-[auto_1fr_auto] xl:h-full min-h-185 border border-(--color-border-default) rounded-lg">
+      <div className="flex xl:flex-row flex-2 flex-col w-full h-full gap-5">
+        <div className="flex flex-2 grid grid-cols-1 grid-rows-[auto_1fr_auto] xl:h-full min-h-185 border border-(--color-border-default) rounded-lg shadow-lg">
           {/* Table header*/}
           <div className="flex w-full h-full px-5 py-2 items-center justify-between">
             <div className="flex w-full h-full gap-2">

@@ -12,7 +12,7 @@ interface InputProps<T extends FieldValues> extends React.InputHTMLAttributes<HT
   className?: string;
 }
 
-export default function Input<T extends FieldValues>({
+export default function InputComponent<T extends FieldValues>({
   placeholder,
   label,
   id,
