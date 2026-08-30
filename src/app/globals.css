@@ -38,6 +38,7 @@ body {
     --color-bg-base: #13131d;
     --color-bg-secondary: #111022;
     --color-bg-subtle: #17162d;
+    --color-sidebar: #17162d;
 
     /*Border/Divider*/
     --color-border-subtle: rgba(82, 183, 136, 0.10);
