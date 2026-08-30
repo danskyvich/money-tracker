@@ -20,6 +20,9 @@ import { useDebouncedValue } from "@/hooks/useDebounceValue";
 import { Transactions, TransactionSearchResults } from "@/lib/types/derived";
 import Modal from "@/components/layout/modal";
 import Spinner from "@/components/layout/spinner";
+import Card from "@/components/layout/card";
+import IncomeCategoriesCard from "./income-categories-card";
+import ExpenseCategoriesCard from "./expense-categories-card";
 
 export default function WholeTransactionList() {
 
@@ -33,7 +36,6 @@ export default function WholeTransactionList() {
   const [chosenTransaction, setChosenTransaction] = useState<
     TransactionSearchResults | undefined
   >(undefined);
-  const [transactionId, setTransactionId] = useState<string | null>(null);
 
   // search feature
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -173,10 +175,10 @@ export default function WholeTransactionList() {
           />
         </div>
       )}
-      <>
-        <div className="grid grid-cols-1 grid-rows-[auto_1fr_auto] h-full border border-(--color-border-default) rounded-lg">
+      <div className="flex xl:flex-row flex-col w-full h-full gap-5">
+        <div className="flex flex-2 grid grid-cols-1 grid-rows-[auto_1fr_auto] xl:h-full min-h-185 border border-(--color-border-default) rounded-lg">
           {/* Table header*/}
-          <div className="flex w-full h-full px-5 py-2 justify-between">
+          <div className="flex w-full h-full px-5 py-2 items-center justify-between">
             <div className="flex w-full h-full gap-2">
               {/** Add transaction */}
               <div
@@ -210,7 +212,15 @@ export default function WholeTransactionList() {
               </div>
             </div>
 
-            <RotateCw size={20} className="min-w-3 h-auto cursor-pointer" onClick={() => fetchData()}/>
+            {loading ? (
+              <Spinner />
+            ) : (
+              <RotateCw
+                size={20}
+                className="min-w-3 h-auto cursor-pointer"
+                onClick={() => fetchData()}
+              />
+            )}
           </div>
 
           {/* Transaction Table */}
@@ -227,9 +237,7 @@ export default function WholeTransactionList() {
             </div>
 
             {loading ? (
-              <div className="flex w-full h-full items-center justify-center">
-                <Spinner/>
-              </div>
+              <TransactionListSkeleton />
             ) : (
               <div className="flex flex-col relative w-full h-full overflow-hidden">
                 {displayedTransactions && (
@@ -340,7 +348,7 @@ export default function WholeTransactionList() {
               {/* window slice (-5, windowStart, +5) */}
               {visiblePages.map((item, key) => (
                 <div
-                  className={`px-3 py-2 border border-(--color-border-default) rounded-lg shadow-md hover:bg-(--color-bg-subtle) cursor-pointer ${currentPage === item ? "bg-(--color-brand-green) text-black hover:bg-(--color-brand-green)" : null}`}
+                  className={`px-3 py-2 border border-(--color-border-default) rounded-lg shadow-md hover:bg-(--color-bg-subtle) cursor-pointer ${currentPage === item ? "bg-(--color-brand-green) hover:bg-(--color-brand-green) text-white" : null}`}
                   key={key}
                   onClick={() => setCurrentPage(item)}
                 >
@@ -364,7 +372,7 @@ export default function WholeTransactionList() {
             </div>
           </div>
         </div>
-      </>
+      </div>
     </>
   );
 }
