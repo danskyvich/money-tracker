@@ -205,13 +205,12 @@ export async function UpdateTransaction(id: string, transaction: InsertTransacti
 }
 
 // DELETE
-export async function DeleteTransaction(id: string) {
-    const {data, error } = await (await createClient()).from("transactions")
+export async function DeleteTransaction(id: string): Promise<{success: false, error: string} | {success: true }> {
+    const {error } = await (await createClient()).from("transactions")
         .delete()
         .eq("id", id)
-        .select()
-    if (!data) return { error: error.message}
-    return { data, error: null}
+    if (error) return { success: false, error: error.message}
+    return { success: true }
 }
 
 // TRANSACTIONS from an ACCOUNT 

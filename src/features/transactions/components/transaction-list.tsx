@@ -8,28 +8,22 @@ import {
   Plus,
   RotateCw,
   Search,
-  Trash,
+  X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import ErrorModal from "@/components/layout/error-modal";
 import TransactionListSkeleton from "./skeleton/transaction-list-skeleton";
 import TransactionModal from "./transaction-modal";
-import FilterModal from "@/components/layout/filter-modal";
-import { FilterTransactionField } from "../types/types";
 import { useDebouncedValue } from "@/hooks/useDebounceValue";
-import { Transactions, TransactionSearchResults } from "@/lib/types/derived";
-import Modal from "@/components/layout/modal";
+import { TransactionSearchResults } from "@/lib/types/derived";
 import Spinner from "@/components/layout/spinner";
-import Card from "@/components/layout/card";
-import IncomeCategoriesCard from "./income-categories-card";
-import ExpenseCategoriesCard from "./expense-categories-card";
+import DeleteTransactionModal from "./delete-transaction-modal";
 
 export default function WholeTransactionList() {
 
   // fetch data & error
   const [transactionsError, setTransactionsError] = useState<string | null>("");
   const [loading, setLoading] = useState<boolean>(false);
-  const [process, setProcess] = useState<boolean>(false);
 
   // modals
   const [toggle, setToggle] = useState<string | null>(null);
@@ -112,43 +106,16 @@ export default function WholeTransactionList() {
     return;
   }
 
-  // delete transaction
-  const handleDelete = (id: string) => {
-    setToggle("delete-transaction");
-  }
-
-  const TransactionFields: FilterTransactionField[] = [
-    {
-      key: "order",
-      label: "Order by",
-      type: "select",
-      options: [{name: "ascending", value: "ascending"}, {name: "descending", value: "descending"}],
-    },  
-  ]
-
   return (
     <>
-      {toggle === "filter-modal" && (
-        <div className="fixed inset-0 z-50 flex w-full h-full items-center justify-center bg-black/50">
-          <FilterModal
-            open
-            onOpen={() => setToggle(null)}
-            onConfirm={() => ""}
-            fields={TransactionFields}
-          />
-        </div>
-      )}
       {toggle === "delete-transaction" && (
         <div className="fixed inset-0 z-50 flex w-full h-full items-center justify-center bg-black/50">
-          <Modal
-            yesButtonText="Yes, delete transaction"
-            noButtonText="No"
-            icon={<Trash size={15} className="min-w-3 h-auto" />}
-            header="Delete transaction"
-            onOpen={() => setToggle(null)}
+          <DeleteTransactionModal
             open
+            onOpen={() => setToggle(null)}
             onCancel={() => setToggle(null)}
-            loading={process}
+            refetch={() => fetchData()}
+            id={chosenTransaction?.id}
           />
         </div>
       )}
@@ -189,15 +156,6 @@ export default function WholeTransactionList() {
                 <p className="text-[0.8rem] hidden lg:block">
                   Add a transaction
                 </p>
-              </div>
-
-              {/* Filter */}
-              <div
-                className="flex w-fit h-full border border-(--color-border-default) rounded-lg gap-2 items-center px-3 py-1 hover:bg-(--color-border-subtle) active:bg-(--color-brand-green) cursor-pointer duration-100 transition-all"
-                onClick={() => setToggle("filter-modal")}
-              >
-                <Filter size={15} />
-                <p className="text-[0.8rem] hidden lg:block">Filter</p>
               </div>
 
               {/* Search field */}
@@ -291,12 +249,13 @@ export default function WholeTransactionList() {
                         >
                           <p className="line-clamp-1">{transaction.amount}</p>
                         </div>
-                        <div className="flex items-center justify-center">
-                          <Trash
-                            className="min-w-3 max-w-5 h-auto text-red-500 cursor-pointer"
+                        <div className="flex items-center justify-center rounded-lg">
+                          <X
+                            className="min-w-3 max-w-5 h-auto cursor-pointer text-(--color-text=primary)"
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleDelete;
+                              setToggle("delete-transaction");
+                              setChosenTransaction(transaction);
                             }}
                           />
                         </div>

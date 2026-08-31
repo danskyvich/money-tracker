@@ -95,7 +95,7 @@ export default function AccountDetailsModal({
       )}
       {open && (
         <div className="fixed flex inset-0 z-50 bg-black/50 w-full h-full items-center justify-center">
-          <div className="flex flex-col xl:w-275 md:w-250 w-150 mx-10 md:mx-0 h-165 bg-(--color-bg-secondary) border border-(--color-border-default) rounded-lg shadow-md justify-between">
+          <div className="flex flex-col xl:w-275 md:w-250 mx-10 md:mx-0 h-165 bg-(--color-bg-secondary) border border-(--color-border-default) rounded-lg shadow-md justify-between">
             {/* Header */}
             <div className="flex w-full h-fit items-center justify-between px-5 py-2">
               <PiggyBank size={20} />
@@ -110,7 +110,7 @@ export default function AccountDetailsModal({
             {/* Filter bar */}
             <div className="flex w-full h-fit px-5 pt-3 pb-1">
               <div
-                className="flex border border-(--color-border-default) rounded-lg px-3 py-2 gap-2 w-fit h-full cursor-pointer hover:bg-(--color-brand-green) duration-100 transition-all active:bg-emerald-700"
+                className="flex border border-(--color-border-default) hover:text-white active:text-white rounded-lg px-3 py-2 gap-2 w-fit h-full cursor-pointer hover:bg-(--color-brand-green) duration-100 transition-all active:bg-emerald-700"
                 onClick={(e) => {
                   e.stopPropagation();
                   openInfo();
