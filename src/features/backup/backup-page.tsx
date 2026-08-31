@@ -107,7 +107,7 @@ export default function BackupPage() {
         const text = await file.text();
         const parsed = JSON.parse(text);
 
-        if (!validateImportShape(parsed)) throw new Error("File is missing expected files");
+        if (!validateImportShape(parsed)) throw new Error("File is missing expected shape.");
 
         await ImportFromJSON(parsed);
         setActiveItem(null);
@@ -324,7 +324,7 @@ export default function BackupPage() {
                 <p>{item.item}</p>
 
                 <button
-                  className="flex w-fit h-fit cursor-pointer ring ring-inset ring-(--color-brand-green) items-center justify-center whitespace-nowrap rounded-lg gap-1 justify-self-end shadow-md px-5 py-1 hover:bg-(--color-brand-green) text-[0.9rem]"
+                  className="flex w-fit h-fit cursor-pointer ring ring-inset ring-(--color-brand-green) items-center justify-center hover:text-white active:bg-emerald-600 active:text-white whitespace-nowrap rounded-lg gap-1 justify-self-end shadow-md px-5 py-1 hover:bg-(--color-brand-green) text-[0.9rem]"
                   onClick={item.onClick}
                 >
                   {item.icon}

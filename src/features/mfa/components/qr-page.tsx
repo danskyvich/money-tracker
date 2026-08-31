@@ -116,7 +116,7 @@ export default function QR() {
               </p>
 
               {/* Code */}
-              <div className="flex w-full h-fit px-5 py-3 rounded-xl shadow-md border border-(--color-border-strong) bg-cyan-950 justify-center items-center">
+              <div className="flex w-full h-fit px-5 py-3 rounded-xl text-white shadow-md border border-(--color-border-strong) bg-cyan-950 justify-center items-center">
                 <p className="font-semibold text-[0.9rem]">{secret}</p>
               </div>
 
@@ -124,13 +124,13 @@ export default function QR() {
                 <button
                   type="button"
                   onClick={() => router.back()}
-                  className="flex flex-1 cursor-pointer transition-all duration-100 items-center justify-center w-full border border-(--color-border-strong) rounded-xl hover:bg-(--color-brand-green) active:bg-emerald-700 px-5 py-2"
+                  className="flex flex-1 cursor-pointer transition-all duration-100 hover:text-white items-center justify-center w-full border border-(--color-border-strong) rounded-xl hover:bg-(--color-brand-green) active:bg-emerald-700 px-5 py-2"
                 >
                   <p className="text-[0.9rem]">Back</p>
                 </button>
                 <button
                   type="button"
-                  className="flex flex-1 cursor-pointer transition-all duration-100 w-full bg-(--color-brand-green) items-center justify-center rounded-xl hover:bg-emerald-600 active:bg-emerald-700 px-5 py-2"
+                  className="flex flex-1 cursor-pointer transition-all duration-100 w-full bg-(--color-brand-green) text-white items-center justify-center rounded-xl hover:bg-emerald-600 active:bg-emerald-700 px-5 py-2"
                   onClick={handleVerify}
                 >
                   {loading ? (
