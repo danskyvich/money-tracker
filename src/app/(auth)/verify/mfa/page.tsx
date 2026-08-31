@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 
 export default async function VerifyMFA({searchParams}: {searchParams: Promise<{mode?: string; factorId?: string}>}) {
   const { mode, factorId: factorIdParams } = await searchParams;
+  console.log(mode, factorIdParams);
   const isEnrollment = mode === "enroll";
   const supabase = await createClient();
 
@@ -15,10 +16,12 @@ export default async function VerifyMFA({searchParams}: {searchParams: Promise<{
     factorId = factorIdParams;
   } else {
     // if user would be enrolling mfa
-    const { data: factorsData } = await supabase.auth.mfa.listFactors();
-    factorId = factorsData?.totp.find((f) => f.id === factorIdParams && (f.status as string) === "unverified")?.id;
+    const { data: factorsData, error: factorsError } = await supabase.auth.mfa.listFactors();
+      factorId = factorsData?.all.find((f) => f.id === factorIdParams && f.factor_type === "totp" && (f.status as string) === "unverified")?.id;
   }
-  if (!factorId) redirect(isEnrollment ? "/profile" : "/overview");
+
+  // if there is no factorId, return to profile
+  if (!factorId) redirect (isEnrollment ? "/profile" : "/overview");
 
   const { challengeId, error } = await challengeUserMfa(factorId);
   if (error || !challengeId) {

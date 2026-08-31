@@ -94,7 +94,7 @@ export default function QR() {
                 <p className="text-2xl font-semibold">Set up your MFA</p>
               </div>
 
-              <p className="text-[0.85rem]/5 font-mono mt-5">
+              <p className="text-[0.9rem]/5 font-display mt-5">
                 Scan this QR code or enter the code below into your preferred
                 authenticator application.
               </p>

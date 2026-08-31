@@ -96,9 +96,10 @@ export async function verifyOtp(email: string, token: string) {
     cookieStore.delete("pending_verification");
     cookieStore.delete(attemptsKey);
 
+    // check if mfa exists
     const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
     const { data: factorsData } = await supabase.auth.mfa.listFactors();
-    const needsMfa = aal?.currentLevel === "aal1" && aal?.nextLevel === "aal2" && (factorsData?.totp?.length ?? 0) > 0;
+    const needsMfa = aal?.currentLevel === "aal1" && aal?.nextLevel === "aal2" && (factorsData?.all.filter((f) => f.factor_type === "totp" && f.status === "verified").length ?? 0) > 0;
 
     // if user needs to mfa
     if (needsMfa) {
@@ -106,11 +107,14 @@ export async function verifyOtp(email: string, token: string) {
         const deviceTrusted = user ? await isDeviceTrusted() : false;
 
         if (!deviceTrusted) {
-            redirect("/verify/mfa?mode=challenge");
+            const factorId = factorsData?.all.find(
+                (f) => f.factor_type === "totp" && f.status === "verified"
+            )?.id
+            redirect(`/verify/mfa?mode=challenge&factorId=${factorId}`);
         }
     }
 
-    redirect("/overview")
+    redirect("/overview");
 }
 
 // SIGN OUT
@@ -162,13 +166,13 @@ export async function enrollUserMfa() {
     const { data: factorsData, error: factorsError } = await supabase.auth.mfa.listFactors();
     if (factorsError) return { success: false, error: factorsError.message }
 
-    const verified = factorsData.totp.filter((f) => f.status === "verified");
+    const verified = factorsData.all.filter((f) => f.factor_type === "totp" && f.status === "verified");
     if (verified.length > 0) {
         return { success: false, error: "MFA is already enabled on this account." };
     }
 
     // check if any unverified factors are found
-    const existingUnverified = factorsData.totp.filter((f) => (f.status as string) === "unverified");
+    const existingUnverified = factorsData.all.filter((f) => f.factor_type === "totp" && (f.status as string) === "unverified");
     for (const f of existingUnverified) {
         const { error } = await supabase.auth.mfa.unenroll({factorId: f.id});
         if (error) return { success: false, error: error.message};

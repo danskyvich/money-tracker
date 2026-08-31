@@ -1,7 +1,7 @@
 'use client'
 
 import { useActionState, useEffect, useState } from "react"
-import Input from "../../../components/layout/input"
+import InputComponent from "@/components/layout/Input"
 import { OTPData, OTPSchema } from "@/lib/schemas/OTPSchema"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation"
 import { resendOtp, verifyOtp } from "@/lib/supabase/actions/auth"
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3"
 import ErrorModal from "@/components/layout/error-modal"
+import Spinner from "@/components/layout/spinner"
 
 export default function VerifyEmailPage({email, rememberMe}:{email: string, rememberMe: boolean}) {
     useEffect(() => {
@@ -108,7 +109,7 @@ export default function VerifyEmailPage({email, rememberMe}:{email: string, reme
 
           <form action={formAction}>
             <div className="flex flex-col flex-1 w-full h-full pt-13">
-              <Input
+              <InputComponent
                 id="otp"
                 name="otp"
                 placeholder="000000"
@@ -119,12 +120,12 @@ export default function VerifyEmailPage({email, rememberMe}:{email: string, reme
               <div className="w-full h-fit flex gap-2 items-center justify-center">
                 <p className="self-center">
                   <button
-                    className={`text-[0.9rem] font-mono text-(--color-text-primary) hover:underline active:font-semibold ${(resendDisabled || resendPending) && "text-(--color-text-secondary) pointer-events-none cursor-default"}`}
+                    className={`text-[0.9rem] font-mono text-(--color-text-primary) hover:underline items-center justify-center active:font-semibold ${(resendDisabled || resendPending) && "text-(--color-text-secondary) pointer-events-none cursor-default"}`}
                     onClick={handleResend}
                     disabled={resendDisabled || resendPending}
                     aria-disabled={resendDisabled || resendPending}
                   >
-                    {resendPending ? "Sending..." : "ResendCode"}
+                    {resendPending ? <Spinner/> : "Resend code"}
                   </button>
                 </p>
                 <p>{timer}s</p>
@@ -137,7 +138,7 @@ export default function VerifyEmailPage({email, rememberMe}:{email: string, reme
                 className="bg-(--color-brand-green) py-2 text-white w-full h-fit rounded-xl mt-5 text-[0.9rem] hover:bg-emerald-600 active:bg-emerald-700 cursor-pointer"
                 type="submit"
               >
-                {pending ? <p>Verifying email...</p> : <p>Verify email</p>}
+                {pending ? <Spinner/> : <p>Verify email</p>}
               </button>
               <Button
                 text="Back"
