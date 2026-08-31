@@ -14,6 +14,8 @@ import { useDebouncedValue } from "@/hooks/useDebounceValue";
 import Spinner from "@/components/layout/spinner";
 import { AccountCategories, AccountsWithBalance } from "@/lib/types/derived";
 import EditAccountModal from "./edit-account-modal";
+import AccountListSkeleton from "./skeleton/account-list-skeleton";
+import AccountListModalSkeleton from "./skeleton/account-list-modal-skeleton";
 
 const numberOfItemsToBeDisplayed = 9;
 
@@ -175,9 +177,7 @@ export default function WholeAccountsList() {
           {/* Content */}
           <div className="flex flex-1 flex-col w-full h-full">
             {loading ? (
-              <div className="flex w-full h-full items-center justify-center">
-                <Spinner />
-              </div>
+              <AccountListModalSkeleton/>
             ) : (
               <div className="flex flex-col relative w-full h-[85%] overflow-hidden">
                 {changedAccounts?.length === 0 && (

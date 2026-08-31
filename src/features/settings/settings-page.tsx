@@ -4,8 +4,7 @@ import ErrorModal from "@/components/layout/error-modal";
 import LoadingModal from "@/components/layout/loading-modal";
 import Modal from "@/components/layout/modal";
 import { DeleteUserData } from "@/lib/supabase/actions/database";
-import { ChevronDown, Eye, Trash } from "lucide-react";
-import { error } from "node:console";
+import { Eye, Trash } from "lucide-react";
 import { useState } from "react";
 import { IncomeCategories } from "./components/income-categories";
 import ExpenseCategories from "./components/expense-categories";
@@ -17,7 +16,6 @@ export default function SettingsPage() {
   const [toggle, setToggle] = useState<string | null>(null);
 
   const settings = [
-    { item: "Main currency", value: "Philippine Peso", icon: "₱" },
     {
       item: "Modify income categories",
       value: "Modify",
@@ -30,6 +28,13 @@ export default function SettingsPage() {
       icon: <Eye size={15} />,
       link: () => setToggle("expense-categories"),
     },
+    {
+      item: "Delete data",
+      value: "Delete data",
+      icon: <Trash size={15}/>,
+      link: () => setToggle("data-deletion"),
+
+    }
   ];
 
   const handleDataDeletion = async () => {
@@ -94,32 +99,17 @@ export default function SettingsPage() {
           }
           {settings.map((item, index) => (
             <div
-              className="grid grid-cols-[1fr_1fr] w-full h-fit px-5 py-2 items-center cursor-pointer min-h-0"
+              className="grid grid-cols-[1fr_1fr] w-full h-fit px-5 py-2 items-center min-h-0"
               key={index}
             >
               <p className="text-[0.9rem]">{item.item}</p>
 
-              <div className="flex w-fit h-fit ring ring-inset ring-(--color-brand-green) text-[0.9rem] rounded-lg hover:bg-(--color-brand-green) hover:text-white px-5 py-1 items-center justify-center justify-self-end gap-1 duration-100 transition-all" onClick={item.link}>
+              <button className="flex w-fit h-fit ring ring-inset ring-(--color-brand-green) hover:text-white active:text-white active:bg-emerald-600 text-[0.9rem] rounded-lg hover:bg-(--color-brand-green) px-5 py-1 items-center justify-center justify-self-end gap-1 duration-100 cursor-pointer transition-all" onClick={item.link}>
                 {item.icon === null ? null : item.icon}
                 <p className="text-[0.9rem] whitespace-nowrap">{item.value}</p>
-                {item.item === "Modify income categories" ||
-                item.item === "Modify expense categories" ? null : (
-                  <ChevronDown size={20} />
-                )}
-              </div>
+              </button>
             </div>
           ))}
-          <div className="flex w-full h-fit text-[0.9rem] items-center justify-between px-5 py-2 min-h-0">
-            <p>Delete data</p>
-
-            <button
-              onClick={() => setToggle("data-deletion")}
-              className="flex border border-(--color-brand-green) rounded-lg items-center justify-center px-5 py-1 gap-1 text-[0.9rem] cursor-pointer hover:bg-(--color-brand-green) active:bg-emerald-600 transition-all duration-100"
-            >
-              <Trash size={15} />
-              <p>Delete data</p>
-            </button>
-          </div>
         </div>
       </div>
     </>

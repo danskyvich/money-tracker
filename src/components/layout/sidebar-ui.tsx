@@ -40,7 +40,7 @@ export default function Sidebar({className, email, lastLogIn}:{className?: strin
 
     return (
       <div
-        className={`${className} hidden md:flex px-5 py-2 flex-col border-r-2 border-(--color-bg-base) h-full w-fit duration-300 bg-(--color-sidebar) transition-all`}
+        className={`${className} hidden md:flex px-5 py-2 flex-col border-r-2 border-(--color-bg-base) h-full w-fit duration-300 bg-[#140f27] transition-all`}
       >
         {/* Header */}
         <header className="flex flex-0 my-5 items-center justify-center">
@@ -93,9 +93,8 @@ export default function Sidebar({className, email, lastLogIn}:{className?: strin
         {/* Session information */}
         <div className="relative hidden xl:block w-full px-2 py-3 border-t border-white/20">
           <div className="flex flex-col items-center">
-            
             <div className="flex items-center gap-2 text-white">
-              <span>{<LogInIcon size={15}/>}</span>
+              <span>{<LogInIcon size={15} />}</span>
               <p className="whitespace-nowrap font-mono text-[0.8rem] text-white">
                 Last sign in:{" "}
               </p>
