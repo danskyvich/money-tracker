@@ -45,7 +45,11 @@ export default function VerifyQRPage({challengeId, factorId, mode}:VerifyQRPage)
           <div className="flex-col gap-1">
             <div className="flex w-full h-fit items-center gap-2">
               <Nfc size={20} className="min-w-3 h-auto" />
-              <p className="text-2xl font-semibold">Set up your MFA</p>
+              <p className="text-2xl font-semibold">
+                {
+                  mode === "enroll" ? "Set up your MFA" : "Multi-factor authentication"
+                }
+              </p>
             </div>
 
             <p className="text-[0.9rem]/5 font-display mt-5">

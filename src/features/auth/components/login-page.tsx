@@ -10,6 +10,7 @@ import {generalSignIn, signInWithFacebook, signInWithGoogle} from "@/lib/supabas
 import { useRouter, useSearchParams } from "next/navigation";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import ErrorModal from "@/components/layout/error-modal";
+import Spinner from "@/components/layout/spinner";
 
 const GoogleIcon = (
   props: React.SVGProps<SVGSVGElement>,
@@ -140,11 +141,11 @@ export default function LoginPage() {
           <div className="flex w-full flex-col h-fit gap-4">
             <button
               disabled={pending}
-              className={`${pending && "cursor-none bg-emerald-800 active:emerald-800"} flex items-center justify-center w-full text-white text-[0.9rem] mt-10 bg-(--color-brand-green) rounded-xl py-2 cursor-pointer hover:bg-emerald-700 active:bg-emerald-800 transition-all duration-100`}
+              className={`${pending && "cursor-none active:emerald-800 bg-gray-500"} flex items-center justify-center text-center w-full text-white text-[0.9rem] mt-10 bg-(--color-brand-green) rounded-xl py-2 cursor-pointer hover:bg-emerald-700 active:bg-emerald-800 transition-all duration-100`}
             >
               {pending ? (
                 <>
-                  <p>Loading...</p>
+                  <Spinner/>
                 </>) : (
                 <p>Sign In</p>)}
             </button>

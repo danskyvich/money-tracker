@@ -16,6 +16,10 @@ export default function Snippet({ type }: { type: "income" | "expense" }) {
     });
   }, [type]);
 
+  useEffect(() => {
+    
+  })
+
   return (
     <>
       {loading ? (

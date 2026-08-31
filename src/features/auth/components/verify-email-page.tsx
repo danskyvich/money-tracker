@@ -100,15 +100,15 @@ export default function VerifyEmailPage({email, rememberMe}:{email: string, reme
                 your email
               </span>
             </p>
-            <p className="font-mono text-[0.9rem]/5">
-              We have sent you a verification email to {email}. Enter the
+            <p className="font-display text-[0.9rem]/5">
+              We have sent you a verification email to<span className="font-semibold ml-1">{email}</span>. Enter the
               One-time PIN (OTP) code that was sent to your email in the input
               box below.{" "}
             </p>
           </div>
 
           <form action={formAction}>
-            <div className="flex flex-col flex-1 w-full h-full pt-13">
+            <div className="flex flex-col flex-1 w-full h-full pt-5">
               <InputComponent
                 id="otp"
                 name="otp"
@@ -135,17 +135,17 @@ export default function VerifyEmailPage({email, rememberMe}:{email: string, reme
             <div className="flex flex-col gap-2 my-5">
               <button
                 disabled={pending}
-                className="bg-(--color-brand-green) py-2 text-white w-full h-fit rounded-xl mt-5 text-[0.9rem] hover:bg-emerald-600 active:bg-emerald-700 cursor-pointer"
+                className="flex bg-(--color-brand-green) py-2 text-white text-center items-center justify-center w-full h-fit rounded-xl mt-5 text-[0.9rem] hover:bg-emerald-600 active:bg-emerald-700 cursor-pointer"
                 type="submit"
               >
                 {pending ? <Spinner/> : <p>Verify email</p>}
               </button>
-              <Button
-                text="Back"
-                variant="secondary"
-                className="w-full h-fit"
+              <button
+                className="flex text-[0.9rem] border border-(--color-brand-green) rounded-lg items-center justify-center text-center py-1 hover:bg-(--color-brand-green) active:bg-emerald-600 active:text-white hover:text-white w-full h-fit"
                 onClick={() => router.back()}
-              />
+              >
+                <p>Back</p>
+              </button>
             </div>
           </form>
         </div>
