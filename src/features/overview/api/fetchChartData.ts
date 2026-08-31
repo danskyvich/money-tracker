@@ -20,7 +20,7 @@ export async function getMonthlyInflowOutflow(monthsBack: number = 6) {
         months_back: monthsBack,
     })
 
-    if (error || !data) return { xAxisLabels: [], inflowData: [], outflowata: [], error };
+    if (error || !data) return { xAxisLabels: [], inflowData: [], outflowData: [], error };
 
     const rows = data as MonthlyFlow[];
     return {

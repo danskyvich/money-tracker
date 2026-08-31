@@ -51,7 +51,7 @@ export default function OverviewHeader() {
       <div className="flex items-center gap-5 text-xl text-primary">
         {getOverviewIcon({ time })}
         <div className="flex flex-col justify-center">
-          <p className="flex font-mono text-[1.5rem]">Welcome, Juan!</p>
+          <p className="flex font-normal text-3xl tracking-tight">Welcome, Juan!</p>
         </div>
       </div>
     </div>

@@ -185,9 +185,12 @@ export default function OverviewPage() {
                 <Skeleton className="flex w-50 h-full" />
               </div>
             ) : (
-              <p className="flex text-5xl font-display font-normal">
+              <p className="flex text-5xl font-display tracking-tight">
                 <span className="text-3xl self-end mr-2 font-display">₱</span>
-                {total?.toLocaleString("en-us", { minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                {total?.toLocaleString("en-us", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
               </p>
             )}
           </div>
@@ -306,13 +309,13 @@ export default function OverviewPage() {
             {/* Footer */}
             <div className="flex w-full h-fit gap-10 justify-center">
               <div className="flex h-fit gap-2">
-                <div className="flex rounded-md bg-[#FF6B6B] px-4" />
-                <p className="font-mono text-[0.7rem]">Inflows</p>
+                <div className="flex rounded-md bg-[#4ECDC4] px-4" />
+                <p className="font-display text-[0.9rem]">Inflows</p>
               </div>
 
               <div className="flex h-fit gap-2">
-                <div className="flex rounded-md bg-[#4ECDC4] px-4" />
-                <p className="font-mono text-[0.7rem]">Outflows</p>
+                <div className="flex rounded-md bg-[#FF6B6B] px-4" />
+                <p className="font-display text-[0.9rem]">Outflows</p>
               </div>
             </div>
           </div>

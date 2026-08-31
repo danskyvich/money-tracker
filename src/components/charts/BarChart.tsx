@@ -26,7 +26,7 @@ export default function SixMonthsRef({inflowData, outflowData, xAxisLabels}:SixM
           type: "shadow",
         },
       },
-      color: ["#FF6B6B", "#4ECDC4"],
+      color: ["#4ECDC4", "#FF6B6B"],
       grid: {
         left: "30px",
         right: "15px",
