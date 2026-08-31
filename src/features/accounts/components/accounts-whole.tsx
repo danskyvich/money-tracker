@@ -1,7 +1,10 @@
 import AddAccountModal from "@/features/accounts/components/add-account-modal";
 import {  
   ChevronLeft,
+  Loader,
+  PiggyBank,
   Plus,
+  RotateCw,
   Search,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -10,6 +13,9 @@ import { FetchAccounts, SearchAccounts } from "@/lib/supabase/actions/database";
 import { useDebouncedValue } from "@/hooks/useDebounceValue";
 import Spinner from "@/components/layout/spinner";
 import { AccountCategories, AccountsWithBalance } from "@/lib/types/derived";
+import EditAccountModal from "./edit-account-modal";
+import AccountListSkeleton from "./skeleton/account-list-skeleton";
+import AccountListModalSkeleton from "./skeleton/account-list-modal-skeleton";
 
 const numberOfItemsToBeDisplayed = 9;
 
@@ -105,10 +111,21 @@ export default function WholeAccountsList() {
           refresh={fetchAccounts}
         />
       )}
+      {toggle === "edit-accounts" && (
+        <div className="fixed z-50 inset-0 flex w-full h-full items-center justify-center bg-black/50">
+          <EditAccountModal
+            onOpen={() => setToggle("account-details")}
+            onCancel={() => setToggle("account-details")}
+            icon={<PiggyBank size={20} className="min-w-3 h-auto" />}
+            chosenAccount={chosenAccount}
+          />
+        </div>
+      )}
       {toggle === "account-details" && (
         <AccountDetailsModal
           accountData={chosenAccount}
           open
+          openInfo={() => setToggle("edit-accounts")}
           onOpen={() => setToggle(null)}
           refresh={fetchAccounts}
         />
@@ -116,32 +133,35 @@ export default function WholeAccountsList() {
       <div className="flex flex-col min-h-[50dvh] w-full h-full items-center">
         <div className="flex flex-col flex-0 w-full h-fit">
           {/* Accounts header */}
-          <div className="flex flex-0 w-full min-h-fit py-2 px-2 gap-3">
+          <div className="flex flex-0 w-full min-h-fit py-2 px-5 justify-between">
+            <div className="flex w-full gap-2">
+              {/* Add account */}
+              <div
+                className="flex w-fit h-fit xl:h-fit gap-2 bg-(--color-brand-green) hover:bg-emerald-600 rounded-md px-5 py-1.5 text-white items-center hover:text-white cursor-pointer transition-all duration-200 active:bg-emerald-700"
+                onClick={() => setToggle("add-account")}
+              >
+                <Plus size={15} />
+                <p className="text-[0.8rem] hidden lg:block whitespace-nowrap">
+                  Add an account
+                </p>
+              </div>
 
-            {/* Add account */}
-            <div
-              className="flex w-fit h-fit xl:h-fit gap-2 border border-(--color-brand-green) rounded-md px-5 py-1.5 items-center bg-transparent text-(--color-text-primary) hover:text-white hover:bg-emerald-600 cursor-pointer transition-all duration-200 active:bg-emerald-700"
-              onClick={() => setToggle("add-account")}
-            >
-              <Plus size={15} />
-              <p className="text-[0.8rem] hidden lg:block whitespace-nowrap">
-                Add an account
-              </p>
+              {/* Search field */}
+              <div className="flex h-full xl:h-fit px-5 py-1 w-75 border border-(--color-border-default) rounded-md items-center gap-2">
+                <Search size={15} className="flex" />
+                <input
+                  type="text"
+                  value={searchTerm ?? ""}
+                  placeholder="Search..."
+                  className="flex flex-3 decorations-none placeholder:text-[0.8rem] focus:outline-none focus:ring-0 focus:border-transparent text-[0.8rem]"
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                  }}
+                />
+              </div>
             </div>
 
-            {/* Search field */}
-            <div className="flex h-full xl:h-fit px-5 py-1 w-75 border border-(--color-border-default) rounded-md items-center gap-2">
-              <Search size={15} className="flex" />
-              <input
-                type="text"
-                value={searchTerm ?? ""}
-                placeholder="Search..."
-                className="flex flex-3 decorations-none placeholder:text-[0.8rem] focus:outline-none focus:ring-0 focus:border-transparent text-[0.8rem]"
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                }}
-              />
-            </div>
+            <RotateCw size={20} className="min-w-3 h-auto cursor-pointer" onClick={() => fetchAccounts()}/>
           </div>
 
           <div className="grid grid-cols-[repeat(4,1fr)] w-full h-full px-5 py-1 text-[0.9rem] border-b border-(--color-border-default) items-end">
@@ -154,13 +174,10 @@ export default function WholeAccountsList() {
 
         {/* Accounts table */}
         <div className="flex flex-col w-full h-full overflow-hidden">
-
           {/* Content */}
           <div className="flex flex-1 flex-col w-full h-full">
             {loading ? (
-              <div className="flex w-full h-full items-center justify-center">
-                <Spinner />
-              </div>
+              <AccountListModalSkeleton/>
             ) : (
               <div className="flex flex-col relative w-full h-[85%] overflow-hidden">
                 {changedAccounts?.length === 0 && (

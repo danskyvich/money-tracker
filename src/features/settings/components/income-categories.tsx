@@ -61,8 +61,8 @@ export function IncomeCategories({open, onOpen}: IncomeCategoriesProps) {
         setProcess(false)
         setName("");
         setId(null);
+        setToggle(null);
         fetchIncomeCategories();
-        onOpen();
     }
 
     // for deleting categories
@@ -85,8 +85,8 @@ export function IncomeCategories({open, onOpen}: IncomeCategoriesProps) {
         setProcess(false);
         setName("");
         setId(null);
+        setToggle(null);
         fetchIncomeCategories();
-        onOpen();
     }
 
     useEffect(() => {
@@ -148,18 +148,15 @@ export function IncomeCategories({open, onOpen}: IncomeCategoriesProps) {
 
           {/* content */}
           <div className="flex flex-2 flex-col w-full h-full overflow-y-auto">
-            {loading && (
+            {loading ? (
               <div className="flex w-full h-full items-center justify-center">
                 <Spinner />
               </div>
-            )}
-            {loading ? (
-              <div className=""></div>
             ) : (
               <>
                 {incomeCategoriesData?.map((item, id) => (
                   <div
-                    className="flex w-full h-full border-y border-(--color-border-subtle) px-5 py-3 items-center justify-between"
+                    className="flex flex-0 w-full h-full border-y border-(--color-border-subtle) px-5 py-3 items-start justify-between"
                     key={id}
                   >
                     <p className="text-[0.9rem] ">{item.name}</p>
@@ -185,12 +182,12 @@ export function IncomeCategories({open, onOpen}: IncomeCategoriesProps) {
                     </div>
                   </div>
                 ))}
-                {incomeCategoriesData?.length === 0 && (
-                  <div className="flex w-full h-full items-center font-mono justify-center text-[0.9rem]">
-                    <p>You don't have any income categories</p>
-                  </div>
-                )}
               </>
+            )}
+            {incomeCategoriesData?.length === 0 && (
+              <div className="flex w-full h-full items-center font-mono justify-center text-[0.9rem]">
+                <p>You don't have any income categories</p>
+              </div>
             )}
           </div>
 

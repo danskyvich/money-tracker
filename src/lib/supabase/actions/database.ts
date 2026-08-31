@@ -6,28 +6,63 @@ import { AccountCategories, AccountsWithBalance, Categories, Transactions, Trans
 
 // <------------------ accounts ---------------------------------->
 
+interface AccountParams {
+    name: string,
+    description: string,
+    category_id: string,
+}
+
 // INSERT
 export async function InsertAccount(name: string, description: string, categoryId: string | undefined) {
-
+    const supabase = await createClient();
     const user = await getUser();
-
-    const { data, error } = await (await createClient())
+    if (!user) return { success: false, error: "User not authenticated"};
+    const user_id = user.id;
+    
+    const { data, error } = await supabase
         .from("accounts")
-        .insert({user_id: user?.id, name, description, category_id: categoryId})
+        .insert({user_id: user_id, name, description, category_id: categoryId})
         .select()
     if (error) return { data: null, error: error.message};
     return { data, error: null};
 }
 
-// UPDATE
+// DELETE
 export async function DeleteAccount(id: string) {
-    const { data, error } = await (await createClient())
+    const supabase = await createClient();
+    const user = await getUser();
+    if (!user) return { success: false, error: "User not authenticated"};
+    const user_id = user.id;
+
+    const { data, error } = await supabase
         .from("accounts")
         .delete()
         .eq('id', id)
+        .eq("user_id", user_id)
         .select()
     if (!data) return { data: null, error: error.message}
     return { error: null };
+}
+
+// UPDATE 
+export async function UpdateAccount(id: string, accounts: AccountParams): Promise<{success: false, error: string} | {success: true, data: any}> {
+    const supabase = await createClient();
+    const user = await getUser();
+    if (!user) return { success: false, error: "User not authenticated"}
+    const user_id = user.id;
+
+    const { data, error } = await supabase
+        .from("accounts")
+        .update({name: accounts.name, description: accounts.description, category_id: accounts.category_id})
+        .eq("user_id", user_id)
+        .eq("id", id)
+        .select()
+        .single();
+
+        console.log(error);
+        console.log(data);
+    if (error) return { success: false, error: "Updating account data failed."};
+    return { success: true, data }
 }
 
 // <------------------ account_categories ------------------------>
@@ -96,6 +131,21 @@ export async function FetchAccounts(currentPage: number, numberOfItems: number):
     }
 }
 
+export async function FetchAccountCategories(): Promise<{success: false, error: string} | {success: true, data: AccountCategories[]}> {
+   const supabase = await createClient();
+   const user = await supabase.auth.getClaims();
+   if (user.error || !user) return { success: false, error: "User not authenticated"};
+   const user_id = user.data?.claims.sub;
+   if (!user_id) return { success: false, error: "Uer id not found"};
+
+   const { data, error} = await supabase
+    .from("account_categories")
+    .select(`*`)
+    .eq("user_id", user_id); 
+    if (error) return { success: false, error: error.message};
+    return { success: true, data}
+}
+
 // <-----------------Transactions --------------------------->
 
 // SELECT
@@ -123,24 +173,24 @@ interface InsertTransactionParams {
 }
 
 // INSERT
-export async function InsertTransaction(transaction: InsertTransactionParams[]) {
+export async function InsertTransaction(transaction: InsertTransactionParams[]): Promise<{success: true, data: any} | {success: false, error: string}> {
     const supabase = await createClient(); // initialize client
 
     const { data, error } = await supabase
         .from("transactions")
         .insert(transaction);
 
-    if (!data || error) return { data: null, error };
+    if (error) return { success: false, error: error.message };
     
-    return { error: null }  
+    return { success: true, data }  
 }
 
 // UPDATE
-export async function UpdateTransaction(id: string, transaction: InsertTransactionParams[]) {
+export async function UpdateTransaction(id: string, transaction: InsertTransactionParams[]): Promise<{success: false, error: string} | {success: true, data: any}> {
     const supabase = await createClient();
     const user = await getUser();
 
-    if (!user) return { data: null, error: "Unauthenticated user."}
+    if (!user) return { success: false, error: "Unauthenticated user."}
 
     const { data, error } = await supabase
         .from("transactions")
@@ -150,18 +200,17 @@ export async function UpdateTransaction(id: string, transaction: InsertTransacti
         .select()
         .single();
     
-    if (error) return { data: null, error };
-    return { data, error: null};
+    if (error) return { success: false, error: error.message };
+    return { success: true, data};
 }
 
 // DELETE
-export async function DeleteTransaction(id: string) {
-    const {data, error } = await (await createClient()).from("transactions")
+export async function DeleteTransaction(id: string): Promise<{success: false, error: string} | {success: true }> {
+    const {error } = await (await createClient()).from("transactions")
         .delete()
         .eq("id", id)
-        .select()
-    if (!data) return { error: error.message}
-    return { data, error: null}
+    if (error) return { success: false, error: error.message}
+    return { success: true }
 }
 
 // TRANSACTIONS from an ACCOUNT 
@@ -352,4 +401,12 @@ export async function SearchTransactions(term: string, currentPage: number): Pro
     if (!data || error) return { success: false, error: error.message ?? "Unknown error"};
 
     return { success: true, data: data as unknown as TransactionSearchResults[] };
+}
+
+export async function CalculateTotalEarnings(): Promise<{success: false, error: string} | {success: true, data: any[]}> {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+        .rpc('calculate_monthly_earnings')
+    if (!data || error ) return { success: false, error: error.message}
+    return { success: true, data } 
 }

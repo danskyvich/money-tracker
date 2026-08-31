@@ -1,21 +1,23 @@
 import { FetchTransaction, SearchTransactions } from "@/lib/supabase/actions/database";
 import ConvertTimestampToDateTime from "@/utils/convertToDateTime";
 import {
+  ArrowRight,
   ChevronLeft,
   ChevronRight,
   Filter,
   Plus,
+  RotateCw,
   Search,
+  X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import ErrorModal from "@/components/layout/error-modal";
 import TransactionListSkeleton from "./skeleton/transaction-list-skeleton";
 import TransactionModal from "./transaction-modal";
-import FilterModal from "@/components/layout/filter-modal";
-import { FilterTransactionField } from "../types/types";
 import { useDebouncedValue } from "@/hooks/useDebounceValue";
 import { TransactionSearchResults } from "@/lib/types/derived";
-import { useRouter, useSearchParams } from "next/navigation";
+import Spinner from "@/components/layout/spinner";
+import DeleteTransactionModal from "./delete-transaction-modal";
 
 export default function WholeTransactionList() {
 
@@ -25,8 +27,9 @@ export default function WholeTransactionList() {
 
   // modals
   const [toggle, setToggle] = useState<string | null>(null);
-  const [chosenTransaction, setChosenTransaction] =
-    useState<TransactionSearchResults[] | null>(null);
+  const [chosenTransaction, setChosenTransaction] = useState<
+    TransactionSearchResults | undefined
+  >(undefined);
 
   // search feature
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -70,8 +73,7 @@ export default function WholeTransactionList() {
       setTransactionsError(null);
       setTransactionsData(result?.data ?? []);
       setTotalNumberOfItems(Number(result.totalItems));
-      setLoading;
-      false;
+      setLoading(false);
     }
     setLoading(false);
   };
@@ -99,29 +101,21 @@ export default function WholeTransactionList() {
       return;
     }
 
-    setChangedTransactionData(result?.data);
+    setChangedTransactionData(result.data);
     setLoading(false);
     return;
   }
 
-  const TransactionFields: FilterTransactionField[] = [
-    {
-      key: "order",
-      label: "Order by",
-      type: "select",
-      options: [{name: "ascending", value: "ascending"}, {name: "descending", value: "descending"}],
-    },  
-  ]
-
   return (
     <>
-      {toggle === "filter-modal" && (
+      {toggle === "delete-transaction" && (
         <div className="fixed inset-0 z-50 flex w-full h-full items-center justify-center bg-black/50">
-          <FilterModal
+          <DeleteTransactionModal
             open
             onOpen={() => setToggle(null)}
-            onConfirm={() => ""}
-            fields={TransactionFields}
+            onCancel={() => setToggle(null)}
+            refetch={() => fetchData()}
+            id={chosenTransaction?.id}
           />
         </div>
       )}
@@ -148,50 +142,56 @@ export default function WholeTransactionList() {
           />
         </div>
       )}
-      <>
-        <div className="grid grid-cols-1 grid-rows-[auto_1fr_auto] h-full border border-(--color-border-default) rounded-lg">
+      <div className="flex xl:flex-row flex-2 flex-col w-full h-full gap-5">
+        <div className="flex flex-2 grid grid-cols-1 grid-rows-[auto_1fr_auto] xl:h-full min-h-185 border border-(--color-border-default) rounded-lg shadow-lg">
           {/* Table header*/}
-          <div className="flex w-full h-full px-5 py-2 gap-3 ">
-            {/** Add transaction */}
-            <div
-              className="flex w-fit h-fit border items-center gap-2 border-(--color-border-default) rounded-lg p-2 bg-(--color-brand-green) cursor-pointer hover:bg-emerald-600 active:bg-emerald-700"
-              onClick={() => setToggle("add-transaction")}
-            >
-              <Plus size={15} />
-              <p className="text-[0.9rem] hidden lg:block">Add a transaction</p>
+          <div className="flex w-full h-full px-5 py-2 items-center justify-between">
+            <div className="flex w-full h-full gap-2">
+              {/** Add transaction */}
+              <div
+                className="flex w-fit h-full border text-white items-center gap-2 border-(--color-border-default) rounded-lg py-1 bg-(--color-brand-green) px-5 cursor-pointer hover:bg-emerald-600 active:bg-emerald-700"
+                onClick={() => setToggle("add-transaction")}
+              >
+                <Plus size={15} />
+                <p className="text-[0.8rem] hidden lg:block">
+                  Add a transaction
+                </p>
+              </div>
+
+              {/* Search field */}
+              <div className="px-3 py-1 flex w-[50%] h-full border border-(--color-border-default) rounded-md items-center gap-2">
+                <Search size={15} className="flex" />
+                <input
+                  type="text"
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search..."
+                  className="flex flex-3 decorations-none placeholder:text-[0.8rem] focus:outline-none focus:ring-0 focus:border-transparent text-[0.8rem]"
+                />
+              </div>
             </div>
 
-            {/* Filter */}
-            <div
-              className="flex w-fit h-fit border border-(--color-border-default) rounded-lg gap-2 items-center p-2 hover:bg-(--color-border-subtle) active:bg-(--color-brand-green) cursor-pointer duration-100 transition-all"
-              onClick={() => setToggle("filter-modal")}
-            >
-              <Filter size={15} />
-              <p className="text-[0.9rem] hidden lg:block">Filter</p>
-            </div>
-
-            {/* Search field */}
-            <div className="px-3 py-1 flex w-fit h-full border border-(--color-border-default) rounded-md items-center gap-2">
-              <Search size={15} className="flex" />
-              <input
-                type="text"
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search..."
-                className="flex flex-3 decorations-none placeholder:text-[0.8rem] focus:outline-none focus:ring-0 focus:border-transparent text-[0.8rem]"
+            {loading ? (
+              <Spinner />
+            ) : (
+              <RotateCw
+                size={20}
+                className="min-w-3 h-auto cursor-pointer"
+                onClick={() => fetchData()}
               />
-            </div>
+            )}
           </div>
 
           {/* Transaction Table */}
           <div className="flex flex-col w-full h-full mt-3">
             {/** Transaction headers */}
-            <div className="grid grid-cols-[repeat(6,1fr)] gap-4 font-mono text-[0.9rem] py-1 px-5 pt-1 font-display border-b border-(--color-border-default)">
+            <div className="grid grid-cols-[repeat(6,1fr)_30px] gap-4 font-mono text-[0.9rem] py-1 px-5 pt-1 font-display border-b border-(--color-border-default)">
               <div className="line-clamp-1">Date & time</div>
               <div>Type</div>
               <div>Description</div>
               <div>Category</div>
               <div>Account</div>
               <div className="text-left">Amount</div>
+              <div />
             </div>
 
             {loading ? (
@@ -202,7 +202,7 @@ export default function WholeTransactionList() {
                   <div className="flex flex-col w-full h-fit">
                     {displayedTransactions.map((transaction, key) => (
                       <div
-                        className="grid grid-cols-[repeat(6,1fr)] gap-4 font-display text-[0.9rem] px-5 py-5 font-display w-full h-fit cursor-pointer hover:bg-(--color-bg-subtle) border-b border-(--color-border-subtle)"
+                        className="grid grid-cols-[repeat(6,1fr)_25px] gap-4 font-display text-[0.9rem] px-5 py-5 font-display w-full h-fit cursor-pointer hover:bg-(--color-bg-subtle) border-b border-(--color-border-subtle)"
                         key={key}
                         onClick={() =>
                           handleGetTransactionToBeModified(transaction)
@@ -227,23 +227,37 @@ export default function WholeTransactionList() {
                         </div>
                         <div className="flex w-full items-center">
                           <p className="line-clamp-1">
-                            {transaction?.account_id?.name}
+                            {transaction.category_id?.name}
                           </p>
                         </div>
                         <div className="flex w-full items-center">
-                          {transaction?.to_account_id?.name ? (
-                            <p className="line-clamp-1">
-                              {transaction?.account_id?.name} to{" "}
-                              {transaction?.to_account_id?.name}
-                            </p>
-                          ) : (
-                            <p>{transaction?.account_id.name}</p>
+                          <p className="line-clamp-1">
+                            {transaction?.account_id?.name}
+                          </p>
+                          {transaction.to_account_id?.name && (
+                            <>
+                              <ArrowRight
+                                size={15}
+                                className="min-w-3 h-auto"
+                              />
+                              <p>{transaction.to_account_id.name}</p>
+                            </>
                           )}
                         </div>
                         <div
                           className={`flex w-full items-center font-mono ${transaction.type === "income" ? "text-emerald-500" : transaction.type === "expense" ? "text-red-500" : "text-(--color-text-primary)"}`}
                         >
                           <p className="line-clamp-1">{transaction.amount}</p>
+                        </div>
+                        <div className="flex items-center justify-center rounded-lg">
+                          <X
+                            className="min-w-3 max-w-5 h-auto cursor-pointer text-(--color-text=primary)"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setToggle("delete-transaction");
+                              setChosenTransaction(transaction);
+                            }}
+                          />
                         </div>
                       </div>
                     ))}
@@ -293,7 +307,7 @@ export default function WholeTransactionList() {
               {/* window slice (-5, windowStart, +5) */}
               {visiblePages.map((item, key) => (
                 <div
-                  className={`px-3 py-2 border border-(--color-border-default) rounded-lg shadow-md hover:bg-(--color-bg-subtle) cursor-pointer ${currentPage === item ? "bg-(--color-brand-green) text-black hover:bg-(--color-brand-green)" : null}`}
+                  className={`px-3 py-2 border border-(--color-border-default) rounded-lg shadow-md hover:bg-(--color-bg-subtle) cursor-pointer ${currentPage === item ? "bg-(--color-brand-green) hover:bg-(--color-brand-green) text-white" : null}`}
                   key={key}
                   onClick={() => setCurrentPage(item)}
                 >
@@ -317,7 +331,7 @@ export default function WholeTransactionList() {
             </div>
           </div>
         </div>
-      </>
+      </div>
     </>
   );
 }

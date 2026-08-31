@@ -1,26 +1,28 @@
 import AccountListSkeleton from "@/features/accounts/components/skeleton/account-list-modal-skeleton";
-import { Transaction } from "@/lib/types/database";
 import {
   DeleteAccount,
   SelectTransactionsFromChosenAccount,
 } from "@/lib/supabase/actions/database";
 import ConvertTimestampToDateTime from "@/utils/convertToDateTime";
-import { ChevronLeft, ChevronRight, Filter, PiggyBank, Trash, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Filter, Luggage, Pencil, PiggyBank, Trash, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import Modal from "@/components/layout/modal";
 import ErrorModal from "@/components/layout/error-modal";
 import Spinner from "@/components/layout/spinner";
+import { Transactions } from "@/lib/types/derived";
 
 interface AccountDetailsModalProps {
   open: boolean;
   onOpen: () => void;
   accountData: any | null;
   refresh: () => void;
+  openInfo: () => void;
 }
 
 export default function AccountDetailsModal({
   open,
   onOpen,
+  openInfo,
   accountData,
   refresh,
 }: AccountDetailsModalProps) {
@@ -30,7 +32,7 @@ export default function AccountDetailsModal({
 
   // fetch data and errors
   const [deleteAccountError, setDeleteAccountError] = useState<string | null>("");
-  const [accountTransactions, setAccountTransactions] = useState<Transaction[] | null>(null);
+  const [accountTransactions, setAccountTransactions] = useState<Transactions[] | null>(null);
   const [accountTransactionsError, setAccountTransactionsError] = useState<string | null>(null);
   
   //pagination
@@ -93,7 +95,7 @@ export default function AccountDetailsModal({
       )}
       {open && (
         <div className="fixed flex inset-0 z-50 bg-black/50 w-full h-full items-center justify-center">
-          <div className="flex flex-col xl:w-275 md:w-250 w-150 mx-10 md:mx-0 h-165 bg-(--color-bg-secondary) border border-(--color-border-default) rounded-lg shadow-md justify-between">
+          <div className="flex flex-col xl:w-275 md:w-250 mx-10 md:mx-0 h-165 bg-(--color-bg-secondary) border border-(--color-border-default) rounded-lg shadow-md justify-between">
             {/* Header */}
             <div className="flex w-full h-fit items-center justify-between px-5 py-2">
               <PiggyBank size={20} />
@@ -107,16 +109,17 @@ export default function AccountDetailsModal({
 
             {/* Filter bar */}
             <div className="flex w-full h-fit px-5 pt-3 pb-1">
-              <div className="flex w-full h-fit mt-2 gap-3">
-                <input
-                  type="datetime-local"
-                  name="accountTransactionDateTimeLocalInput"
-                  className="px-3 py-1 flex border border-(--color-border-default) rounded-lg text-[0.9rem]"
-                />
-                <div className="flex w-fit h-fit border border-(--color-border-default) rounded-lg px-3 py-1 gap-2 text-[0.9rem] items-center">
-                  <Filter size={15} />
-                  <p>Filter</p>
-                </div>
+              <div
+                className="flex border border-(--color-border-default) hover:text-white active:text-white rounded-lg px-3 py-2 gap-2 w-fit h-full cursor-pointer hover:bg-(--color-brand-green) duration-100 transition-all active:bg-emerald-700"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openInfo();
+                }}
+              >
+                <Pencil size={15} className="min-w-3 h-auto" />
+                <p className="hidden xl:block text-[0.9rem]">
+                  Edit account details
+                </p>
               </div>
             </div>
 
@@ -158,16 +161,16 @@ export default function AccountDetailsModal({
                           </div>
                           <div className="line-clamp-1">{item.description}</div>
                           <div className="line-clamp-1">
-                            {item.categories?.name}
+                            {item?.category_name}
                           </div>
                           <div className="line-clamp-1">
-                            {item.toAccount?.name ? (
+                            {item?.account_to_name ? (
                               <p className="line-clamp-1">
-                                {item.fromAccount?.name} to{" "}
-                                {item.toAccount?.name}
+                                {item?.account_from_name} to{" "}
+                                {item?.account_to_name}
                               </p>
                             ) : (
-                              <p>{item.fromAccount?.name}</p>
+                              <p>{item.account_from_name}</p>
                             )}
                           </div>
                           <div className="line-clamp-1 font-mono">

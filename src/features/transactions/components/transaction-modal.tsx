@@ -5,14 +5,14 @@ import Modal from "@/components/layout/modal";
 import { getUser } from "@/lib/supabase/actions/auth";
 import { InsertTransaction, UpdateTransaction } from "@/lib/supabase/actions/database";
 import { createClient } from "@/lib/supabase/clients/client";
-import { Transaction } from "@/lib/types/database";
+import { Transactions, TransactionSearchResults } from "@/lib/types/derived";
 import { Coins } from "lucide-react";
 import { useEffect, useReducer, useState } from "react";
 import TransactionModalSkeleton from "./skeleton/transaction-modal-skeleton";
 
 interface AddTransactionModalProps {
-  transaction?: Transaction;
-  modalType: string;
+  transaction?: TransactionSearchResults;
+  modalType: "modify" | "add";
   open: boolean;
   onOpen: () => void;
   onCancel: () => void;
@@ -31,6 +31,7 @@ export default function TransactionModal({
   const [accounts, setAccounts] = useState<any[] | null>(null);
   const [categories, setCategories] = useState<any[] | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [process, setProcess] = useState<boolean>(false);
   const [transactionError, setTransactionError] = useState<string | null>(
     null,
   );
@@ -40,6 +41,7 @@ export default function TransactionModal({
   const fetchData = async () => {
     setLoading(true);
 
+    // fetch data
     try {
       const [accountsResult, categoriesResult] = await Promise.all([
       (await createClient()).from("accounts").select(`id, name`),
@@ -49,9 +51,19 @@ export default function TransactionModal({
     const { data: accountsData, error: accountsError } = accountsResult;
     const { data: categoriesData, error: categoriesError } = categoriesResult;
 
+    //set data to states
     setAccounts(accountsData);
     setCategories(categoriesData);
 
+    // initialize first items
+    if (modalType === "add") {
+      setFormValues({
+        category_id: categoriesData?.[0]?.id ?? "",
+        account_id: accountsData?.[0]?.id ?? "",
+      });
+    }
+
+    // operation checks
     if (accountsError || categoriesError) {
       setTransactionError("Fetching data failed");
       setLoading(false);
@@ -90,14 +102,17 @@ export default function TransactionModal({
       modalType === "modify"
         ? (transaction?.date_time ?? "")
         : new Date().toISOString().slice(0, 16),
-    amount: modalType === "modify" ? Number(transaction?.amount) ?? 0.00 : 0.00,
+    amount: modalType === "modify" ? (transaction?.amount ?? 0.0) : 0.0,
     category_id:
-      modalType === "modify" ? (transaction?.categories?.id ?? "") : "",
+      modalType === "modify" ? (transaction?.category_id?.id ?? "") : "",
     account_id:
-      modalType === "modify" ? (transaction?.fromAccount?.id ?? "") : "",
+      modalType === "modify" ? (transaction?.account_id?.id ?? "") : "",
     to_account_id:
-      modalType === "modify" ? (transaction?.toAccount?.id ?? "") : "",
-    description: modalType === "modify" ? (transaction?.description ?? "") : "",
+      modalType === "modify"
+        ? (transaction?.to_account_id?.id ?? "")
+        : "",
+    description:
+      modalType === "modify" ? (transaction?.description ?? "") : "",
   };
 
   const [formValues, setFormValues] = useReducer(
@@ -112,12 +127,19 @@ export default function TransactionModal({
 
   // submit
   const handleSubmit = async () => {
-    setLoading(true);
-    if (!transaction) return;
+    setProcess(true);
+    // for modifying data ONLY
+    if (!transaction && modalType === "modify") {
+      setTransactionError("Error: No transaction found.");
+      setProcess(false);
+      return;
+    };
 
+    // check if user is authenticated
     const user = await getUser();
     if (!user) {
       setTransactionError("User not authenticated.");
+      setProcess(false);
       return;
     }
 
@@ -134,14 +156,27 @@ export default function TransactionModal({
         user_id: user.id,
       };
 
-      const { data, error } = 
+      // check if any inputs are empty/null
+      {
+        (payload.type === "income" || payload.type === "expense") && payload.account_id === null || payload.amount === null || payload.category_id === null || payload.date_time === null || payload.type === null && (
+          setTransactionError("Missing fields")
+        );
+        (payload.type === "transfer") && payload.to_account_id === "" && (
+          setTransactionError("Missing fields")
+        );
+      }
+
+      // update/insert based on action
+      const result = 
         modalType === "modify"
-        ? await UpdateTransaction(transaction.id, [payload])
+        ? await UpdateTransaction(transaction!.id, [payload])
         : await InsertTransaction([payload])
 
-      if (!data || error ) {
-        setTransactionError("Error: " + error);
-        setLoading(false);
+      // operation checks
+      if (!result.success) {
+        setTransactionError("Error: " + result.error);
+        setProcess(false);
+        return;
       }
 
       setLoading(false);
@@ -149,10 +184,12 @@ export default function TransactionModal({
       onOpen();
 
     } catch (err) {
-      setTransactionError("Fetching transaction failed")
+      setTransactionError("Fetching transaction failed");
+      setProcess(false);
       return;
     } finally {
-      setLoading(false);
+      setProcess(false);
+      return;
     }
   };
 
@@ -167,7 +204,7 @@ export default function TransactionModal({
         <Modal
           open
           onOpen={onOpen}
-          loading={loading}
+          loading={process}
           onCancel={onCancel}
           onConfirm={handleSubmit}
           icon={<Coins size={20} />}
@@ -175,12 +212,12 @@ export default function TransactionModal({
             modalType === "add" ? "Add a transaction" : "Modify the transaction"
           }
           noButtonText="Go back"
-          yesButtonText="Add transaction"
+          yesButtonText={ modalType === "modify" ? "Save changes" : "Add transaction" }
         >
           <div className="flex w-full h-fit gap-5 mb-3" role="group">
             {transactionTypes.map((item, key) => (
               <div
-                className={`flex ${formValues.type === item && "bg-(--color-brand-green) hover:bg-emerald-600"} flex-1 w-full h-fit border border-(--color-border-default) rounded-lg items-center justify-center py-1 hover:bg-(--color-border-subtle) cursor-pointer active:bg-(--color-brand-green-accent)`}
+                className={`flex ${formValues.type === item && "bg-(--color-brand-green) hover:bg-emerald-600 text-white"} flex-1 w-full h-fit border border-(--color-border-default) rounded-lg items-center justify-center py-1 hover:bg-(--color-border-subtle) cursor-pointer active:bg-(--color-brand-green-accent)`}
                 key={key}
                 onClick={(e) => setFormValues({ type: item})}
               >
@@ -193,7 +230,7 @@ export default function TransactionModal({
             <input
               id="date-time"
               value={formValues.date_time}
-              name="dateTime"
+              name="date_time"
               type="datetime-local"
               className="border border-(--color-border-default) rounded-lg px-3 py-1"
               onChange={handleChange}
@@ -211,7 +248,7 @@ export default function TransactionModal({
             <label htmlFor="category">Category</label>
             <select
               id="category"
-              name="category"
+              name="category_id"
               value={formValues.category_id}
               onChange={handleChange}
               className="border border-(--color-border-default) rounded-lg px-3 py-1"
@@ -229,7 +266,7 @@ export default function TransactionModal({
             <label htmlFor="account-from">Source account</label>
             <select
               id="account-from"
-              name="accountFrom"
+              name="account_id"
               value={formValues.account_id ?? ""}
               onChange={handleChange}
               className="border border-(--color-border-default) rounded-lg px-3 py-1"
@@ -249,7 +286,7 @@ export default function TransactionModal({
                 <label htmlFor="account-to">Destination account</label>
                 <select
                   id="account-to"
-                  name="accountTo"
+                  name="to_account_id"
                   value={formValues.to_account_id ?? ""}
                   onChange={handleChange}
                   className="border border-(--color-border-default) rounded-lg px-3 py-1"

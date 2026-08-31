@@ -1,5 +1,7 @@
 "use client";
 
+import ExpenseCategoriesCard from "./components/expense-categories-card";
+import IncomeCategoriesCard from "./components/income-categories-card";
 import WholeTransactionList from "./components/transaction-list";
 
 export default function TransactionsPage() {
@@ -10,7 +12,13 @@ export default function TransactionsPage() {
         <p className="text-3xl font-semibold">Transactions</p>
       </div>
       {/* Content */}
-      <WholeTransactionList/>
+      <div className="flex flex-col xl:flex-row gap-5 w-full h-full">
+        <WholeTransactionList />
+        <div className="flex flex-row flex-1 xl:flex-col w-full h-full gap-5">
+          <IncomeCategoriesCard />
+          <ExpenseCategoriesCard />
+        </div>
+      </div>
     </div>
   );
 }

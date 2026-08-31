@@ -3,19 +3,17 @@
 import { useEffect, useState } from "react";
 import {
   CircleQuestionMark,
-  Eye,
   Lock,
-  LockIcon,
   LogOutIcon,
-  VerifiedIcon,
   X,
 } from "lucide-react";
-import { deleteUser, getUser, getUserAuthenticationAssuranceLevel, signOut } from "@/lib/supabase/actions/auth";
+import { deleteUser, getUser, getUserAuthenticationAssuranceLevel, listUserMfaFactors, signOut, unenrollFactor } from "@/lib/supabase/actions/auth";
 import { useRouter } from "next/navigation";
 import { AuthenticatorAssuranceLevels, User } from "@supabase/supabase-js";
 import Modal from "../../components/layout/modal";
 import ProfileHeader from "./components/profile-card";
 import Toggle from "@/components/layout/toggle";
+import ErrorModal from "@/components/layout/error-modal";
 
 export default function ProfilePage({
   user,
@@ -26,23 +24,36 @@ export default function ProfilePage({
 }) {
 
   // states
+  const [enable, setEnable] = useState<boolean>(false);
   const [toggle, setToggle] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [factorId, setFactorId] = useState<string | null>(null)
   const [assuranceLevel, setAssuranceLevel] = useState<AuthenticatorAssuranceLevels | null | undefined>(null)
+  const [mfaError, setMfaError] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
     document.title = "Profile";
 
     const checkUserAssuranceLevel = async () => {
-      const result = await getUserAuthenticationAssuranceLevel();
-      if (!result) return null;
-      setAssuranceLevel(result?.data?.currentLevel);
+      const [assuranceLevelResult, factorIdResult] = await Promise.all([
+        getUserAuthenticationAssuranceLevel(),
+        listUserMfaFactors(),
+      ]);
+      if (!assuranceLevelResult.success || !factorIdResult.success) {
+        setMfaError("Something went wrong");
+        return;
+      }
+      setAssuranceLevel(assuranceLevelResult.data?.currentLevel);
+      setFactorId(factorIdResult.totp[0]?.id);
+      setEnable(
+        assuranceLevelResult.data?.currentLevel === "aal2" || 
+        assuranceLevelResult.data?.nextLevel === "aal2"
+      );
     };
 
     checkUserAssuranceLevel();
-  }, []);
+  }, [assuranceLevel, factorId]);
 
   const profile = [
     {
@@ -59,18 +70,28 @@ export default function ProfilePage({
     },
   ];
 
-  const handleOpenModalMFA = () => {
-   assuranceLevel === "aa1"
-     ? router.push("/2fa")
-     : () => setToggle("mfa-modal");
-  }
-
-  const handleMFA = () => {
-
+  const handleDisableMFA = async () => {
+    if (!factorId) {
+      setMfaError("No factor id.");
+      return;
+    }
+    setLoading(true);
+    const result = await unenrollFactor(factorId);
+    if (!result.success) {
+      setMfaError(result.error ?? "Something went wrong");
+      setLoading(false);
+      return;
+    }
+    setLoading(false);
+    window.location.reload();
+    return;
   }
 
   return (
     <div className="relative flex flex-col w-full h-full">
+      {
+        mfaError && <ErrorModal message={mfaError}/>
+      }
       {toggle === "sign-out" && (
         <div className="fixed z-50 inset-0 bg-black/50 flex items-center justify-center">
           <Modal
@@ -114,27 +135,12 @@ export default function ProfilePage({
             onOpen={() => setToggle(null)}
             icon={<Lock size={20} />}
             onCancel={() => setToggle(null)}
-            onConfirm={handleMFA}
+            onConfirm={handleDisableMFA}
             yesButtonText="Disable MFA"
             noButtonText="No"
             header="Disable your MFA"
+            message="Do you want to disable your account's MFA?"
             loading={loading}
-          />
-        </div>
-      )}
-      {toggle === "mfa-modal" && (
-        <div className="fixed z-50 inset-0 bg-black/50 flex items-center justify-center">
-          <Modal
-            open
-            onOpen={() => setToggle(null)}
-            onCancel={() => setToggle(null)}
-            message="Do you want to disable multi-factor authentication on your acocunt?"
-            header="Disable MFA"
-            yesButtonText="Yes, disable MFA"
-            noButtonText="No"
-            icon={<Lock size={18} className="min-w-5 h-auto" />}
-            loading={loading}
-            onConfirm={() => {}}
           />
         </div>
       )}
@@ -150,9 +156,15 @@ export default function ProfilePage({
             <div className="flex w-full h-fit items-center justify-between my-2">
               <p className="text-[0.9rem]">Enable MFA</p>
               <Toggle
-                enable
-                onEnable={() => setToggle("mfa-modal")}
-                onClick={handleOpenModalMFA}
+                enable={enable}
+                onEnable={() => {
+                  setEnable(false);
+                }}
+                onClick={
+                  assuranceLevel === "aal2"
+                    ? () => setToggle("disable-mfa")
+                    : () => router.push("/mfa")
+                }
               />
             </div>
 

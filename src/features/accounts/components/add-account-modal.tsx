@@ -131,7 +131,7 @@ export default function AddAccountModal({
         {/* Footer - button */}
         <div className="flex w-full pt-7">
           <button
-            className="flex bg-(--color-brand-green) focus:outline-1 focus:outline-(--color-brand-green) rounded-lg shadow-md hover:bg-(--color-brand-green-accent) text-[0.9rem] active:bg-emerald-700 items-center justify-center px-5 py-1 w-full cursor-pointer"
+            className="flex bg-(--color-brand-green) text-white focus:outline-1 focus:outline-(--color-brand-green) rounded-lg shadow-md hover:bg-(--color-brand-green-accent) text-[0.9rem] active:bg-emerald-700 items-center justify-center px-5 py-1 w-full cursor-pointer"
             type="submit"
           >
             {loading ? <Spinner /> : "Add account"}

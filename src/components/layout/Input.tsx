@@ -9,18 +9,16 @@ interface InputProps<T extends FieldValues> extends React.InputHTMLAttributes<HT
   leadingIcon?: React.ReactNode;
   register: UseFormRegister<T>,
   name: Path<T>;
-  error?: FieldError;
   className?: string;
 }
 
-export default function Input<T extends FieldValues>({
+export default function InputComponent<T extends FieldValues>({
   placeholder,
   label,
   id,
   type = "text",
   icon,
   leadingIcon,
-  error,
   register,
   name,
   className,
@@ -54,18 +52,6 @@ export default function Input<T extends FieldValues>({
           </div>
         )}
       </div>
-      {error && (
-        <p
-          style={{
-            color: "red",
-            fontSize: "0.8rem",
-            alignItems: "start",
-            width: "100%",
-          }}
-        >
-          {error.message}
-        </p>
-      )}
     </div>
   );
 }

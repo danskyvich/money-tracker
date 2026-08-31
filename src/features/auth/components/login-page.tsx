@@ -1,15 +1,15 @@
 "use client"
 
 import { useForm } from "react-hook-form";
-import Input from "../../../components/layout/input";
+import Input from "@/components/layout/Input";
 import { LoginFormData, loginSchema } from "../../../lib/schemas/LoginSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CircleAlert, MailIcon } from "lucide-react";
+import { MailIcon } from "lucide-react";
 import { useActionState, useEffect, useState } from "react";
-import Link from "next/link";
 import {generalSignIn, signInWithFacebook, signInWithGoogle} from "@/lib/supabase/actions/auth";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
+import ErrorModal from "@/components/layout/error-modal";
 
 const GoogleIcon = (
   props: React.SVGProps<SVGSVGElement>,
@@ -85,6 +85,11 @@ export default function LoginPage() {
 
   return (
     <div className="flex flex-col items-center justify-center w-full">
+    {
+      errors && (
+        <ErrorModal message={errors.email?.message}/>
+      )
+    }
       {/* Card */}
       <div className="flex w-135 h-fit flex-col rounded-2xl bg-(--color-bg-subtle) px-15 py-20 shadow-2xl">
         {/* Header */}

@@ -10,6 +10,7 @@ import Button from "../../../components/layout/button"
 import { useRouter } from "next/navigation"
 import { resendOtp, verifyOtp } from "@/lib/supabase/actions/auth"
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3"
+import ErrorModal from "@/components/layout/error-modal"
 
 export default function VerifyEmailPage({email, rememberMe}:{email: string, rememberMe: boolean}) {
     useEffect(() => {
@@ -31,7 +32,6 @@ export default function VerifyEmailPage({email, rememberMe}:{email: string, reme
     const [resendPending, setResendPending] = useState(false);
     const [resendError, setResendError] = useState<string | null>(null);
     const { executeRecaptcha } = useGoogleReCaptcha();
-    const [showErrorToast, setShowErrorToast] = useState<boolean>(false);
 
     // 120 seconds (2 minutes) timer
     useEffect(() => {
@@ -74,7 +74,6 @@ export default function VerifyEmailPage({email, rememberMe}:{email: string, reme
 
       if (result?.error) {
         setResendError(result.error);
-        setShowErrorToast(true);
         return;
       }
 
@@ -84,6 +83,12 @@ export default function VerifyEmailPage({email, rememberMe}:{email: string, reme
 
     return (
       <div className="flex flex-col w-full h-full items-center justify-center">
+        {
+          resendError && <ErrorModal message={resendError}/>
+        }
+        {
+          errors && <ErrorModal message={errors.root?.message}/>
+        }
         {/* Centered modal */}
         <div className="flex flex-col bg-(--color-bg-subtle) p-10 rounded-xl w-150 shadow-md">
           {/*Header */}

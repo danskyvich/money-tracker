@@ -21,7 +21,7 @@ export default function ExpenseBreakdownPage() {
   if (loading) {
     return (
       <div className="flex w-full h-full items-center justify-center">
-        <p className="text-[0.9rem] font-mono"><Spinner/></p>
+        <Spinner/>
       </div>
     );
   }
