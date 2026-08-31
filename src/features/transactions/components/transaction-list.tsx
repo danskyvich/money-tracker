@@ -182,26 +182,26 @@ export default function WholeTransactionList() {
             <div className="flex w-full h-full gap-2">
               {/** Add transaction */}
               <div
-                className="flex w-fit h-fit border text-white items-center gap-2 border-(--color-border-default) rounded-lg p-2 bg-(--color-brand-green) px-5 cursor-pointer hover:bg-emerald-600 active:bg-emerald-700"
+                className="flex w-fit h-full border text-white items-center gap-2 border-(--color-border-default) rounded-lg py-1 bg-(--color-brand-green) px-5 cursor-pointer hover:bg-emerald-600 active:bg-emerald-700"
                 onClick={() => setToggle("add-transaction")}
               >
                 <Plus size={15} />
-                <p className="text-[0.9rem] hidden lg:block">
+                <p className="text-[0.8rem] hidden lg:block">
                   Add a transaction
                 </p>
               </div>
 
               {/* Filter */}
               <div
-                className="flex w-fit h-fit border border-(--color-border-default) rounded-lg gap-2 items-center p-2 hover:bg-(--color-border-subtle) active:bg-(--color-brand-green) cursor-pointer duration-100 transition-all"
+                className="flex w-fit h-full border border-(--color-border-default) rounded-lg gap-2 items-center px-3 py-1 hover:bg-(--color-border-subtle) active:bg-(--color-brand-green) cursor-pointer duration-100 transition-all"
                 onClick={() => setToggle("filter-modal")}
               >
                 <Filter size={15} />
-                <p className="text-[0.9rem] hidden lg:block">Filter</p>
+                <p className="text-[0.8rem] hidden lg:block">Filter</p>
               </div>
 
               {/* Search field */}
-              <div className="px-3 py-1 flex w-fit h-full border border-(--color-border-default) rounded-md items-center gap-2">
+              <div className="px-3 py-1 flex w-[50%] h-full border border-(--color-border-default) rounded-md items-center gap-2">
                 <Search size={15} className="flex" />
                 <input
                   type="text"
