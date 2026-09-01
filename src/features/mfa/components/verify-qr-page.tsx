@@ -35,21 +35,16 @@ export default function VerifyQRPage({challengeId, factorId, mode}:VerifyQRPage)
     return (
       <div className="flex flex-col w-full h-full items-center justify-center gap-10">
         {verifyError && <ErrorModal message={verifyError} />}
+        <div className="flex w-full gap-2 h-fit mb-5 items-center justify-center">
+          <Image src="/favicon.ico" alt="web_app_logo" width={35} height={17} />
+          <p className="font-bold text-4xl">
+            Money{" "}
+            <span className="bg-brand-gradient bg-clip-text text-transparent">
+              Tracker
+            </span>
+          </p>
+        </div>
         <div className="flex flex-col w-100 px-7 py-10 bg-(--color-bg-subtle) border border-(--color-border-default) rounded-lg shadow-lg gap-2">
-          <div className="flex w-full gap-2 h-fit mb-5 items-center justify-center">
-            <Image
-              src="/favicon.ico"
-              alt="web_app_logo"
-              width={25}
-              height={12}
-            />
-            <p className="font-bold text-2xl">
-              Money{" "}
-              <span className="bg-brand-gradient bg-clip-text text-transparent">
-                Tracker
-              </span>
-            </p>
-          </div>
           {/* Header */}
           <div className="flex-col gap-1 text-center">
             <div className="flex w-full h-fit justify-center items-center gap-2">
@@ -70,10 +65,16 @@ export default function VerifyQRPage({challengeId, factorId, mode}:VerifyQRPage)
             <div className="flex flex-col">
               <input
                 type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 id="otp"
                 name="otp"
                 placeholder="000000"
-                onChange={(e) => setCode(e.target.value)}
+                value={code}
+                maxLength={6}
+                onChange={(e) =>
+                  setCode(e.target.value.replace(/\D/g, "").slice(0, 6))
+                }
                 className="flex px-3 py-1 border border-(--color-border-strong) focus:outline-1 focus:outline-emerald-700 text-center rounded-lg"
               />
             </div>

@@ -99,7 +99,8 @@ export async function verifyOtp(email: string, token: string) {
     // check if mfa exists
     const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
     const { data: factorsData } = await supabase.auth.mfa.listFactors();
-    const needsMfa = aal?.currentLevel === "aal1" && aal?.nextLevel === "aal2" && (factorsData?.all.filter((f) => f.factor_type === "totp" && f.status === "verified").length ?? 0) > 0;
+    const verifiedTotp = factorsData?.all.find((f) => f.factor_type === "totp" && f.status === "verified");
+    const needsMfa = aal?.currentLevel === "aal1" && aal?.nextLevel === "aal2" && !!verifiedTotp;
 
     // if user needs to mfa
     if (needsMfa) {
@@ -107,13 +108,9 @@ export async function verifyOtp(email: string, token: string) {
         const deviceTrusted = user ? await isDeviceTrusted() : false;
 
         if (!deviceTrusted) {
-            const factorId = factorsData?.all.find(
-                (f) => f.factor_type === "totp" && f.status === "verified"
-            )?.id
-            redirect(`/verify/mfa?mode=challenge&factorId=${factorId}`);
+            redirect(`/verify/mfa?mode=challenge&factorId=${verifiedTotp!.id}`);
         }
     }
-
     redirect("/overview");
 }
 
@@ -148,6 +145,7 @@ export async function deleteUser() {
 export async function listUserMfaFactors(): Promise<{success: false, error: string} | {success: true, totp: Factor[]}> {
     const supabase = await createClient();
     const { data, error} = await supabase.auth.mfa.listFactors();
+    console.log("MFA factors:", JSON.stringify(data, null, 2)); // check for data.phone
 
     if (error) return { success: false, error: error.message}
 
@@ -279,11 +277,9 @@ export async function getUser(): Promise<User | null> {
 // get MFA enable for user
 export async function isUserMfaEnabled(): Promise<boolean> {
     const client = await createClient();
-    const { data, error } = await client.auth.mfa.getAuthenticatorAssuranceLevel();
-
-    if ( error || !data ) { console.error("Failed to get AAL:", error); return false}
-
-    return data.nextLevel === 'aal2';
+    const { data, error } = await client.auth.mfa.listFactors();
+    if ( error) { console.error("Failed to get AAL:", error); return false}
+    return data.totp.some(f => f.status === 'verified');
 }
 
 // Google authentication
@@ -306,8 +302,8 @@ export async function signInWithGoogle() {
 
 // Facebook authentication
 export async function signInWithFacebook() {
-    const client = await createClient()
-    const { data, error } = await client.auth.signInWithOAuth({
+    const supabase = await createClient()
+    const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'facebook',
         options: {
             redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/callback`,
@@ -319,9 +315,8 @@ export async function signInWithFacebook() {
         console.error("Error signing in with Facebook:", error.message)
         redirect("/login?error=oauth_failed")
     }
-
     if (data.url) {
-        redirect(data.url)
+        redirect(data.url);
     }
 
     redirect("/login?error=oauth_failed")

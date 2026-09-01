@@ -47,13 +47,12 @@ export default function ProfilePage({
       setAssuranceLevel(assuranceLevelResult.data?.currentLevel);
       setFactorId(factorIdResult.totp[0]?.id);
       setEnable(
-        assuranceLevelResult.data?.currentLevel === "aal2" || 
-        assuranceLevelResult.data?.nextLevel === "aal2"
+       factorIdResult.totp.some(f => f.status === 'verified')
       );
     };
 
     checkUserAssuranceLevel();
-  }, [assuranceLevel, factorId]);
+  }, []);
 
   const profile = [
     {
@@ -71,12 +70,23 @@ export default function ProfilePage({
   ];
 
   const handleDisableMFA = async () => {
-    if (!factorId) {
-      setMfaError("No factor id.");
+    setLoading(true);
+
+    const factors = await listUserMfaFactors();
+    if (!factors.success) {
+      setMfaError(factors.error);
+      setLoading(false);
       return;
     }
-    setLoading(true);
-    const result = await unenrollFactor(factorId);
+    const factorToRemove = factors.totp[0];
+    if (!factorToRemove?.id) {
+      setMfaError("No factor ID found. Please try again.");
+      setLoading(false);
+      return;
+    }
+    const factor_id = factorToRemove.id;
+
+    const result = await unenrollFactor(factor_id);
     if (!result.success) {
       setMfaError(result.error ?? "Something went wrong");
       setLoading(false);
@@ -161,7 +171,7 @@ export default function ProfilePage({
                   setEnable(false);
                 }}
                 onClick={
-                  assuranceLevel === "aal2"
+                  enable
                     ? () => setToggle("disable-mfa")
                     : () => router.push("/mfa")
                 }

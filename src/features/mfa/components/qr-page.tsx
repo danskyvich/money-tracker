@@ -56,7 +56,7 @@ export default function QR() {
   }
 
   return (
-    <div className="flex flex-col w-full h-full bg-(--color-bg-secondary)">
+    <div className="flex flex-col w-full h-full">
       {setupError && (
         <div className="fixed inset-0 z-50 bg-(--color-bg-secondary) flex flex-col w-full h-full items-center justify-center">
           <div className="flex w-fit h-fit gap-2 my-5">
@@ -79,21 +79,21 @@ export default function QR() {
         </div>
       ) : (
         <div className="flex flex-col justify-center gap-5 w-full h-full items-center">
+          <div className="flex w-full gap-2 h-fit items-center justify-center">
+            <Image
+              src="/favicon.ico"
+              alt="web_app_logo"
+              width={35}
+              height={17}
+            />
+            <p className="font-bold text-4xl text-white">
+              Money{" "}
+              <span className="bg-brand-gradient bg-clip-text text-transparent">
+                Tracker
+              </span>
+            </p>
+          </div>
           <div className="flex flex-col gap-5 mt-5 px-7 py-5 w-100 bg-(--color-bg-subtle) border border-(--color-border-subtle) rounded-xl shadow-md">
-            <div className="flex w-full gap-2 h-fit mb-5 items-center justify-center">
-              <Image
-                src="/favicon.ico"
-                alt="web_app_logo"
-                width={25}
-                height={12}
-              />
-              <p className="font-bold text-2xl">
-                Money{" "}
-                <span className="bg-brand-gradient bg-clip-text text-transparent">
-                  Tracker
-                </span>
-              </p>
-            </div>
             {/* Headers */}
             <div className="flex items-center gap-2">
               <NfcIcon size={20} />
