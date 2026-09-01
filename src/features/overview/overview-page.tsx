@@ -228,7 +228,7 @@ export default function OverviewPage() {
           </div>
 
           {/* Bottom side */}
-          <div className="flex flex-col md:flex-row w-full h-auto gap-5">
+          <div className="flex flex-col md:flex-row w-full h-full gap-5">
             {/* Pie chart */}
             <div className="flex flex-col w-full h-75 md:h-full border border-(--color-border-default) rounded-lg px-5 py-3 gap-2 shadow-md">
               <div className="flex w-full h-fit justify-between">
