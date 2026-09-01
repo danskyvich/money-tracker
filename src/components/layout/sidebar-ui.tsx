@@ -40,7 +40,7 @@ export default function Sidebar({className, email, lastLogIn}:{className?: strin
 
     return (
       <div
-        className={`${className} hidden md:flex px-5 py-2 flex-col border-r-2 border-(--color-bg-base) h-full w-fit duration-300 bg-[#140f27] transition-all`}
+        className={`${className} hidden md:flex px-5 py-2 flex-col h-full w-fit duration-300 bg-[#140f27] transition-all`}
       >
         {/* Header */}
         <header className="flex flex-0 my-5 items-center justify-center">

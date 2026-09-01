@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { iconMap } from "../../../../icons";
+import { iconMap } from "../../../lib/icons";
 
 export default function OverviewHeader() {
   const [time, setTime] = useState<string>("");

@@ -89,7 +89,7 @@ export default function AccountsPartialList({
               {/* window slice (-5, windowStart, +5) */}
               {visiblePages.map((item, key) => (
                 <div
-                  className={`px-3 py-2 border border-(--color-border-default) rounded-lg shadow-md hover:bg-(--color-bg-subtle) cursor-pointer ${currentPage === item ? "bg-(--color-brand-green) text-black hover:bg-(--color-brand-green)" : null}`}
+                  className={`px-3 py-2 border border-(--color-border-default) rounded-lg shadow-md hover:bg-(--color-bg-subtle) cursor-pointer ${currentPage === item ? "bg-(--color-brand-green) text-white hover:bg-(--color-brand-green)" : null}`}
                   key={key}
                   onClick={() => {
                     setCurrentPage(item);

@@ -6,6 +6,7 @@ import Spinner from "@/components/layout/spinner";
 import { verifyUserMfa } from "@/lib/supabase/actions/auth";
 import ErrorModal from "@/components/layout/error-modal";
 import { Nfc } from "lucide-react";
+import Image from "next/image";
 
 interface VerifyQRPage {
   challengeId: string,
@@ -32,27 +33,34 @@ export default function VerifyQRPage({challengeId, factorId, mode}:VerifyQRPage)
       setLoading(false);
     }
     return (
-      <div className="flex flex-col w-full h-full items-center justify-center gap-10 bg-(--color-bg-secondary)">
+      <div className="flex flex-col w-full h-full items-center justify-center gap-10">
         {verifyError && <ErrorModal message={verifyError} />}
-        <p className="font-bold text-4xl">
-          Money{" "}
-          <span className="bg-brand-gradient bg-clip-text text-transparent">
-            Tracker
-          </span>
-        </p>
         <div className="flex flex-col w-100 px-7 py-10 bg-(--color-bg-subtle) border border-(--color-border-default) rounded-lg shadow-lg gap-2">
+          <div className="flex w-full gap-2 h-fit mb-5 items-center justify-center">
+            <Image
+              src="/favicon.ico"
+              alt="web_app_logo"
+              width={25}
+              height={12}
+            />
+            <p className="font-bold text-2xl">
+              Money{" "}
+              <span className="bg-brand-gradient bg-clip-text text-transparent">
+                Tracker
+              </span>
+            </p>
+          </div>
           {/* Header */}
-          <div className="flex-col gap-1">
-            <div className="flex w-full h-fit items-center gap-2">
-              <Nfc size={20} className="min-w-3 h-auto" />
-              <p className="text-2xl font-semibold">
-                {
-                  mode === "enroll" ? "Set up your MFA" : "Multi-factor authentication"
-                }
+          <div className="flex-col gap-1 text-center">
+            <div className="flex w-full h-fit justify-center items-center gap-2">
+              <p className="flex text-xl font-semibold w-full h-fit text-center items-center justify-center">
+                {mode === "enroll"
+                  ? "Set up your MFA"
+                  : "Multi-factor authentication"}
               </p>
             </div>
 
-            <p className="text-[0.9rem]/5 font-display mt-5">
+            <p className="text-[0.9rem]/5 font-display mt-2">
               Enter the generated one-time, six-digit code from your
               authenticator app into the input field below
             </p>
