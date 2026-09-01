@@ -1,7 +1,7 @@
 import ErrorModal from "@/components/layout/error-modal";
 import Modal from "@/components/layout/modal";
 import Spinner from "@/components/layout/spinner";
-import { AddIncomeCategory, DeleteIncomeCategory, FetchIncomeCategories } from "@/lib/supabase/actions/database";
+import { AddIncomeCategory, CountTransactionsWithCategory, DeleteCategory, FetchIncomeCategories } from "@/lib/supabase/actions/database";
 import { Categories } from "@/lib/types/derived";
 import { Coins, Pencil, Plus, Trash, X } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -22,6 +22,7 @@ export function IncomeCategories({open, onOpen}: IncomeCategoriesProps) {
     // for db modification
     const [name, setName] = useState<string | null>(null);
     const [id, setId] = useState<string | null>(null);
+    const [affectedRows, setAffectedRows] = useState<number>(0);
 
     const fetchIncomeCategories = async () => {
         setLoading(true);
@@ -37,7 +38,7 @@ export function IncomeCategories({open, onOpen}: IncomeCategoriesProps) {
         return;
     }
 
-    // for adding and moifying categories
+    // for adding and modifying categories
     const handleAddUpdateIncomeCategory = async () => {
         const trimmedName = name?.trim();
 
@@ -65,17 +66,40 @@ export function IncomeCategories({open, onOpen}: IncomeCategoriesProps) {
         fetchIncomeCategories();
     }
 
-    // for deleting categories
+    // for confirm deleting categories
+    const handleConfirmDeleteIncomeCategory = async (id: string) => {
+      setProcess(true);
+      if (!id) {
+        setFetchError("No fetched category");
+        setProcess(false);
+        return;
+      }
+      // get the count of all affected rows.
+      const result = await CountTransactionsWithCategory(id);
+      if (!result.success) {
+        setFetchError(result.error);
+        setProcess(false);
+        return;
+      }
+     
+      setAffectedRows(result.count);
+      setProcess(false);
+      setToggle("delete-category");
+      return;
+    }
+
+    // for absolute deleting categories
     const handleDeleteIncomeCategory = async () => {
         if (!id) {
-            setFetchError("No fetched category");
+            setFetchError("No chosen category");
             return;
         }
 
         setFetchError(null);
         setProcess(true);
 
-        const result = await DeleteIncomeCategory(id);
+        // delete category and its transactions
+        const result = await DeleteCategory(id);
         if (!result.success) {
             setFetchError(result.error);
             setProcess(false);
@@ -132,12 +156,12 @@ export function IncomeCategories({open, onOpen}: IncomeCategoriesProps) {
               onConfirm={handleDeleteIncomeCategory}
               noButtonText="Return"
               yesButtonText="Delete category"
-              message={`Do you want to delete the category "${name}"?`}
+              message={`Do you want to delete the category "${name}"? ${(affectedRows ?? 0) > 0 ? `Approximately ${affectedRows} transactions will be affected by the deletion of this category. Continue?` : `There are no transactions currently using this category`}`}
               onCancel={() => setToggle(null)}
             />
           </div>
         )}
-        <div className="flex flex-col w-100 xl:w-125 h-100 bg-(--color-bg-secondary) border border-(--color-border-default) rounded-lg">
+        <div className="flex flex-col w-100 xl:w-125 h-150 bg-(--color-bg-secondary) border border-(--color-border-default) rounded-lg">
           {fetchError && <ErrorModal message={fetchError} />}
           {/* header */}
           <div className="flex flex-0 w-full h-fit justify-between px-5 pt-5 pb-2">
@@ -176,7 +200,7 @@ export function IncomeCategories({open, onOpen}: IncomeCategoriesProps) {
                         onClick={() => {
                           setId(item.id);
                           setName(item.name);
-                          setToggle("delete-category");
+                          handleConfirmDeleteIncomeCategory(item.id);
                         }}
                       />
                     </div>
@@ -194,7 +218,7 @@ export function IncomeCategories({open, onOpen}: IncomeCategoriesProps) {
           {/* Footer */}
           <div className="flex flex-0 w-full h-fit px-5 py-3">
             <div
-              className="flex w-full border border-(--color-border-default) rounded-lg py-1 items-center justify-center gap-1 text-[0.9rem] hover:bg-(--color-brand-green) active:bg-emerald-700 transition-all duration-100 cursor-pointer"
+              className="flex w-full border border-(--color-border-default) rounded-lg py-1 items-center justify-center gap-1 text-[0.9rem] hover:bg-(--color-brand-green) active:bg-emerald-700 transition-all hover:text-white active:text-white duration-100 cursor-pointer"
               onClick={() => setToggle("name-category")}
             >
               {process ? (

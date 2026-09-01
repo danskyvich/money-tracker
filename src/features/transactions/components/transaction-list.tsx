@@ -4,7 +4,6 @@ import {
   ArrowRight,
   ChevronLeft,
   ChevronRight,
-  Filter,
   Plus,
   RotateCw,
   Search,
@@ -227,7 +226,7 @@ export default function WholeTransactionList() {
                         </div>
                         <div className="flex w-full items-center">
                           <p className="line-clamp-1">
-                            {transaction.category_id?.name}
+                            {transaction.category_id?.name ?? "--"}
                           </p>
                         </div>
                         <div className="flex w-full items-center">
@@ -283,7 +282,7 @@ export default function WholeTransactionList() {
             <div className="flex w-fit h-full items-center">
               <p>Show data</p>
 
-              <div className="flex border border-(--color-border-default) text-(--color-text-secondary) px-3 py-2 mx-2 rounded-lg shadow-sm">
+              <div className="flex border border-(--color-border-default) text-(--color-text-secondary) px-3 py-2 mx-2 rounded-lg">
                 <p>{displayedTransactions?.length}</p>
               </div>
 
@@ -295,7 +294,7 @@ export default function WholeTransactionList() {
               {/* Left */}
               {windowStart > 0 && (
                 <div
-                  className="px-3 py-2 border border-(--color-border-default) rounded-lg shadow-md cursor-pointer hover:bg-(--color-bg-subtle)"
+                  className="px-3 py-2 border border-(--color-border-default) rounded-lg cursor-pointer hover:bg-(--color-bg-subtle)"
                   onClick={() =>
                     setWindowStart((prev) => Math.max(0, prev - 5))
                   }
@@ -307,7 +306,7 @@ export default function WholeTransactionList() {
               {/* window slice (-5, windowStart, +5) */}
               {visiblePages.map((item, key) => (
                 <div
-                  className={`px-3 py-2 border border-(--color-border-default) rounded-lg shadow-md hover:bg-(--color-bg-subtle) cursor-pointer ${currentPage === item ? "bg-(--color-brand-green) hover:bg-(--color-brand-green) text-white" : null}`}
+                  className={`px-3 py-2 border border-(--color-border-default) rounded-lg hover:bg-(--color-bg-subtle) cursor-pointer ${currentPage === item ? "bg-(--color-brand-green) hover:bg-(--color-brand-green) text-white" : null}`}
                   key={key}
                   onClick={() => setCurrentPage(item)}
                 >
@@ -318,7 +317,7 @@ export default function WholeTransactionList() {
               {/* Right */}
               {windowStart + 5 < paginationArray.length && (
                 <div
-                  className="px-3 py-2 border border-(--color-border-default) rounded-lg shadow-md"
+                  className="px-3 py-2 border border-(--color-border-default) rounded-lg"
                   onClick={() =>
                     setWindowStart((prev) =>
                       Math.min(paginationArray.length - 5, prev + 5),

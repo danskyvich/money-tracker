@@ -3,7 +3,8 @@ import Modal from "@/components/layout/modal";
 import Spinner from "@/components/layout/spinner";
 import {
   AddExpenseCategory,
-  DeleteExpenseCategory,
+  CountTransactionsWithCategory,
+  DeleteCategory,
   FetchExpenseCategories,
 } from "@/lib/supabase/actions/database";
 import { Categories } from "@/lib/types/derived";
@@ -28,6 +29,7 @@ export default function ExpenseCategories({
   const [name, setName] = useState<string | null>(null);
   const [id, setId] = useState<string | null>(null);
   const [toggle, setToggle] = useState<string | null>(null);
+  const [affectedRows, setAffectedRows] = useState<number>(0);
 
   const fetchData = async () => {
     setLoading(true);
@@ -77,6 +79,30 @@ export default function ExpenseCategories({
     fetchData();
   };
 
+  const handleConfirmDeleteExpenseCategory = async (id: string) => {
+    setProcess(true);
+    if (!id) {
+      setFetchError("No fetched category");
+      setProcess(false);
+      return;
+    }
+
+    const result = await CountTransactionsWithCategory(id);
+    if (!result.success) {
+      setFetchError(result.error);
+      setProcess(false);
+      return;
+    }
+    if (result.count === null || result.count === undefined) {
+      setFetchError("Count not fetched");
+      setProcess(false);
+      return;
+    }
+    setAffectedRows(result.count);
+    setProcess(false);
+    setToggle("delete-category");
+    return;
+  }
   const handleDeleteExpenseCategory = async () => {
     if (!id) {
       setFetchError("No chosen category");
@@ -85,7 +111,7 @@ export default function ExpenseCategories({
     setFetchError(null);
     setProcess(true);
 
-    const result = await DeleteExpenseCategory(id);
+    const result = await DeleteCategory(id);
     if (!result.success) {
       setFetchError(result.error);
       setProcess(false);
@@ -101,7 +127,7 @@ export default function ExpenseCategories({
 
   if (!open) return null;
   return (
-    <div className="flex flex-col w-100 xl:w-125 h-100 bg-(--color-bg-secondary) border border-(--color-border-default) rounded-lg">
+    <div className="flex flex-col w-100 xl:w-125 h-150 bg-(--color-bg-secondary) border border-(--color-border-default) rounded-lg">
       {fetchError && <ErrorModal message={fetchError} />}
       {toggle === "delete-category" && (
         <div className="fixed z-50 inset-0 bg-black/50 flex w-full h-full items-center justify-center">
@@ -114,7 +140,7 @@ export default function ExpenseCategories({
             noButtonText="No"
             yesButtonText="Delete category"
             header="Delete expense category"
-            message={`Are you sure you want to delete the "${name}" category?`}
+            message={`Do you want to delete the category "${name}"? ${(affectedRows ?? 0) > 0 ? `Approximately ${affectedRows} transactions will be affected by the deletion of this category. Continue?`: `There are no transactions currently using this category.`}`}
             onConfirm={handleDeleteExpenseCategory}
           />
         </div>
@@ -151,7 +177,7 @@ export default function ExpenseCategories({
         <X onClick={() => onOpen()} className="cursor-pointer" />
       </div>
 
-      <div className="flex flex-1 w-full h-full">
+      <div className="flex flex-1 w-full h-full overflow-y-auto">
         {loading ? (
           <div className="fixed z-50 inset-0 flex w-full h-full items-center justify-center">
             <Spinner />
@@ -178,9 +204,9 @@ export default function ExpenseCategories({
                     size={18}
                     className="min-w-3 h-auto text-red-400 cursor-pointer"
                     onClick={() => {
-                      setToggle("delete-category");
                       setId(item.id);
                       setName(item.name);
+                      handleConfirmDeleteExpenseCategory(item.id);
                     }}
                   />
                 </div>
@@ -198,7 +224,7 @@ export default function ExpenseCategories({
       {/* Footer */}
       <div className="flex flex-0 w-full h-fit px-5 py-3">
         <div
-          className="flex w-full border border-(--color-border-default) rounded-lg py-1 items-center justify-center gap-1 text-[0.9rem] hover:bg-(--color-brand-green) active:bg-emerald-700 transition-all duration-100 cursor-pointer"
+          className="flex w-full border border-(--color-border-default) rounded-lg py-1 items-center justify-center gap-1 text-[0.9rem] hover:bg-(--color-brand-green) active:bg-emerald-700 transition-all duration-100 cursor-pointer hover:text-white active:text-white"
           onClick={() => {
             setToggle("name-category");
           }}

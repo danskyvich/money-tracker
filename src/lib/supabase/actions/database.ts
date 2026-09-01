@@ -149,7 +149,7 @@ export async function FetchAccountCategories(): Promise<{success: false, error: 
 // <-----------------Transactions --------------------------->
 
 // SELECT
-export async function FetchTransaction(currentPage: number, numberOfItems: number):Promise<{success: true, data: TransactionSearchResults[], totalItems: number | null} | {success: false, error: string}> {
+export async function FetchTransaction(currentPage: number, numberOfItems: number):Promise<{success: true, data: any[], totalItems: number | null} | {success: false, error: string}> {
     const supabase = await createClient();
     const { data, error, count } = await supabase
         .from("transactions")
@@ -229,8 +229,7 @@ export async function SelectTransactionsFromChosenAccount(id: string, currentPag
 
 // <!-------------------- INCOME & EXPENSE CATEGORIES ------------>
 
-
-// INCOME categories
+// FETCH income categories
 export async function FetchIncomeCategories(): Promise<{success: false, error: string} | {success: true, data: Categories[]}> {
     const supabase = await createClient();
     const { data, error } = await supabase 
@@ -241,6 +240,7 @@ export async function FetchIncomeCategories(): Promise<{success: false, error: s
     return { success: true, data}
 }
 
+// INSERT income category
 export async function AddIncomeCategory(name: string, id?: string): Promise<{success: false, error: string} | {success: true}> {
     const supabase = await createClient();
     const user = await getUser();
@@ -276,21 +276,7 @@ export async function AddIncomeCategory(name: string, id?: string): Promise<{suc
    return { success: true};
 }
 
-export async function DeleteIncomeCategory(id: string): Promise<{success: true} | {success: false, error: string}> {
-    const supabase = await createClient();
-    const user = await getUser();
-    if (!user) return { success: false, error: "Unauthenticated user"};
-    const user_id = user.id;
-
-    const { error } = await supabase
-        .from('categories')
-        .delete()
-        .eq('id', id)
-        .eq('user_id', user_id)
-    if (error) return { success: false, error: error?.message}
-    return { success: true} 
-}
-
+// FETCH expense category
 export async function FetchExpenseCategories(): Promise<{success: false, error: string} | {success: true, data: Categories[]}> {
     const supabase = await createClient();
     const { data, error } = await supabase
@@ -301,6 +287,7 @@ export async function FetchExpenseCategories(): Promise<{success: false, error: 
     return { success: true, data}
 }
 
+// INSERT expense category
 export async function AddExpenseCategory(name: string, id?: string): Promise<{success: false, error: string} | {success: true}> {
     const trimmedName = name.trim();
     const user = await getUser();
@@ -336,19 +323,44 @@ export async function AddExpenseCategory(name: string, id?: string): Promise<{su
     return { success: true };
 }
 
-export async function DeleteExpenseCategory(id: string): Promise<{success: false, error: string} | {success: true}> {
+// DELETE expense category
+export async function DeleteCategory(id: string): Promise<{success: true} | {success: false, error: string}> {
     const supabase = await createClient();
     const user = await getUser();
     if (!user) return { success: false, error: "Unauthenticated user"}
     const user_id = user?.id;
 
-    const { error } = await supabase
-        .from('categories')
+    const { error: nullifyError } = await supabase
+        .from("transactions")
+        .update({ category_id: null})
+        .eq("user_id", user_id)
+        .eq('category_id', id)
+    if (nullifyError) return { success: false, error: nullifyError.message};
+    
+    const { error: deleteError } = await supabase
+        .from("categories")
         .delete()
-        .eq('user_id', user_id)
         .eq('id', id)
-    if (error) return { success: false, error: error.message}
-    return { success: true }
+        .eq('user_id', user_id)
+    if (deleteError) return { success: false, error: deleteError.message};
+
+    return { success: true };
+}
+
+// CHECK transactions with the target category
+export async function CountTransactionsWithCategory(category_id: string): Promise<{error: string, success: false} | {success: true, count: number}> {
+    const supabase = await createClient();
+    const user = await getUser();
+    if (!user) return { success: false, error: "Unauthenticated user"}
+    const user_id = user?.id;
+
+    const { count, error } = await supabase
+        .from("transactions")
+        .select('id', {count: 'exact', head: true})
+        .eq('category_id', category_id)
+        .eq('user_id', user_id)
+    if (error) return { success: false, error: error.message};
+    return  { success: true, count: count ?? 0 }
 }
 
 // <!-------------------- SETTINGS / CONFIG -------------------->
