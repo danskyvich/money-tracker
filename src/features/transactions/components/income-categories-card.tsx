@@ -35,7 +35,7 @@ export default function IncomeCategoriesCard() {
   return (
     <Card
       header="Income categories"
-      className="flex flex-1 border border-(--color-border-default) rounded-lg xl:h-full h-150 overflow-auto"
+      className="flex flex-1 border border-(--color-border-default) rounded-lg xl:h-full h-150 overflow-auto shadow-lg"
     >
       {incomeCategoriesError && <ErrorModal message={incomeCategoriesError} />}
       {loading ? (

@@ -8,8 +8,8 @@ import ErrorModal from "@/components/layout/error-modal";
 export default function Snippet({ type }: { type: "income" | "expense" }) {
   const [total, setTotal] = useState<number>(0.0);
   const [loading, setLoading] = useState(true);
-  const [growthRate, setGrowthRate] = useState<number>(0);
-  const [expenseRate, setExpenseRate] = useState<number>(0);
+  const [growthRate, setGrowthRate] = useState<string>("");
+  const [expenseRate, setExpenseRate] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
 
   // the growth and expense rate would remain zero UNLESS transactions
@@ -21,10 +21,6 @@ export default function Snippet({ type }: { type: "income" | "expense" }) {
     const income = await calculateGrowthRate();
     const expense = await calculateExpenseRate();
 
-    if (!income.success || !expense.success) {
-      setError("Error fetching rate data");
-      return;
-    }
     setGrowthRate(income.value);
     setExpenseRate(expense.value);
     setTotal(total);
@@ -41,16 +37,14 @@ export default function Snippet({ type }: { type: "income" | "expense" }) {
       {loading ? (
         <SnippetSkeleton />
       ) : (
-        <div className="flex flex-col h-31.5 flex-1 border border-(--color-border-default) rounded-xl px-5 py-3 shadow-md">
-          {
-            error && <ErrorModal message={error}/>
-          }
+        <div className="flex flex-col h-31.5 flex-1 border border-(--color-border-default) rounded-xl px-5 py-3 shadow-lg">
+          {error && <ErrorModal message={error} />}
           <div className="flex gap-1 items-center justify-between">
             <p className="font-semibold">
               {type === "income" ? "Income" : "Expense"}
             </p>
             <p className="text-(--color-text-primary) text-[0.7rem] font-mono self-end">
-              (monthly)
+              (total)
             </p>
           </div>
           <div className="flex flex-auto w-auto h-full" />
@@ -60,16 +54,23 @@ export default function Snippet({ type }: { type: "income" | "expense" }) {
               ? "..."
               : total.toLocaleString("en-PH", { minimumFractionDigits: 2 })}
           </p>
-          <div className="flex w-full items-center text-sm mt-1 text-(--color-text-secondary)">
-            <p>{type === "income" ? "Growth rate" : "Expense rate"}</p>
+          <div className="flex w-full items-center text-sm mt-1 text-(--color-text-secondary) justify-between">
+            <p>{type === "income" ? "Monthly rate" : "Monthly rate"}</p>
 
-            <div className="flex w-auto flex-auto" />
-            {type === "income" ? <p>{growthRate}%</p> : <p>{expenseRate}%</p>}
-            {type === "income" ? (
-              <ArrowUpRight size={18} className="min-w-2 h-auto text-(--color-brand-green)" />
-            ) : (
-              <ArrowDownLeft size={18} className="min-w-2 h-auto text-(--color-brand-red)"/>
-            )}
+            <div className="flex w-fit">
+              {type === "income" ? <p>{growthRate}</p> : <p>{expenseRate}</p>}
+              {type === "income" ? (
+                <ArrowUpRight
+                  size={18}
+                  className="min-w-2 h-auto text-(--color-brand-green)"
+                />
+              ) : (
+                <ArrowDownLeft
+                  size={18}
+                  className="min-w-2 h-auto text-red-500"
+                />
+              )}
+            </div>
           </div>
         </div>
       )}

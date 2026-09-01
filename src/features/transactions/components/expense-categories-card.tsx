@@ -33,7 +33,7 @@ export default function ExpenseCategoriesCard () {
     return (
       <Card
         header="Expense categories"
-        className="flex flex-1 border border-(--color-border-default) rounded-lg xl:h-full h-150 overflow-auto"
+        className="flex flex-1 border border-(--color-border-default) rounded-lg xl:h-full h-150 overflow-auto shadow-lg"
       >
         {expenseCategoriesError && (
           <ErrorModal message={expenseCategoriesError} />

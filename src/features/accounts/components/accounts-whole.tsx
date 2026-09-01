@@ -130,11 +130,11 @@ export default function WholeAccountsList() {
           refresh={fetchAccounts}
         />
       )}
-      <div className="flex flex-col min-h-[50dvh] w-full h-full items-center">
+      <div className="flex flex-col min-h-[50dvh] w-full h-full items-center shadow-lg">
         <div className="flex flex-col flex-0 w-full h-fit">
           {/* Accounts header */}
-          <div className="flex flex-0 w-full min-h-fit py-2 px-5 justify-between">
-            <div className="flex w-full gap-2">
+          <div className="flex flex-0 w-full min-h-fit py-2 px-5 justify-between items-center">
+            <div className="flex w-full gap-2 items-center">
               {/* Add account */}
               <div
                 className="flex w-fit h-fit xl:h-fit gap-2 bg-(--color-brand-green) hover:bg-emerald-600 rounded-md px-5 py-1.5 text-white items-center hover:text-white cursor-pointer transition-all duration-200 active:bg-emerald-700"
@@ -160,8 +160,15 @@ export default function WholeAccountsList() {
                 />
               </div>
             </div>
-
-            <RotateCw size={20} className="min-w-3 h-auto cursor-pointer" onClick={() => fetchAccounts()}/>
+            {loading ? (
+              <Spinner />
+            ) : (
+              <RotateCw
+                size={20}
+                className="min-w-3 h-auto cursor-pointer"
+                onClick={() => fetchAccounts()}
+              />
+            )}
           </div>
 
           <div className="grid grid-cols-[repeat(4,1fr)] w-full h-full px-5 py-1 text-[0.9rem] border-b border-(--color-border-default) items-end">
@@ -177,7 +184,7 @@ export default function WholeAccountsList() {
           {/* Content */}
           <div className="flex flex-1 flex-col w-full h-full">
             {loading ? (
-              <AccountListModalSkeleton/>
+              <AccountListModalSkeleton />
             ) : (
               <div className="flex flex-col relative w-full h-[85%] overflow-hidden">
                 {changedAccounts?.length === 0 && (
