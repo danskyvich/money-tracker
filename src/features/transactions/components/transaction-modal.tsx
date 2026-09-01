@@ -61,6 +61,12 @@ export default function TransactionModal({
     initialValues,
   );
 
+  const typeStyles: Record<string, string> = {
+    expense: "bg-red-500/70 hover:bg-red-600/70 active:bg-red-700/70 text-white",
+    transfer: "bg-amber-500/70 hover:bg-amber-600/70 text-white active:bg-amber-700/70",
+    income: "bg-(--color-brand-green) hover:bg-emerald-600 active:bg-emerald-700 text-white",
+  }
+
   // fetch accounts and categories
   const fetchData = async () => {
     setLoading(true);
@@ -231,15 +237,18 @@ export default function TransactionModal({
           }
         >
           <div className="flex w-full h-fit gap-5 mb-3" role="group">
-            {transactionTypes.map((item, key) => (
+            {transactionTypes.map((item, key) => {
+              const isActive = formValues.type === item;
+              return (
               <div
-                className={`flex ${formValues.type === item && "bg-(--color-brand-green) hover:bg-emerald-600 text-white"} flex-1 w-full h-fit border border-(--color-border-default) rounded-lg items-center justify-center py-1 hover:bg-(--color-border-subtle) cursor-pointer active:bg-(--color-brand-green-accent)`}
+                className={`flex ${isActive ? typeStyles[item] : "hover:bg-(--color-border-subtle)"} flex-1 w-full h-fit border border-(--color-border-default) rounded-lg items-center justify-center py-1 hover:bg-(--color-border-subtle) cursor-pointer active:bg-(--color-brand-green-accent)`}
                 key={key}
                 onClick={(e) => setFormValues({ type: item })}
               >
                 <p className="line-clamp-1 text-[0.9rem] font-mono">{item}</p>
               </div>
-            ))}
+              )
+            })}
           </div>
           <div className="grid grid-cols-[1fr_1fr] w-full h-full gap-y-3 items-center py-1">
             <label htmlFor="date-time">Date and time</label>
