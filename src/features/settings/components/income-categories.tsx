@@ -218,11 +218,11 @@ export function IncomeCategories({open, onOpen}: IncomeCategoriesProps) {
           {/* Footer */}
           <div className="flex flex-0 w-full h-fit px-5 py-3">
             <div
-              className="flex w-full border border-(--color-border-default) rounded-lg py-1 items-center justify-center gap-1 text-[0.9rem] hover:bg-(--color-brand-green) active:bg-emerald-700 transition-all hover:text-white active:text-white duration-100 cursor-pointer"
+              className="flex w-full border border-(--color-border-default) rounded-lg py-2 items-center justify-center gap-1 text-[0.9rem] hover:bg-(--color-brand-green) active:bg-emerald-700 transition-all hover:text-white active:text-white duration-100 cursor-pointer"
               onClick={() => setToggle("name-category")}
             >
               {process ? (
-                <Spinner />
+                <div className="flex py-1"><Spinner/></div>
               ) : (
                 <>
                   <Plus size={18} className="min-w-5 h-auto" />

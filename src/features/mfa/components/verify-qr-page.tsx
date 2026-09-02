@@ -37,18 +37,19 @@ export default function VerifyQRPage({challengeId, factorId, mode}:VerifyQRPage)
         {verifyError && <ErrorModal message={verifyError} />}
         <div className="flex w-full gap-2 h-fit mb-5 items-center justify-center">
           <Image src="/favicon.ico" alt="web_app_logo" width={35} height={17} />
-          <p className="font-bold text-4xl">
+          <p className="font-bold text-4xl text-white">
             Money{" "}
             <span className="bg-brand-gradient bg-clip-text text-transparent">
               Tracker
             </span>
           </p>
         </div>
-        <div className="flex flex-col w-100 px-7 py-10 bg-(--color-bg-subtle) border border-(--color-border-default) rounded-lg shadow-lg gap-2">
+        <div className="flex flex-col w-125 px-7 py-10 bg-(--color-bg-subtle) border border-(--color-border-default) rounded-lg shadow-lg gap-2">
           {/* Header */}
-          <div className="flex-col gap-1 text-center">
+          <div className="flex-col gap-1">
             <div className="flex w-full h-fit justify-center items-center gap-2">
-              <p className="flex text-xl font-semibold w-full h-fit text-center items-center justify-center">
+              <Nfc size={18} className="min-w-3 h-auto"/>
+              <p className="flex text-xl font-semibold w-full h-fit items-center">
                 {mode === "enroll"
                   ? "Set up your MFA"
                   : "Multi-factor authentication"}
@@ -97,19 +98,19 @@ export default function VerifyQRPage({challengeId, factorId, mode}:VerifyQRPage)
 
             <div className="flex flex-col gap-2 mt-13">
               <button
-                className="flex cursor-pointer border border-(--color-brand-green) hover:bg-(--color-brand-green) hover:text-white active:text-white active:bg-emerald-600 items-center justify-center py-1 rounded-xl w-full duration-100 transition-all text-[0.9rem]"
+                className="flex cursor-pointer border border-(--color-brand-green) hover:bg-(--color-brand-green) hover:text-white active:text-white active:bg-emerald-600 items-center justify-center py-2 rounded-xl w-full duration-100 transition-all text-[0.9rem]"
                 onClick={() => router.back()}
                 type="button"
               >
                 <p>Back</p>
               </button>
               <button
-                className="flex cursor-pointer items-center justify-center w-full text-white py-1 bg-(--color-brand-green) hover:bg-emerald-600 active:bg-emerald-700 rounded-lg duration-100 transition-all"
+                className="flex cursor-pointer items-center justify-center w-full text-white py-2 bg-(--color-brand-green) hover:bg-emerald-600 active:bg-emerald-700 rounded-lg duration-100 transition-all"
                 type="submit"
                 disabled={loading}
               >
                 {loading ? (
-                  <Spinner />
+                  <div className="flex py-1"><Spinner/></div>
                 ) : (
                   <p className="text-[0.9rem]">Verify</p>
                 )}

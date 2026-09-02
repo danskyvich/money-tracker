@@ -60,7 +60,7 @@ export default function Modal({loading, children, onCancel, noButtonText, yesBut
             disabled={loading}
           >
             {
-              loading ? <Spinner/> : yesButtonText
+              loading ? <div className="flex py-1"><Spinner/></div> : yesButtonText
             }
           </button>
         </div>

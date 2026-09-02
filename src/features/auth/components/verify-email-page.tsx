@@ -5,7 +5,7 @@ import InputComponent from "@/components/layout/Input";
 import { OTPData, OTPSchema } from "@/lib/schemas/OTPSchema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Lock } from "lucide-react";
+import { Lock, Mail } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { resendOtp, verifyOtp } from "@/lib/supabase/actions/auth";
@@ -88,25 +88,25 @@ export default function VerifyEmailPage({
     <div className="flex flex-col w-full h-full items-center justify-center">
       {resendError && <ErrorModal message={resendError} />}
       {errors && <ErrorModal message={errors.root?.message} />}
+      <div className="flex w-full gap-2 h-fit items-center justify-center">
+        <Image src="/favicon.ico" alt="web_app_logo" width={25} height={12} />
+        <p className="font-bold text-4xl text-white">
+          Money{" "}
+          <span className="bg-brand-gradient bg-clip-text text-transparent">
+            Tracker
+          </span>
+        </p>
+      </div>
       {/* Centered modal */}
-      <div className="flex flex-col bg-(--color-bg-subtle) p-10 rounded-xl w-150 shadow-md">
-        <div className="flex w-full gap-2 h-fit items-center justify-center">
-          <Image src="/favicon.ico" alt="web_app_logo" width={25} height={12} />
-          <p className="font-bold text-3xl text-white">
-            Money{" "}
-            <span className="bg-brand-gradient bg-clip-text text-transparent">
-              Tracker
-            </span>
-          </p>
-        </div>
+      <div className="flex flex-col bg-(--color-bg-subtle) p-10 rounded-xl w-125 shadow-md mt-10">
         {/*Header */}
         <div className="flex flex-col flex-1 w-full h-full gap-5">
-          <p className="text-3xl text-(--color-text-primary) font-bold">
-            Confirm{" "}
-            <span className="bg-brand-gradient bg-clip-text text-transparent">
-              your email
-            </span>
-          </p>
+          <div className="flex w-full gap-2 items-center h-fit">
+            <Mail size={20} className="min-w-3 h-auto"/>
+            <p className="text-xl text-(--color-text-primary) font-semibold">
+              Confirm your email
+            </p>
+          </div>
           <p className="font-display text-[0.9rem]/5">
             We have sent you a verification email to
             <span className="font-semibold ml-1">{email}</span>. Enter the
@@ -146,7 +146,13 @@ export default function VerifyEmailPage({
               className="flex bg-(--color-brand-green) py-2 text-white text-center items-center justify-center w-full h-fit rounded-xl mt-5 text-[0.9rem] hover:bg-emerald-600 active:bg-emerald-700 cursor-pointer"
               type="submit"
             >
-              {pending ? <Spinner /> : <p>Verify email</p>}
+              {pending ? (
+                <div className="flex py-1">
+                  <Spinner />
+                </div>
+              ) : (
+                <p>Verify email</p>
+              )}
             </button>
             <button
               className="flex text-[0.9rem] border border-(--color-brand-green) rounded-lg items-center justify-center text-center py-1 hover:bg-(--color-brand-green) active:bg-emerald-600 active:text-white hover:text-white w-full h-fit"
