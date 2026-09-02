@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Card from "@/components/layout/card";
+import card from "@/components/layout/card";
 import { BaggageClaim, CircleDollarSign, PiggyBank, Plus } from "lucide-react";
 import IncomeBreakdownPage from "@/features/overview/components/breakdown-income";
 import ExpenseBreakdownPage from "@/features/overview/components/breakdown-expense";
@@ -259,7 +259,7 @@ export default function OverviewPage() {
             </div>
 
             {/* Transactions list */}
-            <Card
+            <card
               header={
                 <div className="flex md:h-auto gap-2 items-center min-h-0">
                   <CircleDollarSign size={20} />
@@ -282,7 +282,7 @@ export default function OverviewPage() {
                   loading={loadingTransactions}
                 />
               )}
-            </Card>
+            </card>
           </div>
         </div>
 
@@ -321,7 +321,7 @@ export default function OverviewPage() {
           </div>
 
           {/* Accounts list */}
-          <Card
+          <card
             className="flex flex-2 shrink-0 h-100 lg:flex-2 flex-col w-full"
             header={
               <div className="flex gap-2 items-center">
@@ -349,7 +349,7 @@ export default function OverviewPage() {
               pressedCurrentPage={(page) => setCurrentPage(page)}
               loading={loadingAccounts}
             />
-          </Card>
+          </card>
         </div>
       </div>
     </div>
