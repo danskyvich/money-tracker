@@ -1,4 +1,4 @@
-import VerifyQRPage from "@/features/mfa/components/verify-qr-page";
+import VerifyQRPage from "@/features/mfa/verify-qr-page";
 import { challengeUserMfa } from "@/lib/supabase/actions/auth";
 import { createClient } from "@/lib/supabase/clients/server";
 import { redirect } from "next/navigation";

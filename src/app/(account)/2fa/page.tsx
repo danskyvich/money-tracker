@@ -1,4 +1,4 @@
-import MFAPage from "@/features/mfa/components/qr-page";
+import MFAPage from "@/features/mfa/qr-page";
 
 export default function MFA() {
 

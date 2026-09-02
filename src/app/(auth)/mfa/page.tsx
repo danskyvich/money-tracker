@@ -1,4 +1,4 @@
-import QR from "@/features/mfa/components/qr-page";
+import QR from "@/features/mfa/qr-page";
 
 export default function QRPage () {
     return <QR/>

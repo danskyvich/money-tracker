@@ -79,6 +79,8 @@ export default function QR() {
         </div>
       ) : (
         <div className="flex flex-col justify-center gap-5 w-full h-full items-center">
+
+          {/* Outside text */}
           <div className="flex w-full gap-2 h-fit items-center justify-center">
             <Image
               src="/favicon.ico"
@@ -93,6 +95,8 @@ export default function QR() {
               </span>
             </p>
           </div>
+
+          {/* Card */}
           <div className="flex flex-col gap-5 mt-5 px-7 py-5 w-100 bg-(--color-bg-subtle) border border-(--color-border-subtle) rounded-xl shadow-md">
             {/* Headers */}
             <div className="flex items-center gap-2">

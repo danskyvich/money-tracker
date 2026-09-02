@@ -5,8 +5,7 @@ import LoadingModal from "@/components/layout/loading-modal";
 import Modal from "@/components/layout/modal";
 import { exportAllTablesCsv, ExportAllTablesToJSON, ImportFromCSV, ImportFromJSON, parseZipToTables, validateImportShape } from "@/lib/supabase/actions/backup";
 import { ArrowRight, FileSpreadsheet, MoveDownLeft, MoveUpRight } from "lucide-react"
-import { useEffect, useRef, useState } from "react"
-import JSZip from "jszip";
+import { useEffect, useState } from "react"
 
 export default function BackupPage() {
     useEffect(() => {
