@@ -1,4 +1,4 @@
-import Card from "@/components/layout/card";
+import CardComponent from "@/components/layout/card";
 import ErrorModal from "@/components/layout/error-modal";
 import { FetchExpenseCategories } from "@/lib/supabase/actions/database";
 import { Categories } from "@/lib/types/derived";
@@ -31,7 +31,7 @@ export default function ExpenseCategoriesCard () {
         fetchData();
     }, []);
     return (
-      <Card
+      <CardComponent
         header="Expense categories"
         className="flex flex-1 border border-(--color-border-default) rounded-lg xl:h-full h-150 overflow-y-auto shadow-lg"
         link="/settings"
@@ -54,6 +54,6 @@ export default function ExpenseCategoriesCard () {
             ))}
           </>
         )}
-      </Card>
+      </CardComponent>
     );
 }

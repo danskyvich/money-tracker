@@ -11,7 +11,7 @@ interface CardProps {
   linkText?: string;
 }
 
-export default function Card({
+export default function CardComponent({
   header,
   subheader,
   children,
