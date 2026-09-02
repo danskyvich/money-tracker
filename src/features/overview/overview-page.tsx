@@ -24,6 +24,7 @@ import {
   TransactionSearchResults,
 } from "@/lib/types/derived";
 import Skeleton from "@/components/layout/skeleton/skeleton-file";
+import CardComponent from "@/components/layout/card";
 
 export default function OverviewPage() {
   // variables - general
@@ -259,7 +260,7 @@ export default function OverviewPage() {
             </div>
 
             {/* Transactions list */}
-            <card
+            <CardComponent
               header={
                 <div className="flex md:h-auto gap-2 items-center min-h-0">
                   <CircleDollarSign size={20} />
@@ -282,7 +283,7 @@ export default function OverviewPage() {
                   loading={loadingTransactions}
                 />
               )}
-            </card>
+            </CardComponent>
           </div>
         </div>
 
@@ -321,7 +322,7 @@ export default function OverviewPage() {
           </div>
 
           {/* Accounts list */}
-          <card
+          <CardComponent
             className="flex flex-2 shrink-0 h-100 lg:flex-2 flex-col w-full"
             header={
               <div className="flex gap-2 items-center">
@@ -349,7 +350,7 @@ export default function OverviewPage() {
               pressedCurrentPage={(page) => setCurrentPage(page)}
               loading={loadingAccounts}
             />
-          </card>
+          </CardComponent>
         </div>
       </div>
     </div>
