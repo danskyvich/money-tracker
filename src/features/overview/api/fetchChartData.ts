@@ -4,13 +4,13 @@ import { createClient } from "@/lib/supabase/clients/server";
 
 export interface MonthlyFlow {
     month_start: string;
-    inflow: string;
-    outflow: string;
+    inflow: number;
+    outflow: number;
 }
 
 export interface CategoryBreakdownRow {
   category_name: string;
-  total: string;
+  total: number;
 }
 
 
