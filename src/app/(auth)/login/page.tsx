@@ -1,9 +1,12 @@
 import LoginPage from "@/features/auth/components/login-page";
+import { Suspense } from "react";
 
 export default async function Login() {
-  return(
+  return (
     <div className="flex flex-col">
-      <LoginPage/>
+      <Suspense fallback={null}>
+        <LoginPage />
+      </Suspense>
     </div>
-  )
+  );
 }

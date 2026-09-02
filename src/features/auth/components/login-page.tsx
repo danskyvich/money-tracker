@@ -87,8 +87,8 @@ export default function LoginPage() {
   return (
     <div className="flex flex-col items-center justify-center w-full">
     {
-      errors && (
-        <ErrorModal message={errors.email?.message}/>
+      error && (
+        <ErrorModal message={error}/>
       )
     }
       {/* Card */}
