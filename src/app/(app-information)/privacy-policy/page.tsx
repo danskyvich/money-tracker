@@ -1,7 +1,5 @@
 export default function PrivacyPolicy() {
     return(
-        <div className="flex w-full h-full">
-
-        </div>
+        <div className="flex w-full h-full"></div>
     )
 }
