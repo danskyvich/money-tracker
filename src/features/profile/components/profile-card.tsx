@@ -8,14 +8,14 @@ interface ProfileHeader {
 
 export default function ProfileHeader({user, mfaActive}:ProfileHeader) {
     return (
-      <div className="flex flex-0 w-full h-fit gap-5 p-5 rounded-xl bg-linear-to-r mb-2 from-slate-800 to-emerald-600 items-center justify-between">
+      <div className="fle flex-col md:flex-row flex-0 w-full h-fit gap-5 p-5 rounded-xl bg-linear-to-r mb-2 from-slate-800 to-emerald-600 items-center justify-between">
         {/* User information */}
         <div className="flex flex-col w-full h-fit">
-          <p className="text-lg font-mono text-white">
+          <p className="text-[0.85rem] md:text-lg font-mono text-white">
             <span>{user?.email}</span>
           </p>
-          <div className="text-[0.85rem] text-white">
-            <p>
+          <div className="text-[0.75rem] text-white">
+            <p className="pb-5">
               Created on{" "}
               {new Date(user?.created_at as string).toLocaleDateString()},{" "}
               {new Date(user?.created_at as string).toLocaleTimeString()}

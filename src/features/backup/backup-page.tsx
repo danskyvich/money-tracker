@@ -320,14 +320,14 @@ export default function BackupPage() {
                 className="grid grid-cols-[1fr_1fr] w-full h-fit items-center text-[0.9rem] px-5 py-2"
                 key={index}
               >
-                <p>{item.item}</p>
+                <p className="text-[0.85rem]">{item.item}</p>
 
                 <button
-                  className="flex w-fit h-fit cursor-pointer ring ring-inset ring-(--color-brand-green) items-center justify-center hover:text-white active:bg-emerald-600 active:text-white whitespace-nowrap rounded-lg gap-1 justify-self-end shadow-md px-5 py-1 hover:bg-(--color-brand-green) text-[0.9rem]"
+                  className="flex w-fit h-fit cursor-pointer ring ring-inset ring-(--color-brand-green) items-center justify-center hover:text-white active:bg-emerald-600 active:text-white whitespace-nowrap rounded-lg gap-1 justify-self-end shadow-md px-4 md:px-5 py-2 md:py-1 hover:bg-(--color-brand-green) text-[0.9rem]"
                   onClick={item.onClick}
                 >
                   {item.icon}
-                  <p>{item.value}</p>
+                  <p className="hidden md:block">{item.value}</p>
                 </button>
               </div>
             ))}

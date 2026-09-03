@@ -104,9 +104,9 @@ export default function SettingsPage() {
             >
               <p className="text-[0.9rem]">{item.item}</p>
 
-              <button className="flex w-fit h-fit ring ring-inset ring-(--color-brand-green) hover:text-white active:text-white active:bg-emerald-600 text-[0.9rem] rounded-lg shadow-md hover:bg-(--color-brand-green) px-5 py-1 items-center justify-center justify-self-end gap-1 duration-100 cursor-pointer transition-all" onClick={item.link}>
+              <button className="flex w-fit h-fit ring ring-inset ring-(--color-brand-green) hover:text-white active:text-white active:bg-emerald-600 text-[0.9rem] rounded-lg shadow-md hover:bg-(--color-brand-green) px-4 md:x-5 py-2 md:py-1 items-center justify-center justify-self-end gap-1 duration-100 cursor-pointer transition-all" onClick={item.link}>
                 {item.icon === null ? null : item.icon}
-                <p className="text-[0.9rem] whitespace-nowrap">{item.value}</p>
+                <p className="hidden md:block whitespace-nowrap">{item.value}</p>
               </button>
             </div>
           ))}

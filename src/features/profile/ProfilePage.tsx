@@ -184,15 +184,15 @@ export default function ProfilePage({
                 className="grid grid-cols-[1fr_1fr] w-full h-fit text-[0.9rem]  py-2 items-center justify-between"
                 key={index}
               >
-                <p>{item.item}</p>
+                <p className="text-[0.9rem] md:text-[1rem]">{item.item}</p>
 
                 {/* Buttons */}
                 <button
-                  className={`flex w-fit h-fit ring ring-inset ring-(--color-brand-green) text-[0.9rem] items-center justify-self-end gap-2 hover:bg-(--color-brand-green) whitespace-nowrap hover:text-white rounded-lg shadow-md px-5 py-1 transition-all duration-100 cursor-pointer`}
+                  className={`flex w-fit h-fit ring ring-inset ring-(--color-brand-green) text-[0.9rem] items-center justify-self-end gap-2 hover:bg-(--color-brand-green) whitespace-nowrap hover:text-white rounded-lg shadow-md px-4 md:px-5 py-2 md:py-1 transition-all duration-100 cursor-pointer`}
                   onClick={() => item.onClick()}
                 >
                   {item.icon === null ? null : item.icon}
-                  <p>{item.value}</p>
+                  <p className="hidden md:block">{item.value}</p>
                 </button>
               </div>
             ))}

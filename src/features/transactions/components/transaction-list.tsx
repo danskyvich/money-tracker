@@ -108,7 +108,7 @@ export default function WholeTransactionList() {
   return (
     <>
       {toggle === "delete-transaction" && (
-        <div className="fixed inset-0 z-50 flex w-full h-full items-center justify-center bg-black/50">
+        <div className="fixed inset-0 z-50 flex w-full min-h-185 md:h-full items-center justify-center bg-black/50">
           <DeleteTransactionModal
             open
             onOpen={() => setToggle(null)}
@@ -142,13 +142,13 @@ export default function WholeTransactionList() {
         </div>
       )}
       <div className="flex xl:flex-row flex-2 flex-col w-full h-full gap-5">
-        <div className="flex flex-2 grid grid-cols-1 grid-rows-[auto_1fr_auto] xl:h-full min-h-185 border border-(--color-border-default) rounded-lg shadow-lg">
+        <div className="flex flex-2 grid grid-cols-1 grid-rows-[auto_1fr_auto] xl:h-full border border-(--color-border-default) rounded-lg shadow-lg">
           {/* Table header*/}
-          <div className="flex w-full h-full px-5 py-2 items-center justify-between">
+          <div className="flex flex-col sm:flex-row w-full h-full px-5 py-2 items-stretch sm:items-center justify-between gap-2">
             <div className="flex w-full h-full gap-2">
               {/** Add transaction */}
               <div
-                className="flex w-fit h-full border text-white items-center gap-2 border-(--color-border-default) rounded-lg py-1 bg-(--color-brand-green) px-5 cursor-pointer hover:bg-emerald-600 active:bg-emerald-700"
+                className="flex w-fit h-full border text-white items-center gap-2 border-(--color-border-default) rounded-lg py-1 bg-(--color-brand-green) px-3 sm:px-5 cursor-pointer hover:bg-emerald-600 active:bg-emerald-700"
                 onClick={() => setToggle("add-transaction")}
               >
                 <Plus size={15} />
@@ -158,7 +158,7 @@ export default function WholeTransactionList() {
               </div>
 
               {/* Search field */}
-              <div className="px-3 py-1 flex w-[50%] h-full border border-(--color-border-default) rounded-md items-center gap-2">
+              <div className="px-3 py-1 flex w-full sm:w-[50%] h-full border border-(--color-border-default) rounded-md items-center gap-2">
                 <Search size={15} className="flex" />
                 <input
                   type="text"
@@ -174,7 +174,7 @@ export default function WholeTransactionList() {
             ) : (
               <RotateCw
                 size={20}
-                className="min-w-3 h-auto cursor-pointer"
+                className="min-w-3 h-auto cursor-pointer self-end sm:self-auto"
                 onClick={() => fetchData()}
               />
             )}
@@ -183,7 +183,7 @@ export default function WholeTransactionList() {
           {/* Transaction Table */}
           <div className="flex flex-col w-full h-full mt-3">
             {/** Transaction headers */}
-            <div className="grid grid-cols-[repeat(6,1fr)_30px] gap-4 font-mono text-[0.9rem] py-1 px-5 pt-1 font-display border-b border-(--color-border-default)">
+            <div className="hidden md:grid grid-cols-[repeat(6,1fr)_30px] gap-4 font-mono text-[0.9rem] py-1 px-5 pt-1 font-display border-b border-(--color-border-default)">
               <div className="line-clamp-1">Date & time</div>
               <div>Type</div>
               <div>Description</div>
@@ -201,62 +201,77 @@ export default function WholeTransactionList() {
                   <div className="flex flex-col w-full h-fit">
                     {displayedTransactions.map((transaction, key) => (
                       <div
-                        className="grid grid-cols-[repeat(6,1fr)_25px] gap-4 font-display text-[0.9rem] px-5 py-5 font-display w-full h-fit cursor-pointer hover:bg-(--color-bg-subtle) border-b border-(--color-border-subtle)"
+                        className="flex flex-col gap-2 md:grid md:grid-cols-[repeat(6,1fr)_25px] md:gap-4 md:items-center font-display text-[0.9rem] px-5 py-4 w-full h-fit cursor-pointer hover:bg-(--color-bg-subtle) border-b border-(--color-border-subtle)"
                         key={key}
                         onClick={() =>
                           handleGetTransactionToBeModified(transaction)
                         }
                       >
-                        <div className="flex w-full items-center">
-                          <p className="line-clamp-1">
+                        {/* Row 1 (mobile): date + amount + delete */}
+                        <div className="flex items-center justify-between md:contents">
+                          <p className="line-clamp-1 text-(--color-text-secondary) text-xs md:text-[0.9rem] md:text-(--color-text-primary)">
                             {ConvertTimestampToDateTime(
                               transaction.date_time ?? "",
                             )}
                           </p>
+
+                          <div className="flex items-center gap-3 md:contents">
+                            <p
+                              className={`line-clamp-1 font-mono ${
+                                transaction.type === "income"
+                                  ? "text-emerald-500"
+                                  : transaction.type === "expense"
+                                    ? "text-red-500"
+                                    : "text-(--color-text-primary)"
+                              }`}
+                            >
+                              {transaction.amount}
+                            </p>
+
+                            <div className="flex items-center justify-center rounded-lg md:order-last">
+                              <X
+                                className="min-w-3 max-w-5 h-auto cursor-pointer text-(--color-text-primary)"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setToggle("delete-transaction");
+                                  setChosenTransaction(transaction);
+                                }}
+                              />
+                            </div>
+                          </div>
                         </div>
-                        <div className="flex w-full items-center text-(--color-text-secondary)">
-                          <p className="capitalize line-clamp-1">
-                            {transaction.type}
-                          </p>
-                        </div>
-                        <div className="flex w-full items-center">
+
+                        {/* Row 2 (mobile): description */}
+                        <div className="flex w-full items-center md:contents">
                           <p className="line-clamp-1">
                             {transaction.description}
                           </p>
                         </div>
-                        <div className="flex w-full items-center">
+
+                        {/* Row 3 (mobile): type + category + account, small/secondary */}
+                        <div className="flex items-center gap-3 text-xs text-(--color-text-secondary) md:contents md:text-[0.9rem]">
+                          <p className="capitalize line-clamp-1">
+                            {transaction.type}
+                          </p>
+                          <span className="md:hidden">·</span>
                           <p className="line-clamp-1">
                             {transaction.category_id?.name ?? "--"}
                           </p>
-                        </div>
-                        <div className="flex w-full items-center">
-                          <p className="line-clamp-1">
-                            {transaction?.account_id?.name}
-                          </p>
-                          {transaction.to_account_id?.name && (
-                            <>
-                              <ArrowRight
-                                size={15}
-                                className="min-w-3 h-auto"
-                              />
-                              <p>{transaction.to_account_id.name}</p>
-                            </>
-                          )}
-                        </div>
-                        <div
-                          className={`flex w-full items-center font-mono ${transaction.type === "income" ? "text-emerald-500" : transaction.type === "expense" ? "text-red-500" : "text-(--color-text-primary)"}`}
-                        >
-                          <p className="line-clamp-1">{transaction.amount}</p>
-                        </div>
-                        <div className="flex items-center justify-center rounded-lg">
-                          <X
-                            className="min-w-3 max-w-5 h-auto cursor-pointer text-(--color-text=primary)"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setToggle("delete-transaction");
-                              setChosenTransaction(transaction);
-                            }}
-                          />
+                          <span className="md:hidden">·</span>
+                          <div className="flex items-center">
+                            <p className="line-clamp-1">
+                              {transaction?.account_id?.name}
+                            </p>
+                            {transaction.to_account_id?.name && (
+                              <>
+                                <ArrowRight
+                                  size={15}
+                                  className="min-w-3 h-auto"
+                                />
+                                <p>{transaction.to_account_id.name}</p>
+                              </>
+                            )}
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -277,20 +292,18 @@ export default function WholeTransactionList() {
           </div>
 
           {/* Footer */}
-          <div className="flex text-[0.9rem] w-full h-full px-5 py-2 font-display justify-between text-(--color-text-secondary) gap-2 items-center">
+          <div className="flex flex-col sm:flex-row text-[0.9rem] w-full h-full px-5 py-2 font-display justify-between text-(--color-text-secondary) gap-3 sm:gap-2 items-center">
             {/* Show num of items */}
-            <div className="flex w-fit h-full items-center">
+            <div className="flex w-full sm:w-fit h-full items-center justify-center sm:justify-start">
               <p>Show data</p>
-
               <div className="flex border border-(--color-border-default) text-(--color-text-secondary) px-3 py-2 mx-2 rounded-lg">
                 <p>{displayedTransactions?.length}</p>
               </div>
-
               <p>of {totalNumberOfItems}</p>
             </div>
 
             {/* Pagination */}
-            <div className="flex w-fit h-full items-center gap-2 mx-3">
+            <div className="flex w-fit h-full items-center gap-2 sm:mx-3 overflow-x-auto">
               {/* Left */}
               {windowStart > 0 && (
                 <div
