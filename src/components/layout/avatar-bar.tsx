@@ -72,7 +72,7 @@ export default function AvatarBar() {
             <ThemeSwitcher />
           </div>
           {navigation && (
-            <div className="fixed w-full flex md:hidden top-16 bottom-0 left-0 right-0 z-50 bg-black/30 border-b border-(--color-border-default)/20 shadow-md">
+            <div className="fixed w-full flex md:hidden top-16 bottom-0 left-0 right-0 z-50 bg-black/70 border-b border-(--color-border-default)/20 shadow-md">
               <div className="flex flex-col bg-(--color-bg-secondary) w-full h-fit pt-3">
                 <p className="text-xl font-semibold px-5 py-3 border-b border-(--color-border-subtle)">
                   Navigation

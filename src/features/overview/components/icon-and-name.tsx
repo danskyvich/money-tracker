@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { iconMap } from "../../../lib/icons";
+import { getUser } from "@/lib/supabase/actions/auth";
+import { headers } from "@/lib/headers";
 
 export default function OverviewHeader() {
   const [time, setTime] = useState<string>("");
+  const [header, setHeader] = useState<string>("");
 
   // get current time
   useEffect(() => {
@@ -46,12 +49,17 @@ export default function OverviewHeader() {
     );
   };
 
+  const getHeaderText = ({ time } : { time: string}) => {
+    const hour = parseInt(time.split(":")[0], 10);
+    return headers.find(({range}) => hour >= range[0] && hour < range[1])?.header;
+  }
+
   return (
     <div className="flex flex-col">
       <div className="flex items-center gap-5 text-xl text-primary">
         {getOverviewIcon({ time })}
         <div className="flex flex-col justify-center">
-          <p className="flex font-normal text-3xl tracking-tight">Welcome, Juan!</p>
+          <p className="flex font-normal text-3xl tracking-tight">{getHeaderText({time})}</p>
         </div>
       </div>
     </div>
