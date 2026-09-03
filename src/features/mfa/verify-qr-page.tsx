@@ -44,12 +44,12 @@ export default function VerifyQRPage({challengeId, factorId, mode}:VerifyQRPage)
             </span>
           </p>
         </div>
-        <div className="flex flex-col w-125 px-7 py-10 bg-(--color-bg-subtle) border border-(--color-border-default) rounded-lg shadow-lg gap-2">
+        <div className="flex flex-col w-75 sm:w-120 xl:w-125 px-5 sm:px-10 lg:px-10 xl:px-15 py-10 bg-(--color-bg-subtle) border border-(--color-border-default) rounded-lg shadow-lg gap-2">
           {/* Header */}
           <div className="flex-col gap-1">
             <div className="flex w-full h-fit justify-center items-center gap-2">
-              <Nfc size={18} className="min-w-3 h-auto"/>
-              <p className="flex text-xl font-semibold w-full h-fit items-center">
+              <Nfc size={18} className="min-w-3 h-auto" />
+              <p className="flex text-[1rem] sm:text-xl font-semibold w-full h-fit items-center">
                 {mode === "enroll"
                   ? "Set up your MFA"
                   : "Multi-factor authentication"}
@@ -80,7 +80,7 @@ export default function VerifyQRPage({challengeId, factorId, mode}:VerifyQRPage)
               />
             </div>
             {mode !== "enroll" && (
-              <div className="flex px-3 gap-2">
+              <div className="flex px-3 gap-2 mt-1">
                 <input
                   id="trustDeviceForThirtyDays"
                   type="checkbox"
@@ -89,7 +89,7 @@ export default function VerifyQRPage({challengeId, factorId, mode}:VerifyQRPage)
                 />
                 <label
                   htmlFor="trustDeviceForThirtyDays"
-                  className="text-[0.9rem] font-light"
+                  className="text-[0.8rem] sm:text-[0.9rem] font-light"
                 >
                   Trust this device for 30 days?
                 </label>
@@ -110,7 +110,9 @@ export default function VerifyQRPage({challengeId, factorId, mode}:VerifyQRPage)
                 disabled={loading}
               >
                 {loading ? (
-                  <div className="flex py-1"><Spinner/></div>
+                  <div className="flex py-1">
+                    <Spinner />
+                  </div>
                 ) : (
                   <p className="text-[0.9rem]">Verify</p>
                 )}

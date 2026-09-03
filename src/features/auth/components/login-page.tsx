@@ -92,17 +92,17 @@ export default function LoginPage() {
       )
     }
       {/* Card */}
-      <div className="flex w-125 h-fit flex-col rounded-2xl bg-(--color-bg-subtle) px-15 py-20 shadow-2xl">
+      <div className="flex w-75 sm:w-120 xl:w-125 h-fit flex-col rounded-2xl bg-(--color-bg-subtle) px-5 sm:px-10 lg:px-10 xl:px-15 py-20 shadow-2xl">
         {/* Header */}
         <header className="text-center">
-          <p className="font-bold text-5xl">
+          <p className="font-bold text-4xl sm:text-5xl">
             Money{" "}
             <span className="bg-brand-gradient bg-clip-text text-transparent">
               Tracker
             </span>
           </p>
-          <p className="font-mono font-light my-3 text-(--color-text-secondary)">
-            An average money tracker app for an average man
+          <p className="font-mono text-[0.8rem] sm:text-[1rem] font-light my-3 text-(--color-text-secondary)">
+            An average money tracker app for the average man.
           </p>
         </header>
 

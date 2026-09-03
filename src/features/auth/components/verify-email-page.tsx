@@ -98,20 +98,20 @@ export default function VerifyEmailPage({
         </p>
       </div>
       {/* Centered modal */}
-      <div className="flex flex-col bg-(--color-bg-subtle) p-10 rounded-xl w-125 shadow-md mt-10">
+      <div className="flex flex-col bg-(--color-bg-subtle) px-5 sm:px-10 lg:px-10 xl:px-15 py-10 rounded-xl w-75 sm:w-120 xl:w-125 shadow-md mt-10">
         {/*Header */}
         <div className="flex flex-col flex-1 w-full h-full gap-5">
           <div className="flex w-full gap-2 items-center h-fit">
-            <Mail size={20} className="min-w-3 h-auto"/>
+            <Mail size={20} className="min-w-3 h-auto" />
             <p className="text-xl text-(--color-text-primary) font-semibold">
               Confirm your email
             </p>
           </div>
           <p className="font-display text-[0.9rem]/5">
             We have sent you a verification email to
-            <span className="font-semibold ml-1">{email}</span>. Enter the
-            One-time PIN (OTP) code that was sent to your email in the input box
-            below.{" "}
+            <span className="font-semibold ml-1 inline-block">{email}</span>.
+            Enter the One-time PIN (OTP) code that was sent to your email in the
+            input box below.{" "}
           </p>
         </div>
 
