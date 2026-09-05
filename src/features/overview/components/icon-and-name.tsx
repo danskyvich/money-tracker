@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
 import { iconMap } from "../../../lib/icons";
-import { getUser } from "@/lib/supabase/actions/auth";
 import { headers } from "@/lib/headers";
 
 export default function OverviewHeader() {
   const [time, setTime] = useState<string>("");
-  const [header, setHeader] = useState<string>("");
 
   // get current time
   useEffect(() => {
