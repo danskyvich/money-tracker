@@ -33,7 +33,7 @@ export default function AccountsPartialList({
           <p>{accountsError}</p>
         </div>
       ) : (
-        <div className="flex flex-col w-full h-100 2xl:h-full">
+        <div className="flex flex-col w-full h-75 xl:h-full">
           {accountsData?.length === 0 ? (
             <div className="flex w-full h-full items-center font-mono justify-center text-[0.9rem]">
               <p>You have no accounts.</p>
@@ -46,17 +46,29 @@ export default function AccountsPartialList({
                 <div className="flex flex-col w-full h-full">
                   {accountsData?.map((item, key) => (
                     <div
-                      className="grid grid-cols-[1fr_1fr_1fr_1fr] w-full h-15 border-b border-(--color-border-subtle) px-5 py-1 text-[0.9rem] items-center hover:bg-(--color-bg-subtle) cursor-pointer"
+                      className="flex flex-col gap-1 md:grid md:grid-cols-[1fr_1fr_1fr_1fr] md:items-center w-full h-fit md:h-15 border-b border-(--color-border-subtle) px-5 py-2 md:py-1 text-[0.9rem] hover:bg-(--color-bg-subtle) cursor-pointer"
                       key={key}
                     >
-                      <div className="line-clamp-1">{item.name}</div>
-                      <div className="text-(--color-text-secondary) line-clamp-1">
-                        {item.description}
+                      {/* Row 1 (mobile): name + balance */}
+                      <div className="flex items-center justify-between md:contents">
+                        <div className="line-clamp-1 font-medium md:font-normal">
+                          {item.name}
+                        </div>
+                        <div className="line-clamp-1 md:order-last">
+                          {item.balance}
+                        </div>
                       </div>
-                      <div className="line-clamp-1">
-                        {item?.category_id?.name}
+
+                      {/* Row 2 (mobile): category · description */}
+                      <div className="flex items-center gap-2 text-xs text-(--color-text-secondary) md:contents md:text-[0.9rem]">
+                        <div className="line-clamp-1">
+                          {item?.category_id?.name}
+                        </div>
+                        <span className="md:hidden">·</span>
+                        <div className="line-clamp-1 whitespace-nowrap">
+                          {item.description}
+                        </div>
                       </div>
-                      <div className="line-clamp-1">{item.balance}</div>
                     </div>
                   ))}
                 </div>
@@ -94,7 +106,6 @@ export default function AccountsPartialList({
                   onClick={() => {
                     setCurrentPage(item);
                     pressedCurrentPage(item);
-                    ;
                   }}
                 >
                   <p>{item}</p>

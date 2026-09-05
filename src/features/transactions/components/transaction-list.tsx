@@ -42,6 +42,7 @@ export default function WholeTransactionList() {
   const displayedTransactions = searchTerm.trim()
     ? changedTransactionsData
     : transactionsData;
+  const isSearching = debouncedSearch.trim().length > 0;
   
   // pagination --> edit # of items calculations on lib/data/overview.ts
   // calculation here is purely for pagination purposes
@@ -150,7 +151,7 @@ export default function WholeTransactionList() {
             <div className="flex w-full h-full gap-2">
               {/** Add transaction */}
               <div
-                className="flex w-fit whitespace-nowrap h-full border text-white items-center gap-2 border-(--color-border-default) rounded-lg py-1 md:py-2 bg-(--color-brand-green) px-3 sm:px-5 cursor-pointer hover:bg-emerald-600 active:bg-emerald-700"
+                className="flex w-fit whitespace-nowrap h-full border text-white items-center gap-2 border-(--color-border-default) rounded-lg py-1 bg-(--color-brand-green) px-3 sm:px-5 cursor-pointer hover:bg-emerald-600 active:bg-emerald-700"
                 onClick={() => setToggle("add-transaction")}
               >
                 <Plus size={15} />
@@ -160,7 +161,7 @@ export default function WholeTransactionList() {
               </div>
 
               {/* Search field */}
-              <div className="px-2 md:py-2 flex w-full h-full border border-(--color-border-default) rounded-md items-center gap-2">
+              <div className="px-2 py-1 flex w-full h-full border border-(--color-border-default) rounded-md items-center gap-2">
                 <Search size={15} className="min-w-3 h-auto" />
                 <input
                   type="text"
@@ -185,7 +186,7 @@ export default function WholeTransactionList() {
           {/* Transaction Table */}
           <div className="flex flex-col w-full h-full mt-3">
             {/** Transaction headers */}
-            <div className="hidden h-0 md:h-fit md:grid grid-cols-[repeat(6,1fr)_30px] gap-4 font-mono text-[0.9rem] py-1 px-5 pt-1 font-display border-b border-(--color-border-default)">
+            <div className="hidden h-0 md:h-fit md:grid grid-cols-[repeat(6,1fr)_30px] gap-4 font-display text-[0.9rem] py-1 px-5 pt-1 font-display border-b border-(--color-border-default)">
               <div className="line-clamp-1">Date & time</div>
               <div>Type</div>
               <div>Description</div>
@@ -297,11 +298,11 @@ export default function WholeTransactionList() {
           <div className="flex flex-col sm:flex-row text-[0.9rem] w-full h-full px-5 py-2 font-display justify-between text-(--color-text-secondary) gap-3 sm:gap-2 items-center">
             {/* Show num of items */}
             <div className="flex w-full sm:w-fit h-full items-center justify-center sm:justify-start">
-              <p>Show data</p>
+              <p>{isSearching ? "Found" : "Show data"}</p>
               <div className="flex border border-(--color-border-default) text-(--color-text-secondary) px-3 py-2 mx-2 rounded-lg">
-                <p>{displayedTransactions?.length}</p>
+                <p>{displayedTransactions?.length}{!isSearching && "of"}</p>
               </div>
-              <p>of {totalNumberOfItems}</p>
+              <p>{`${!isSearching && `of ${totalNumberOfItems}`}`}</p>
             </div>
 
             {/* Pagination */}

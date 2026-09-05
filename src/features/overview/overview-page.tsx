@@ -73,70 +73,61 @@ export default function OverviewPage() {
     document.title = "Dashboard";
   }, []);
 
-  // fetch accounts
-  const fetchData = async () => {
-    setLoadingTransactions(true);
+  const fetchAccounts = async (page: number) => {
     setLoadingAccounts(true);
-    setLoading(true);
-
     try {
-      const [accountsResult, transactionResult] = await Promise.all([
-        FetchAccounts(currentPage, 4),
-        FetchTransaction(currentPage, 9),
-      ]);
-
+      const accountsResult = await FetchAccounts(page, 4);
       if (!accountsResult.success) {
         setAccountError(accountsResult.error);
-        setLoading(false);
         return;
-      } else {
-        setAccounts(accountsResult.accountsData);
-        setAccountCategoriesData(accountsResult.accountCategoriesData);
-        setTotalNumberOfItems(accountsResult.totalItems);
-        setLoading(false);
       }
+      setAccounts(accountsResult.accountsData);
+      setAccountCategoriesData(accountsResult.accountCategoriesData);
+      setTotalNumberOfItems(accountsResult.totalItems);
+    } finally {
+      setLoadingAccounts(false);
+    }
+  };
 
-      // --- transactions handling ---
+  // transactions + total earnings, still keyed off currentPage as before
+  const fetchTransactionsAndTotal = async () => {
+    setLoading(true);
+    setLoadingTransactions(true);
+    try {
+      const transactionResult = await FetchTransaction(currentPage, 9);
       if (!transactionResult.success) {
         setTransactionError(transactionResult.error);
-        setLoading(false);
         return;
-      } else {
-        const sortedTransactions = [...(transactionResult.data ?? [])].sort(
-          (a, b) =>
-            new Date(b.date_time).getTime() - new Date(a.date_time).getTime(),
-        );
-        setTransactionData(sortedTransactions);
-        setLoading(false);
       }
+      const sortedTransactions = [...(transactionResult.data ?? [])].sort(
+        (a, b) =>
+          new Date(b.date_time).getTime() - new Date(a.date_time).getTime(),
+      );
+      setTransactionData(sortedTransactions);
 
-      // --- retrieve total count ---
       const result = await CalculateTotalEarnings();
       if (!result.success) {
         setCalculateError(result.error ?? "Fetching total earnings failed");
-        setLoading(false);
-        return;
-      } else {
-        const row = result.data?.[0];
-        const total = (
-          Number(row?.total_income ?? 0.0) - Number(row?.total_expense ?? 0.0)
-        ).toFixed(2);
-        setTotal(Number(total));
-        setLoading(false);
         return;
       }
-    } catch (err) {
+      const row = result.data?.[0];
+      const total = (
+        Number(row?.total_income ?? 0.0) - Number(row?.total_expense ?? 0.0)
+      ).toFixed(2);
+      setTotal(Number(total));
     } finally {
       setLoading(false);
-      setLoadingAccounts(false);
       setLoadingTransactions(false);
     }
   };
 
-  // call fetchData()
   useEffect(() => {
-    fetchData();
+    fetchTransactionsAndTotal();
   }, [currentPage]);
+
+  useEffect(() => {
+    fetchAccounts(1);
+  }, []);
 
   // inflows and outflows
   useEffect(() => {
@@ -158,7 +149,7 @@ export default function OverviewPage() {
             open
             onOpen={() => setToggle(null)}
             onCancel={() => setToggle(null)}
-            fetch={fetchData}
+            fetch={fetchTransactionsAndTotal}
           />
         </div>
       )}
@@ -167,7 +158,7 @@ export default function OverviewPage() {
           open
           onOpen={() => setToggle(null)}
           accountCategoriesData={accountCategoriesData}
-          refresh={fetchData}
+          refresh={fetchTransactionsAndTotal}
         />
       )}
 
@@ -175,7 +166,7 @@ export default function OverviewPage() {
       <OverviewHeader />
 
       {/* Main Content */}
-      <div className="flex flex-col 2xl:flex-row w-full md:h-full gap-5">
+      <div className="flex flex-col xl:flex-row w-full md:h-full gap-5">
         {/* Left side */}
         <div className="flex flex-1 flex-col w-full h-full gap-5">
           <div className="flex w-full flex-col gap-1">
@@ -231,7 +222,7 @@ export default function OverviewPage() {
           {/* Bottom side */}
           <div className="flex flex-col md:flex-row w-full h-full gap-5">
             {/* Pie chart */}
-            <div className="flex flex-col w-full h-75 md:h-full border border-(--color-border-default) rounded-lg px-5 py-3 gap-2 shadow-md">
+            <div className="flex flex-col w-full xl:w-fit h-75 md:h-full border border-(--color-border-default) rounded-lg px-5 py-3 gap-2 shadow-md">
               <div className="flex w-full h-fit justify-between">
                 <p className="text-sm text-(--color-text-secondary) font-mono">
                   Transfers are not included.
@@ -347,7 +338,7 @@ export default function OverviewPage() {
               accountsData={accounts}
               accountsError={accountError}
               totalNumberOfItems={totalNumberOfItems}
-              pressedCurrentPage={(page) => setCurrentPage(page)}
+              pressedCurrentPage={(page) => fetchAccounts(page)}
               loading={loadingAccounts}
             />
           </CardComponent>
