@@ -187,10 +187,10 @@ export default function WholeAccountsList() {
           {loading ? (
             <AccountListModalSkeleton />
           ) : (
-            <div className="flex flex-col relative w-full">
+            <div className="flex flex-col relative w-full h-full">
               {changedAccounts?.length === 0 && (
-                <div className="flex w-full h-full items-center justify-center text-[0.9rem]">
-                  <p className="self-center font-mono">You have no accounts.</p>
+                <div className="flex w-full h-full items-center text-center justify-center text-[0.9rem]">
+                  <p className="font-display">You have no accounts.</p>
                 </div>
               )}
               {unchangedAccounts ? (
@@ -272,7 +272,7 @@ export default function WholeAccountsList() {
             )}
             {visiblePages.map((item, index) => (
               <div
-                className={`border border-(--color-border-default) rounded-lg px-3 py-1 md:py-2 hover:cursor-pointer ${currentPage === item ? "bg-(--color-brand-green) text-white hover:bg-(--color-brand-green)" : null}`}
+                className={`border border-(--color-border-default) rounded-lg px-3 py-1 md:py-2 text-(--color-text-secondary) hover:cursor-pointer ${currentPage === item ? "bg-(--color-brand-green) text-white hover:bg-(--color-brand-green)" : null}`}
                 key={index}
                 onClick={() => setCurrentPage(item)}
               >
