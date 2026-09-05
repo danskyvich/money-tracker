@@ -75,8 +75,8 @@ export default function AccountsPartialList({
               )}
             </div>
           )}
-          <div className="flex flex-0 w-full h-fit px-5 py-3 text-[0.9rem] text-(--color-text-secondary) whitespace-nowrap items-center justify-between">
-            <div className="flex flex-1 w-full h-fit">
+          <div className="flex flex-col md:flex-row flex-0 w-full h-fit px-5 py-3 gap-2 text-[0.9rem] text-(--color-text-secondary) whitespace-nowrap items-center justify-center md:justify-between">
+            <div className="flex flex-1 w-full h-fit justify-center md:justify-start">
               <p>
                 Show data{" "}
                 <span className="border border-(--color-border-subtle) mx-1 rounded-lg p-2">
@@ -86,10 +86,10 @@ export default function AccountsPartialList({
               </p>
             </div>
 
-            <div className="flex flex-1 w-full h-full items-center justify-end gap-2">
+            <div className="flex flex-1 w-full h-full items-center justify-center md:justify-end gap-2">
               {windowStart > 0 && (
                 <div
-                  className="px-3 py-2 border border-(--color-border-default) rounded-lg shadow-md cursor-pointer hover:bg-(--color-bg-subtle)"
+                  className="px-1 md:px-3 py-1 md:py-2 border border-(--color-border-default) rounded-lg shadow-md cursor-pointer hover:bg-(--color-bg-subtle)"
                   onClick={() =>
                     setWindowStart((prev) => Math.max(0, prev - 5))
                   }

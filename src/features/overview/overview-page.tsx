@@ -326,7 +326,7 @@ export default function OverviewPage() {
           >
             <div className="flex flex-col w-full h-fit">
               {/* Header */}
-              <div className="grid grid-cols-[1fr_1fr_1fr_1fr] w-full h-full px-5 py-1 font-display text-[0.9rem] border-b border-(--color-border-subtle)">
+              <div className="hidden md:grid grid-cols-[1fr_1fr_1fr_1fr] w-full h-full px-5 py-1 font-display text-[0.9rem] border-b border-(--color-border-subtle)">
                 <p>Name</p>
                 <p>Description</p>
                 <p>Category</p>

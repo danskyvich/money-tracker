@@ -282,7 +282,7 @@ export default function WholeTransactionList() {
                 )}
 
                 {displayedTransactions?.length === 0 && (
-                  <div className="flex w-full h-full items-center font-mono justify-center text-[0.8rem] md:text-[0.9rem]">
+                  <div className="flex w-full h-full items-center font-display justify-center text-[0.8rem] md:text-[0.9rem]">
                     <p>No transactions found</p>
                   </div>
                 )}

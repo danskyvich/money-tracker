@@ -23,68 +23,74 @@ export default function DoughnutChart({ data }: DoughnutChartProps) {
   ]);
 
   useEffect(() => {
-    const rootStyles = getComputedStyle(document.documentElement);
-    const textPrimary = rootStyles.getPropertyValue("--color-text-primary").trim();
+    const renderChart = () => {
+      const rootStyles = getComputedStyle(document.documentElement);
+      const textPrimary = rootStyles
+        .getPropertyValue("--color-text-primary")
+        .trim();
 
-    const option = {
-      title: {
-        text: data
-          .reduce((sum, item) => sum + item.value, 0)
-          .toLocaleString("en-PH", {
-            style: "currency",
-            currency: "PHP",
-            minimumFractionDigits: 2,
-          }),
-        subtext: "Total",
-        left: "center",
-        top: "center",
-        textStyle: {
-          fontSize: 20,
-          fontWeight: "bold",
-          color: textPrimary || "#333333",
+      const option = {
+        title: {
+          text: data
+            .reduce((sum, item) => sum + item.value, 0)
+            .toLocaleString("en-PH", {
+              style: "currency",
+              currency: "PHP",
+              minimumFractionDigits: 2,
+            }),
+          subtext: "Total",
+          left: "center",
+          top: "center",
+          textStyle: {
+            fontSize: 20,
+            fontWeight: "bold",
+            color: textPrimary,
+          },
+          subtextStyle: {
+            fontSize: 14,
+            color: textPrimary,
+          },
         },
-        subtextStyle: {
-          fontSize: 14,
-          color: textPrimary || "#333333",
+        tooltip: {
+          trigger: "item",
+          formatter: (params: any) => {
+            const amount = Number(params.value).toLocaleString("en-PH", {
+              minimumFractionDigits: 2,
+            });
+            return `${params.name}: ${amount} (${params.percent}%)`;
+          },
         },
-      },
-      tooltip: {
-        trigger: "item",
-        formatter: (params: any) => {
-          const amount = Number(params.value).toLocaleString("en-PH", {
-            minimumFractionDigits: 2,
-          });
-          return `${params.name}: ${amount} (${params.percent}%)`;
+        color: ["#FF6B6B", "#4ECDC4", "#45B7D1", "#FFA07A", "#98D8C8"],
+        series: {
+          type: "pie",
+          data: data,
+          radius: ["45%", "75%"],
+          center: ["50%", "50%"],
+          avoidLabelOverlap: true,
+          labelLine: {
+            show: false,
+          },
+          label: {
+            show: false,
+          },
         },
-      },
-      color: ["#FF6B6B", "#4ECDC4", "#45B7D1", "#FFA07A", "#98D8C8"],
-      series: {
-        type: "pie",
-        data: data,
-        radius: ["45%", "75%"],
-        center: ["50%", "50%"],
-        avoidLabelOverlap: true,
-        labelLine: {
-          show: false,
+        legend: {
+          orient: "vertical",
+          left: "left",
+          data: data.map((item) => item.name),
         },
-        label: {
-          show: false,
-        },
-      },
-      legend: {
-        orient: "vertical",
-        left: "left",
-        data: data.map((item) => item.name),
-      },
+      };
+
+      if (divRef.current && !chartRef.current) {
+        chartRef.current = echarts.init(divRef.current);
+      }
+
+      if (chartRef.current) {
+        chartRef.current.setOption(option);
+      }
     };
 
-    if (divRef.current && !chartRef.current) {
-      chartRef.current = echarts.init(divRef.current);
-    }
-
-    if (chartRef.current) {
-      chartRef.current.setOption(option);
-    }
+    renderChart();
 
     const handleResize = () => {
       chartRef.current?.resize(); // ✅ Add () to actually call resize
@@ -92,9 +98,16 @@ export default function DoughnutChart({ data }: DoughnutChartProps) {
 
     window.addEventListener("resize", handleResize);
 
+    const observer = new MutationObserver(renderChart);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
     return () => {
       window.removeEventListener("resize", handleResize);
       chartRef.current?.dispose();
+      observer.disconnect();
       chartRef.current = null;
     };
   }, [data]);

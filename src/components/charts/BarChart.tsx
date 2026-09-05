@@ -19,58 +19,77 @@ export default function SixMonthsRef({inflowData, outflowData, xAxisLabels}:SixM
 
   //stacked bar chart
   useEffect(() => {
-    const options = {
-      tooltip: {
-        trigger: "item",
-        axisPointer: {
-          type: "shadow",
-        },
-      },
-      color: ["#4ECDC4", "#FF6B6B"],
-      grid: {
-        left: "30px",
-        right: "15px",
-        top: "30px",
-        bottom: "30px",
-        containLabel: true,
-      },
-      label: {
-        show: false,
-      },
-      xAxis: {
-        type: "category",
-        data: xAxisLabels,
-      },
-      yAxis: {
-        type: "value",
-      },
-      series: [
-        {
-          type: "bar",
-          data: inflowData,
-          stack: "total",
-        },
-        {
-          type: "bar",
-          data: outflowData,
-          stack: "total",
-        },
-      ],
-    };
+    const renderChart = () => {
+      const rootStyles = getComputedStyle(document.documentElement);
+      const textPrimary = rootStyles.getPropertyValue("--color-text-primary").trim();
 
-    // attach container ref to chartRef if chartRef is null
-    if (!chartRef.current && sixMonthsRef.current) {
-      chartRef.current = echarts.init(sixMonthsRef.current);
+      const options = {
+        tooltip: {
+          trigger: "item",
+          axisPointer: {
+            type: "shadow",
+          },
+        },
+        color: ["#4ECDC4", "#FF6B6B"],
+        grid: {
+          left: "30px",
+          right: "15px",
+          top: "30px",
+          bottom: "30px",
+          containLabel: true,
+        },
+        label: {
+          show: false,
+        },
+        xAxis: {
+          type: "category",
+          data: xAxisLabels,
+          xAxisLabels: { color: textPrimary }
+        },
+        yAxis: {
+          type: "value",
+          xAxisLabels: { color: textPrimary }
+        },
+        series: [
+          {
+            type: "bar",
+            data: inflowData,
+            stack: "total",
+          },
+          {
+            type: "bar",
+            data: outflowData,
+            stack: "total",
+          },
+        ],
+      };
+
+      // attach container ref to chartRef if chartRef is null
+      if (!chartRef.current && sixMonthsRef.current) {
+        chartRef.current = echarts.init(sixMonthsRef.current);
+      }
+
+      if (chartRef.current) {
+        chartRef.current.setOption(options);
+      }
     }
 
-    if (chartRef.current) {
-      chartRef.current.setOption(options);
-    }
+    renderChart();
 
     // function for handling resize
     const handleResize = () => chartRef.current?.resize();
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+
+    const observer = new MutationObserver(renderChart);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      observer.disconnect();
+    }
   }, [xAxisLabels, inflowData, outflowData]);
 
   return (
