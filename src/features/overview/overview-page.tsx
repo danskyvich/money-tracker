@@ -177,7 +177,7 @@ export default function OverviewPage() {
                 <Skeleton className="flex w-50 h-full" />
               </div>
             ) : (
-              <p className="flex text-5xl font-display tracking-tight">
+              <p className="flex font-mono text-3xl py-1 md:py-0 lg:text-4xl xl:text-5xl tracking-tight">
                 <span className="text-3xl self-end mr-2 font-display">₱</span>
                 {total?.toLocaleString("en-us", {
                   minimumFractionDigits: 2,
@@ -196,23 +196,25 @@ export default function OverviewPage() {
             <div className="flex flex-col flex-2 border border-(--color-border-default) rounded-lg shadow-md w-full h-full p-5 gap-2">
               <p className="text-xl font-semibold">Quick Actions</p>
               <div className="flex w-full h-full gap-5 flex-col md:flex-row">
+                {/* Add transaction */}
                 <div
-                  className="flex flex-1 bg-(--color-brand-green) text-white rounded-lg shadow-md items-center justify-center text-[0.9rem] gap-1 py-2 cursor-pointer hover:bg-(--color-brand-green-accent) duration-100 transition-all active:bg-emerald-600"
+                  className="flex flex-1 bg-(--color-brand-green) px-2 text-white rounded-lg shadow-md items-center justify-center text-[0.9rem] gap-1 py-2 cursor-pointer hover:bg-(--color-brand-green-accent) duration-100 transition-all active:bg-emerald-600"
                   onClick={() => setToggle("add-transaction")}
                 >
-                  <Plus size={20} />
-                  <p className="hidden lg:block whitespace-nowrap">
-                    Add a transaction
+                  <Plus size={18} className="min-w-3 h-auto" />
+                  <p className="hidden text-[0.7rem] md:text-[0.8rem] lg:block whitespace-nowrap">
+                    Add transaction
                   </p>
                 </div>
 
+                {/* Add account */}
                 <div
-                  className="flex flex-1 ring ring-inset ring-(--color-brand-green) hover:bg-(--color-brand-green) hover:text-white rounded-lg shadow-md items-center justify-center text-[0.9rem] gap-1 py-2 cursor-pointer duration-100 transition-all active:bg-emerald-600"
+                  className="flex flex-1 px-2 ring ring-inset ring-(--color-brand-green) hover:bg-(--color-brand-green) hover:text-white rounded-lg shadow-md items-center justify-center text-[0.9rem] gap-1 py-2 cursor-pointer duration-100 transition-all active:bg-emerald-600"
                   onClick={() => setToggle("add-account")}
                 >
-                  <PiggyBank size={20} />
-                  <p className="hidden lg:block whitespace-nowrap">
-                    Add an account
+                  <PiggyBank size={18} className="min-w-3 h-auto" />
+                  <p className="hidden text-[0.7rem] md:text-[0.8rem] lg:block whitespace-nowrap">
+                    Add account
                   </p>
                 </div>
               </div>
