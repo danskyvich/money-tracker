@@ -236,22 +236,25 @@ export async function verifyUserMfa(factorId: string, challengeId: string, code:
     redirect(redirectTo);
 }
 
-export async function isDeviceTrusted() {
+export async function isDeviceTrusted(user_id?: string) {
     const supabase = await createClient();
     const cookieStore = await cookies();
     const token = cookieStore.get("trusted_devices")?.value;
     if (!token) return false;
 
-    const user = await getUser();
-    if (!user) return { success: false, error: "User not authenticated"};
-    const user_id = user.id;
+    let uid = user_id;
+    if (!uid) {
+        const user = await getUser();
+        if (!user) return false;
+        uid = user.id;
+    }
 
     const tokenHash = createHash("sha256").update(token).digest("hex");
 
     const { data } = await supabase
         .from("trusted_devices")
         .select("id")
-        .eq("user_id", user_id)
+        .eq("user_id", uid)
         .eq("device_token_hash", tokenHash)
         .gte("expires_at", new Date().toISOString())
         .maybeSingle();

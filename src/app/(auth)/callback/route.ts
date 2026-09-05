@@ -13,6 +13,7 @@ export async function GET(request: NextRequest) {
     if (code) {
         const supabase = await createClient();
         const { error } = await supabase.auth.exchangeCodeForSession(code);
+        const data = await supabase.auth.exchangeCodeForSession(code);
 
         if (!error) {
             const forwardedHost = request.headers.get('x-forwarded-host')
@@ -32,7 +33,7 @@ export async function GET(request: NextRequest) {
             const needsMfa = aal?.currentLevel === "aal1" && aal?.nextLevel === "aal2" && !!verifiedTotp;
 
             if (needsMfa) {
-                const { data: { user } } = await supabase.auth.getUser();
+                const user = data.data.user;
                 const deviceTrusted = user ? await isDeviceTrusted() : false;
 
                 if (!deviceTrusted) {
@@ -45,5 +46,5 @@ export async function GET(request: NextRequest) {
         }
     }
 
-    return NextResponse.redirect(`/login?error=oauth_failed`)
+    return NextResponse.redirect(`${origin}/login?error=oauth_failed`)
 }
