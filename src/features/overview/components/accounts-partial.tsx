@@ -66,7 +66,7 @@ export default function AccountsPartialList({
                         </div>
                         <span className="md:hidden">·</span>
                         <div className="line-clamp-1 whitespace-nowrap">
-                          {item.description}
+                          {item.description?.length === 0 ? "-" : item.description }
                         </div>
                       </div>
                     </div>
