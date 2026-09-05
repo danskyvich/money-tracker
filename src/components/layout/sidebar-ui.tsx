@@ -16,19 +16,16 @@ export default function Sidebar({className, email, lastLogIn}:{className?: strin
         icon: <LayoutDashboardIcon size={20} />,
         label: "Dashboard",
         path: "/overview",
-        isActive: false,
       },
       {
         icon: <Wallet2Icon size={20} />,
         label: "Transactions",
         path: "/transactions",
-        isActive: false,
       },
       {
         icon: <BaggageClaimIcon size={20} />,
         label: "Accounts",
         path: "/accounts",
-        isActive: false,
       },
     ];
 
@@ -67,25 +64,24 @@ export default function Sidebar({className, email, lastLogIn}:{className?: strin
                 isActive={path === overviewItem.path}
               />
             ))}
+            {/* Others */}
+            <div className="flex flex-1 flex-col gap-1">
+              {!isMinimized && (
+                <p className="hidden md:block mt-4 text-[0.9rem] text-white/50 font-light">
+                  Others
+                </p>
+              )}
+              {OthersItems.map((otherItem) => (
+                <SidebarItem
+                  icon={otherItem.icon}
+                  label={isMinimized ? "" : otherItem.label}
+                  path={otherItem.path}
+                  key={otherItem.path}
+                  isActive={path === otherItem.path}
+                />
+              ))}
+            </div>
           </>
-        </div>
-
-        {/* Others */}
-        <div className="flex flex-1 flex-col gap-1">
-          {!isMinimized && (
-            <p className="hidden md:block mt-4 text-[0.9rem] text-white/50 font-light">
-              Others
-            </p>
-          )}
-          {OthersItems.map((otherItem) => (
-            <SidebarItem
-              icon={otherItem.icon}
-              label={isMinimized ? "" : otherItem.label}
-              path={otherItem.path}
-              key={otherItem.path}
-              isActive={path === otherItem.path}
-            />
-          ))}
         </div>
 
         <div className="flex flex-auto h-auto w-full" />

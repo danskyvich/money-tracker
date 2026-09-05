@@ -6,7 +6,6 @@ import {
 import ConvertTimestampToDateTime from "@/utils/convertToDateTime";
 import { ChevronLeft, ChevronRight, Filter, Luggage, Pencil, PiggyBank, Trash, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import Modal from "@/components/layout/modal";
 import ErrorModal from "@/components/layout/error-modal";
 import Spinner from "@/components/layout/spinner";
 import { Transactions } from "@/lib/types/derived";
@@ -95,7 +94,7 @@ export default function AccountDetailsModal({
       )}
       {open && (
         <div className="fixed flex inset-0 z-50 bg-black/50 w-full h-full items-center justify-center">
-          <div className="flex flex-col xl:w-275 md:w-250 mx-10 md:mx-0 h-165 bg-(--color-bg-secondary) border border-(--color-border-default) rounded-lg shadow-md justify-between">
+          <div className="flex flex-col w-75 sm:w-140 md:w-185 lg:w-200 xl:w-225 md:mx-0 h-165 bg-(--color-bg-secondary) border border-(--color-border-default) rounded-lg shadow-md justify-between">
             {/* Header */}
             <div className="flex w-full h-fit items-center justify-between px-5 py-2">
               <PiggyBank size={20} />
@@ -124,8 +123,8 @@ export default function AccountDetailsModal({
             </div>
 
             {/* Body */}
-            <div className="flex flex-col w-full h-full">
-              <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr] gap-x-3 md:gap-x-5 h-fit text-[0.9rem] px-5 pb-1 pt-4 border-b border-(--color-border-subtle)">
+            <div className="flex flex-col w-full h-full min-h-0">
+              <div className="hidden md:grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr] gap-x-3 md:gap-x-5 h-fit text-[0.9rem] px-5 pb-1 pt-4 border-b border-(--color-border-subtle)">
                 <p className="linear-clamp-1">Date & time</p>
                 <p className="linear-clamp-1">Type</p>
                 <p className="linear-clamp-1">Description</p>
@@ -139,48 +138,64 @@ export default function AccountDetailsModal({
                   <AccountListSkeleton />
                 </div>
               ) : (
-                <>
+                <div className="felx w-full h-full overflow-x-scroll">
                   {accountTransactions?.length === 0 ? (
                     <div className="flex w-full h-full items-center justify-center">
-                      <p className="text-[0.9rem]">
-                        You have no lodged transactions in this account.
+                      <p className="text-[0.8rem] md:text-[0.9rem]">
+                        No transactions found
                       </p>
                     </div>
                   ) : (
-                    <div className="flex flex-col w-full h-full">
+                    <div className="flex flex-col w-full h-full overflow-y-auto">
                       {accountTransactions?.map((item, key) => (
                         <div
-                          className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr] border-b border-(--color-border-subtle) text-[0.9rem] px-5 py-2"
+                          className="flex flex-col gap-1 md:grid md:grid-cols-[repeat(6,1fr)] md:gap-x-3 md:gap-x-5 md:items-center border-b border-(--color-border-subtle) text-[0.9rem] px-5 py-3 md:py-2"
                           key={key}
                         >
-                          <div className="line-clamp-1">
-                            {ConvertTimestampToDateTime(item?.date_time)}
+                          <div className="flex items-center justify-between md:contents">
+                            <p className="line-clamp-1 text-(--color-text-secondary) text-xs md:text-[0.9rem] md:text-(--color-text-primary)">
+                              {ConvertTimestampToDateTime(item?.date_time)}
+                            </p>
+                            <p className="hidden md:block line-clamp-1 capitalize text-(--color-text-secondary)">
+                              {item?.type}
+                            </p>
                           </div>
-                          <div className="line-clamp-1 capitalize text-(--color-text-secondary)">
-                            {item?.type}
-                          </div>
-                          <div className="line-clamp-1">{item.description}</div>
-                          <div className="line-clamp-1">
+
+                          <p className="line-clamp-1 md:contents">
+                            {item.description}
+                          </p>
+
+                          <p className="hidden md:block line-clamp-1">
                             {item?.category_name}
-                          </div>
-                          <div className="line-clamp-1">
-                            {item?.account_to_name ? (
-                              <p className="line-clamp-1">
-                                {item?.account_from_name} to{" "}
-                                {item?.account_to_name}
-                              </p>
-                            ) : (
-                              <p>{item.account_from_name}</p>
-                            )}
-                          </div>
-                          <div className="line-clamp-1 font-mono">
-                            {item?.amount}
+                          </p>
+
+                          <p className="hidden md:block line-clamp-1">
+                            {item?.account_to_name
+                              ? `${item?.account_from_name} to ${item?.account_to_name}`
+                              : item.account_from_name}
+                          </p>
+
+                          <div className="flex items-center justify-between md:contents">
+                            <div className="flex items-center gap-2 text-xs text-(--color-text-secondary) md:hidden">
+                              <span className="capitalize">{item?.type}</span>
+                              <span>·</span>
+                              <span>{item?.category_name}</span>
+                              <span>·</span>
+                              <span className="line-clamp-1">
+                                {item?.account_to_name
+                                  ? `${item?.account_from_name} to ${item?.account_to_name}`
+                                  : item.account_from_name}
+                              </span>
+                            </div>
+                            <p className={`line-clamp-1 font-mono ${item.type === "income" ? "text-emerald-400" : item.type === "expense" ? "text-red-500" : "text-white"}`}>
+                              {item?.amount}
+                            </p>
                           </div>
                         </div>
                       ))}
                     </div>
                   )}
-                </>
+                </div>
               )}
             </div>
 
@@ -211,7 +226,7 @@ export default function AccountDetailsModal({
                 {/* window slice (-5, windowStart, +5) */}
                 {visiblePages.map((item, key) => (
                   <div
-                    className={`px-3 py-2 border border-(--color-border-default) rounded-lg shadow-md hover:bg-(--color-bg-subtle) cursor-pointer ${currentPage === item ? "bg-(--color-brand-green) text-black hover:bg-(--color-brand-green)" : null}`}
+                    className={`px-3 py-2 border border-(--color-border-default) rounded-lg shadow-md hover:bg-(--color-bg-subtle) cursor-pointer ${currentPage === item ? "bg-(--color-brand-green) text-white hover:bg-(--color-brand-green)" : null}`}
                     key={key}
                     onClick={() => setCurrentPage(item)}
                   >

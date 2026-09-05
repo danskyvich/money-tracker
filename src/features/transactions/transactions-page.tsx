@@ -14,7 +14,7 @@ export default function TransactionsPage() {
       {/* Content */}
       <div className="flex flex-col xl:flex-row gap-5 w-full h-full">
         <WholeTransactionList />
-        <div className="flex flex-col w-full h-full gap-5">
+        <div className="flex flex-1 flex-col md:flex-row lg:flex-col w-full h-full gap-5">
           <IncomeCategoriesCard />
           <ExpenseCategoriesCard />
         </div>

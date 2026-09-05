@@ -8,9 +8,9 @@ interface ProfileHeader {
 
 export default function ProfileHeader({user, mfaActive}:ProfileHeader) {
     return (
-      <div className="fle flex-col md:flex-row flex-0 w-full h-fit gap-5 p-5 rounded-xl bg-linear-to-r mb-2 from-slate-800 to-emerald-600 items-center justify-between">
+      <div className="flex flex-col md:flex-row flex-0 w-full h-fit gap-0 md:gap-5 p-3 md:p-5 rounded-xl bg-linear-to-r mb-2 from-slate-800 to-emerald-600 items-center justify-between">
         {/* User information */}
-        <div className="flex flex-col w-full h-fit">
+        <div className="flex flex-col w-full h-fit items-center justify-center md:items-start">
           <p className="text-[0.85rem] md:text-lg font-mono text-white">
             <span>{user?.email}</span>
           </p>

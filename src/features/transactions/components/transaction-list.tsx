@@ -141,14 +141,16 @@ export default function WholeTransactionList() {
           />
         </div>
       )}
-      <div className="flex xl:flex-row flex-2 flex-col w-full h-full gap-5">
+
+      {/* MAIN */}
+      <div className="flex flex-2 xl:flex-row flex-col w-full min-h-300 sm:min-h-168 md:h-full gap-5">
         <div className="flex flex-2 grid grid-cols-1 grid-rows-[auto_1fr_auto] xl:h-full border border-(--color-border-default) rounded-lg shadow-lg">
           {/* Table header*/}
-          <div className="flex flex-col sm:flex-row w-full h-full px-5 py-2 items-stretch sm:items-center justify-between gap-2">
+          <div className="flex flex-row w-full h-full px-2 md:px-5 py-2 items-stretch sm:items-center justify-between gap-2">
             <div className="flex w-full h-full gap-2">
               {/** Add transaction */}
               <div
-                className="flex w-fit h-full border text-white items-center gap-2 border-(--color-border-default) rounded-lg py-1 bg-(--color-brand-green) px-3 sm:px-5 cursor-pointer hover:bg-emerald-600 active:bg-emerald-700"
+                className="flex w-fit whitespace-nowrap h-full border text-white items-center gap-2 border-(--color-border-default) rounded-lg py-1 md:py-2 bg-(--color-brand-green) px-3 sm:px-5 cursor-pointer hover:bg-emerald-600 active:bg-emerald-700"
                 onClick={() => setToggle("add-transaction")}
               >
                 <Plus size={15} />
@@ -158,8 +160,8 @@ export default function WholeTransactionList() {
               </div>
 
               {/* Search field */}
-              <div className="px-3 py-1 flex w-full sm:w-[50%] h-full border border-(--color-border-default) rounded-md items-center gap-2">
-                <Search size={15} className="flex" />
+              <div className="px-2 md:py-2 flex w-full h-full border border-(--color-border-default) rounded-md items-center gap-2">
+                <Search size={15} className="min-w-3 h-auto" />
                 <input
                   type="text"
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -174,7 +176,7 @@ export default function WholeTransactionList() {
             ) : (
               <RotateCw
                 size={20}
-                className="min-w-3 h-auto cursor-pointer self-end sm:self-auto"
+                className="min-w-4 h-auto cursor-pointer self-center"
                 onClick={() => fetchData()}
               />
             )}
@@ -183,7 +185,7 @@ export default function WholeTransactionList() {
           {/* Transaction Table */}
           <div className="flex flex-col w-full h-full mt-3">
             {/** Transaction headers */}
-            <div className="hidden md:grid grid-cols-[repeat(6,1fr)_30px] gap-4 font-mono text-[0.9rem] py-1 px-5 pt-1 font-display border-b border-(--color-border-default)">
+            <div className="hidden h-0 md:h-fit md:grid grid-cols-[repeat(6,1fr)_30px] gap-4 font-mono text-[0.9rem] py-1 px-5 pt-1 font-display border-b border-(--color-border-default)">
               <div className="line-clamp-1">Date & time</div>
               <div>Type</div>
               <div>Description</div>
@@ -279,8 +281,8 @@ export default function WholeTransactionList() {
                 )}
 
                 {displayedTransactions?.length === 0 && (
-                  <div className="flex w-full h-full items-center font-mono justify-center text-[0.9rem]">
-                    <p>You have no lodged transactions</p>
+                  <div className="flex w-full h-full items-center font-mono justify-center text-[0.8rem] md:text-[0.9rem]">
+                    <p>No transactions found</p>
                   </div>
                 )}
 
@@ -319,7 +321,7 @@ export default function WholeTransactionList() {
               {/* window slice (-5, windowStart, +5) */}
               {visiblePages.map((item, key) => (
                 <div
-                  className={`px-3 py-2 border border-(--color-border-default) rounded-lg hover:bg-(--color-bg-subtle) cursor-pointer ${currentPage === item ? "bg-(--color-brand-green) hover:bg-(--color-brand-green) text-white" : null}`}
+                  className={`px-3 py-1 md:py-2 border border-(--color-border-default) rounded-lg hover:bg-(--color-bg-subtle) cursor-pointer ${currentPage === item ? "bg-(--color-brand-green) hover:bg-(--color-brand-green) text-white" : null}`}
                   key={key}
                   onClick={() => setCurrentPage(item)}
                 >

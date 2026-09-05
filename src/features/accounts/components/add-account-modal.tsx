@@ -66,7 +66,7 @@ export default function AddAccountModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center shadow-md bg-black/50">
       {error !== null && <ErrorModal message={error} />}
       <form
-        className="p-5 w-50 transform:translate(-50, -50%) bg-(--color-bg-secondary) md:w-100 border border-(--color-border-default) rounded-lg shadow-md"
+        className="p-5 w-75 md:100 transform:translate(-50, -50%) bg-(--color-bg-secondary) md:w-100 border border-(--color-border-default) rounded-lg shadow-md"
         onSubmit={handleSubmit}
       >
         {/* Header */}
@@ -89,7 +89,7 @@ export default function AddAccountModal({
               name="accountName"
               value={formValues.accountName}
               onChange={handleChange}
-              className="focus:outline-(--color-brand-green) focus:outline-1 border border-(--color-border-default) rounded-lg px-3 py-1"
+              className="flex w-full focus:outline-(--color-brand-green) focus:outline-1 border border-(--color-border-default) rounded-lg px-3 py-1"
               placeholder="Enter acccount name..."
               aria-placeholder="Enter account name..."
             />

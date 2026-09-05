@@ -114,7 +114,7 @@ export default function EditAccountModal({
   };
 
   return (
-    <div className="flex flex-col w-100 mx-5 sm:mx-0 sm:w-110 md:w-125 lg:w-140 xl:w-160 border border-(--color-border-default) rounded-lg bg-(--color-bg-secondary) justify-between p-5">
+    <div className="flex flex-col w-75 md:w-100 mx-5 sm:mx-0 sm:w-110 lg:w-125 xl:w-160 border border-(--color-border-default) rounded-lg bg-(--color-bg-secondary) justify-between p-5">
       {accountDetailsError && <ErrorModal message={accountDetailsError} />}
       {loading ? (
         <EditAccountModalSkeleton />
@@ -123,7 +123,9 @@ export default function EditAccountModal({
           {/* Header */}
           <div className="flex w-full h-fit items-center justify-between mb-3">
             {icon}
-            <p className="font-semibold text-xl">Edit account details</p>
+            <p className="font-semibold text-[1rem] md:text-xl">
+              Edit account details
+            </p>
             <X
               size={15}
               className="cursor-pointer"
@@ -134,7 +136,7 @@ export default function EditAccountModal({
           {/* Content */}
           <div className="grid grid-cols-[repeat(2,1fr)] gap-y-2 text-[0.9rem] my-2">
             <label htmlFor="name" className="flex items-center">
-              Name
+              Name<span className="text-red-500"> *</span>
             </label>
             <input
               id="name"
@@ -144,10 +146,10 @@ export default function EditAccountModal({
               onChange={handleChange}
             />
             <label htmlFor="category_id" className="flex items-center">
-              Category
+              Category<span className="text-red-500"> *</span>
             </label>
             <select
-              className="flex border border-(--color-border-strong) w-full h-fit py-1 px-3 rounded-lg"
+              className="flex border border-(--color-border-strong) w-full h-fit py-1 px-2 rounded-lg"
               id="category_id"
               name="category"
               onChange={handleChange}

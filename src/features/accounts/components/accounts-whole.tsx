@@ -1,6 +1,7 @@
 import AddAccountModal from "@/features/accounts/components/add-account-modal";
 import {  
   ChevronLeft,
+  ChevronRight,
   Loader,
   PiggyBank,
   Plus,
@@ -14,8 +15,8 @@ import { useDebouncedValue } from "@/hooks/useDebounceValue";
 import Spinner from "@/components/layout/spinner";
 import { AccountCategories, AccountsWithBalance } from "@/lib/types/derived";
 import EditAccountModal from "./edit-account-modal";
-import AccountListSkeleton from "./skeleton/account-list-skeleton";
 import AccountListModalSkeleton from "./skeleton/account-list-modal-skeleton";
+import ErrorModal from "@/components/layout/error-modal";
 
 const numberOfItemsToBeDisplayed = 9;
 
@@ -30,6 +31,7 @@ export default function WholeAccountsList() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchError, setSearchError] = useState<string | null>(null);
   const debouncedSearch = useDebouncedValue(searchTerm, 400);
+  const isSearching = debouncedSearch.trim().length > 0;
 
   // for modals
   const [chosenAccount, setChosenAccount] =
@@ -102,7 +104,7 @@ export default function WholeAccountsList() {
   }
 
   return (
-    <div className="flex flex-1 relative w-full h-full border border-(--color-border-default) rounded-lg">
+    <div className="flex flex-1 relative w-full min-h-195 sm:min-h-180 md:min-h-145 md:h-full border border-(--color-border-default) rounded-lg">
       {toggle === "add-account" && (
         <AddAccountModal
           accountCategoriesData={accountCategories}
@@ -130,14 +132,15 @@ export default function WholeAccountsList() {
           refresh={fetchAccounts}
         />
       )}
-      <div className="flex flex-col min-h-[50dvh] w-full h-full items-center shadow-lg">
+      {searchError && <ErrorModal message={searchError} />}
+      <div className="flex flex-col w-full items-center shadow-lg">
         <div className="flex flex-col flex-0 w-full h-fit">
           {/* Accounts header */}
-          <div className="flex flex-0 w-full min-h-fit py-2 px-5 justify-between items-center">
-            <div className="flex w-full gap-2 items-center">
+          <div className="flex flex-0 w-full min-h-fit px-2 md:px-5 py-2 justify-between items-center">
+            <div className="flex w-full gap-1 sm:gap-2 items-center">
               {/* Add account */}
               <div
-                className="flex w-fit h-fit xl:h-fit gap-2 bg-(--color-brand-green) hover:bg-emerald-600 rounded-md px-5 py-1.5 text-white items-center hover:text-white cursor-pointer transition-all duration-200 active:bg-emerald-700"
+                className="flex w-fit h-fit xl:h-fit gap-2 bg-(--color-brand-green) hover:bg-emerald-600 rounded-md px-3 md:px-5 py-1.5 text-white items-center hover:text-white cursor-pointer transition-all duration-200 active:bg-emerald-700"
                 onClick={() => setToggle("add-account")}
               >
                 <Plus size={15} />
@@ -147,7 +150,7 @@ export default function WholeAccountsList() {
               </div>
 
               {/* Search field */}
-              <div className="flex h-full xl:h-fit px-5 py-1 w-75 border border-(--color-border-default) rounded-md items-center gap-2">
+              <div className="flex h-full xl:h-fit w-full px-3 py-1 border border-(--color-border-default) rounded-md items-center gap-2">
                 <Search size={15} className="flex" />
                 <input
                   type="text"
@@ -164,14 +167,14 @@ export default function WholeAccountsList() {
               <Spinner />
             ) : (
               <RotateCw
-                size={20}
-                className="min-w-3 h-auto cursor-pointer"
+                size={18}
+                className="min-w-4 h-auto cursor-pointer ml-2"
                 onClick={() => fetchAccounts()}
               />
             )}
           </div>
 
-          <div className="grid grid-cols-[repeat(4,1fr)] w-full h-full px-5 py-1 text-[0.9rem] border-b border-(--color-border-default) items-end">
+          <div className="hidden md:grid grid-cols-[repeat(4,1fr)] w-full h-full px-5 py-1 text-[0.9rem] border-b border-(--color-border-default) items-end">
             <div>Account</div>
             <div>Category</div>
             <div>Description</div>
@@ -179,34 +182,41 @@ export default function WholeAccountsList() {
           </div>
         </div>
 
-        {/* Accounts table */}
-        <div className="flex flex-col w-full h-full overflow-hidden">
-          {/* Content */}
-          <div className="flex flex-1 flex-col w-full h-full">
-            {loading ? (
-              <AccountListModalSkeleton />
-            ) : (
-              <div className="flex flex-col relative w-full h-[85%] overflow-hidden">
-                {changedAccounts?.length === 0 && (
-                  <div className="flex w-full h-full items-center justify-center text-[0.9rem]">
-                    <p className="self-center font-mono">
-                      You have no accounts.
-                    </p>
-                  </div>
-                )}
-                {unchangedAccounts ? (
-                  <div className="flex relative w-full overflow-hidden">
-                    <div className="flex flex-col w-full">
-                      {changedAccounts?.map((account, id) => (
-                        <div
-                          className="grid grid-cols-[repeat(4,1fr)] w-full h-12 px-5 py-3 border-b border-(--color-border-subtle) text-[0.9rem] gap-x-2 hover:bg-(--color-bg-subtle) cursor-pointer"
-                          onClick={() => {
-                            setToggle("account-details");
-                            setChosenAccount(account);
-                          }}
-                          key={id}
-                        >
-                          <div className="line-clamp-1">{account.name}</div>
+        {/* Content */}
+        <div className="flex flex-col w-full h-full">
+          {loading ? (
+            <AccountListModalSkeleton />
+          ) : (
+            <div className="flex flex-col relative w-full">
+              {changedAccounts?.length === 0 && (
+                <div className="flex w-full h-full items-center justify-center text-[0.9rem]">
+                  <p className="self-center font-mono">You have no accounts.</p>
+                </div>
+              )}
+              {unchangedAccounts ? (
+                <div className="flex relative w-full">
+                  <div className="flex flex-col w-full">
+                    {changedAccounts?.map((account, id) => (
+                      <div
+                        className="flex flex-col gap-1 md:grid md:grid-cols-[repeat(4,1fr)] md:items-center w-full h-fit md:h-12 px-5 py-3 border-b border-(--color-border-subtle) text-[0.9rem] md:gap-x-2 hover:bg-(--color-bg-subtle) cursor-pointer"
+                        onClick={() => {
+                          setToggle("account-details");
+                          setChosenAccount(account);
+                        }}
+                        key={id}
+                      >
+                        {/* Row 1 (mobile): name + balance */}
+                        <div className="flex items-center justify-between md:contents">
+                          <div className="line-clamp-1 font-medium md:font-normal">
+                            {account.name}
+                          </div>
+                          <div className="line-clamp-1 font-mono md:order-last">
+                            {account.balance}
+                          </div>
+                        </div>
+
+                        {/* Row 2 (mobile): category · description */}
+                        <div className="flex items-center gap-2 text-xs text-(--color-text-secondary) md:contents md:text-[0.9rem]">
                           <div className="line-clamp-1">
                             {
                               (
@@ -217,38 +227,38 @@ export default function WholeAccountsList() {
                               )?.name
                             }
                           </div>
-                          <div className="line-clamp-1 text-(--color-text-secondary) whitespace-nowrap">
+                          <span className="md:hidden">·</span>
+                          <div className="line-clamp-1 whitespace-nowrap">
                             {account.description === ""
                               ? "-"
                               : account.description}
                           </div>
-                          <div className="line-clamp-1 font-mono">
-                            {account.balance}
-                          </div>
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    ))}
                   </div>
-                ) : (
-                  <div className="flex w-full h-full items-center justify-center">
-                    <p className="text-[0.9rem]">{fetchAccountError}</p>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+                </div>
+              ) : (
+                <div className="flex w-full h-full items-center justify-center">
+                  <p className="text-[0.9rem]">{fetchAccountError}</p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Footer */}
-        <div className="flex flex-0 h-fit justify-between w-full px-5 py-2">
+        <div className="flex flex-0 h-fit justify-between flex-col sm:flex-row w-full px-5 py-2 items-center gap-2 md:gap-0">
           <div
             className={`${unchangedAccounts?.length === 0 || (fetchAccountError && "hidden")} flex w-full text-[0.9rem] text-(--color-text-secondary) items-center gap-2`}
           >
-            <p>Show data</p>
-            <div className="flex py-2 px-3 border border-(--color-border-default) rounded-md">
-              <p>{unchangedAccounts?.length === 0 ? "0" : totalPages}</p>
+            <div className="flex w-full sm:w-fit h-full items-center justify-center sm:justify-start">
+              <p>{isSearching ? "Found" : "Show data"}</p>
+              <div className="flex border border-(--color-border-default) text-(--color-text-secondary) px-3 py-2 mx-2 rounded-lg">
+                <p>{changedAccounts?.length}</p>
+              </div>
+              <p>{!isSearching && `of ${totalNumberOfItems}`}</p>
             </div>
-            <p>of {totalNumberOfItems === 0 ? 0 : totalNumberOfItems}</p>
           </div>
 
           <div className="flex w-fit h-full gap-2 items-center">
@@ -262,7 +272,7 @@ export default function WholeAccountsList() {
             )}
             {visiblePages.map((item, index) => (
               <div
-                className={`border border-(--color-border-default) rounded-lg px-3 py-2 hover:cursor-pointer ${currentPage === item ? "bg-(--color-brand-green) text-white hover:bg-(--color-brand-green)" : null}`}
+                className={`border border-(--color-border-default) rounded-lg px-3 py-1 md:py-2 hover:cursor-pointer ${currentPage === item ? "bg-(--color-brand-green) text-white hover:bg-(--color-brand-green)" : null}`}
                 key={index}
                 onClick={() => setCurrentPage(item)}
               >
@@ -278,7 +288,7 @@ export default function WholeAccountsList() {
                   )
                 }
               >
-                <ChevronLeft size={15} />
+                <ChevronRight size={15} />
               </div>
             )}
           </div>

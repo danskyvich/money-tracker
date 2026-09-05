@@ -106,7 +106,7 @@ export default function Accounts() {
   return (
     <>
       {loading ? (
-        <AccountsPageSkeleton/>
+        <AccountsPageSkeleton />
       ) : (
         <div className="flex flex-col w-full h-full gap-5">
           {accountCategoriesError && (
@@ -192,11 +192,13 @@ export default function Accounts() {
                     <p className="text-xl font-semibold">Categories</p>
 
                     <div
-                      className="flex w-fit h-fit items-center gap-1 cursor-pointer text-white px-3 py-2 text-[0.9rem] font-display bg-(--color-brand-gold) rounded-lg shadow-md hover:bg-yellow-600 duration-100 transition-all"
+                      className="flex w-fit h-fit items-center gap-1 cursor-pointer text-white px-1 md:px-3 py-2 font-display bg-(--color-brand-gold) rounded-lg shadow-md hover:bg-yellow-600 duration-100 transition-all"
                       onClick={() => setToggle("add-account-category")}
                     >
                       <Plus size={20} />
-                      <p className="text-[0.9rem]">Add a category</p>
+                      <p className="text-[0.75rem] md:text-[0.9rem]">
+                        Add a category
+                      </p>
                     </div>
                   </div>
 
@@ -221,7 +223,9 @@ export default function Accounts() {
                       ))
                     ) : (
                       <div className="flex w-full h-full items-center justify-center">
-                        <p className="text-[0.9rem] font-mono">You have no categories.</p>
+                        <p className="text-[0.9rem] font-mono">
+                          You have no categories.
+                        </p>
                       </div>
                     )}
                   </div>
