@@ -33,7 +33,7 @@ export default function AccountsPartialList({
           <p>{accountsError}</p>
         </div>
       ) : (
-        <div className="flex flex-col w-full h-75 xl:h-full">
+        <div className="flex flex-col w-full h-75 xl:h-full">     
           {accountsData?.length === 0 ? (
             <div className="flex w-full h-full items-center font-mono justify-center text-[0.9rem]">
               <p>You have no accounts.</p>
