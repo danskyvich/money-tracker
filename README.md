@@ -3,6 +3,26 @@
 
 A basic web application that tracks your monthly finances by recording your day-to-day transactions using three categories: Income, Transfer, and Expenses.
 
+<img width="1919" height="900" alt="money-tracker-banner" src="https://github.com/user-attachments/assets/72a28493-b93f-457d-bdad-b0c97e200b14" />
+
+## Features
+
+- Users can add a transaction (*income*, *expense*, or *transfer*)
+- Real-time changes; changes are reflected immediately after the time of modification.
+- Email, Google, and Facebook authentication
+- Two-factor authentication
+- Data backup (exporting through JSON, Excel) and data import (importing through JSON and Excel files)
+- Deletion of accounts (a group of transactions), transaction/s, and category/s
+- Easy account deletion
+- Responsiveness for smaller screens
+- A basic visual analysis of monthly inflows and outflows, and most recent transactions.
+
+
+## Tech Stack
+
+**Client:** React, HTML, Javascript, Typescript, TailwindCSS, Zod, and lucide-react, and recharts
+
+**Server:** NextJS, Google Cloud Project, Meta for developers, Supabase (Supabase Auth, Supabase) and PostgreSQL
 
 ## Authors
 
@@ -36,28 +56,6 @@ For reCAPTCHA v3:
 `NEXT_PUBLIC_RECAPTCHA_SITE_KEY`
 
 `RECAPTCHA_SECRET_KEY`
-
-
-
-## Features
-
-- Users can add a transaction (*income*, *expense*, or *transfer*)
-- Real-time changes; changes are reflected immediately after the time of modification.
-- Email, Google, and Facebook authentication
-- Two-factor authentication
-- Data backup (exporting through JSON, Excel) and data import (importing through JSON and Excel files)
-- Deletion of accounts (a group of transactions), transaction/s, and category/s
-- Easy account deletion
-- Responsiveness for smaller screens
-- A basic visual analysis of monthly inflows and outflows, and most recent transactions.
-
-
-## Tech Stack
-
-**Client:** React, HTML, Javascript, Typescript, TailwindCSS, Zod, and lucide-react, and recharts
-
-**Server:** NextJS, Google Cloud Project, Meta for developers, Supabase (Supabase Auth, Supabase) and PostgreSQL
-
 
 ## License
 
