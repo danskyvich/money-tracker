@@ -1,0 +1,14 @@
+name: Ping Supabase Project
+
+on:
+  schedule:
+    - cron: '0 0 * * 6'
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Query database
+        run: |
+          curl -f "${{ secrets.SUPABASE_URL }}/rest/v1/transactions?select=id&limit=1"
+          -H " apikey: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}" 
