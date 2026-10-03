@@ -86,11 +86,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex flex-col items-center justify-center w-full">
-    {
-      error && (
-        <ErrorModal message={error}/>
-      )
-    }
+      {error && <ErrorModal message={error} />}
       {/* Card */}
       <div className="flex w-75 sm:w-120 xl:w-125 h-fit flex-col rounded-2xl bg-(--color-bg-subtle) px-5 sm:px-10 lg:px-10 xl:px-15 py-20 shadow-2xl">
         {/* Header */}
@@ -101,7 +97,7 @@ export default function LoginPage() {
               Tracker
             </span>
           </p>
-          <p className="font-mono text-[0.8rem] sm:text-[1rem] font-light my-3 text-(--color-text-secondary)">
+          <p className="font-mono text-[0.8rem]/5 sm:text-[1rem]/5 font-normal my-3 text-(--color-text-secondary)">
             An average money tracker app for the average man.
           </p>
         </header>
@@ -120,17 +116,15 @@ export default function LoginPage() {
           />
 
           {/* Remember me? */}
-          <div className="flex w-full gap-2 px-2 items-center">
-            <label className="text-[0.9rem]">
-              <input
-                type="checkbox"
-                name="rememberMe"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                className="mr-2"
-              />
-              Remember me?
-            </label>
+          <div className="flex w-full px-2 items-center justify-start h-fit">
+            <input
+              type="checkbox"
+              name="rememberMe"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              className="mr-2"
+            />
+            <label className="text-[0.9rem]">Remember me?</label>
           </div>
 
           {/* Error */}
@@ -145,9 +139,11 @@ export default function LoginPage() {
             >
               {pending ? (
                 <div className="flex py-1">
-                  <Spinner/>
-                </div>) : (
-                <p>Sign In</p>)}
+                  <Spinner />
+                </div>
+              ) : (
+                <p>Sign In</p>
+              )}
             </button>
           </div>
         </form>
