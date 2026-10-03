@@ -22,7 +22,7 @@ export async function calculateGrowthRate(): Promise<{success: true, value: stri
 
     if (thisMonth === null) return { success: true, value: String(0)};
 
-    if (thisMonth !== null && lastMonth === 0 ) return { success: true, value: "N/A" };
+    if (thisMonth !== null && lastMonth === 0 ) return { success: true, value: "0.00" };
     console.log({ thisMonth, lastMonth });
 
     const value = String(roundUpToTwoDecimalPlaces((((lastMonth - thisMonth) / thisMonth) * 100)).toLocaleString("en-PH", {minimumFractionDigits: 2}) + "%");
@@ -39,7 +39,7 @@ export async function calculateExpenseRate(): Promise<{success: true, value: str
 
     const lastMonth = lastMonthArray.reduce((x, y) => x + y, 0);
     console.log({ thisMonth, lastMonth });
-    if (thisMonth !== null && lastMonth === 0) return { success: true, value: "N/A" };
+    if (thisMonth !== null && lastMonth === 0) return { success: true, value: "0.00" };
     const value = String(roundUpToTwoDecimalPlaces((((lastMonth - thisMonth) / thisMonth) * 100)).toLocaleString("en-PH", {minimumFractionDigits: 2}) + "%");
     return { success: true, value}
 }
