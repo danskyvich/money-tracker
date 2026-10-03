@@ -173,7 +173,9 @@ export default function WholeTransactionList() {
             </div>
 
             {loading ? (
-              <Spinner />
+              <div className="flex items-center justify-center">
+                <Spinner />
+              </div>
             ) : (
               <RotateCw
                 size={20}
@@ -186,7 +188,7 @@ export default function WholeTransactionList() {
           {/* Transaction Table */}
           <div className="flex flex-col w-full h-full mt-3">
             {/** Transaction headers */}
-            <div className="hidden h-0 md:h-fit md:grid grid-cols-[repeat(6,1fr)_30px] gap-4 font-display text-[0.9rem] py-1 px-5 pt-1 font-display border-b border-(--color-border-default)">
+            <div className="hidden h-0 md:h-fit md:grid grid-cols-[repeat(6,1fr)_30px] gap-4 font-display text-[0.8rem] py-1 px-5 pt-1 font-display border-b border-(--color-border-default)">
               <div className="line-clamp-1">Date & time</div>
               <div>Type</div>
               <div>Description</div>
@@ -212,13 +214,13 @@ export default function WholeTransactionList() {
                       >
                         {/* Row 1 (mobile): date + amount + delete */}
                         <div className="flex items-center justify-between md:contents">
-                          <p className="line-clamp-1 text-(--color-text-secondary) text-xs md:text-[0.9rem] md:text-(--color-text-primary)">
+                          <p className="line-clamp-1 text-(--color-text-secondary) text-xs md:text-[0.8rem] md:text-(--color-text-primary)">
                             {ConvertTimestampToDateTime(
                               transaction.date_time ?? "",
                             )}
                           </p>
 
-                          <div className="flex items-center gap-3 md:contents">
+                          <div className="flex items-center gap-3 md:contents text-[0.8rem]">
                             <p
                               className={`line-clamp-1 font-mono ${
                                 transaction.type === "income"
@@ -245,14 +247,14 @@ export default function WholeTransactionList() {
                         </div>
 
                         {/* Row 2 (mobile): description */}
-                        <div className="flex w-full items-center md:contents">
+                        <div className="flex w-full items-center md:contents text-[0.8rem]">
                           <p className="line-clamp-1">
                             {transaction.description}
                           </p>
                         </div>
 
                         {/* Row 3 (mobile): type + category + account, small/secondary */}
-                        <div className="flex items-center gap-3 text-xs text-(--color-text-secondary) md:contents md:text-[0.9rem]">
+                        <div className="flex items-center gap-3 text-xs text-(--color-text-secondary) md:contents md:text-[0.8rem]">
                           <p className="capitalize line-clamp-1">
                             {transaction.type}
                           </p>
@@ -299,8 +301,10 @@ export default function WholeTransactionList() {
             {/* Show num of items */}
             <div className="flex w-full sm:w-fit h-full items-center justify-center sm:justify-start">
               <p>{isSearching ? "Found" : "Show data"}</p>
-              <div className="flex border border-(--color-border-default) text-(--color-text-secondary) px-3 py-2 mx-2 rounded-lg">
-                <p>{displayedTransactions?.length}{!isSearching && "of"}</p>
+              <div className="flex text-(--color-text-secondary) px-3 py-2 rounded-lg">
+                <p className="border border-(--color-border-default) px-3 py-2 rounded-lg">
+                  {displayedTransactions?.length}
+                </p>
               </div>
               <p>{`${!isSearching && `of ${totalNumberOfItems}`}`}</p>
             </div>

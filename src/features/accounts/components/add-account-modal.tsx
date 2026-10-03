@@ -89,7 +89,7 @@ export default function AddAccountModal({
               name="accountName"
               value={formValues.accountName}
               onChange={handleChange}
-              className="flex w-full focus:outline-(--color-brand-green) focus:outline-1 border border-(--color-border-default) rounded-lg px-3 py-1"
+              className="flex w-full focus:outline-(--color-brand-green) focus:outline-1 border border-(--color-border-default) rounded-lg px-3 py-1 text-[0.8rem]"
               placeholder="Enter acccount name..."
               aria-placeholder="Enter account name..."
             />
@@ -102,7 +102,7 @@ export default function AddAccountModal({
               name="accountType"
               value={formValues.accountType}
               onChange={handleChange}
-              className="flex focus:outline-(--color-brand-green) focus:outline-1 w-full border border-(--color-border-default) rounded-lg px-3 py-1"
+              className="flex focus:outline-(--color-brand-green) focus:outline-1 w-full border border-(--color-border-default) rounded-lg px-3 py-1 text-[0.8rem]"
             >
               {accountCategoriesData?.map((item, id) => (
                 <option
@@ -123,7 +123,7 @@ export default function AddAccountModal({
               onChange={handleChange}
               placeholder="Write something about your account."
               aria-placeholder="Write something about your account."
-              className="flex w-full h-24 focus:outline-(--color-brand-green) focus:outline-1 border border-(--color-border-default) rounded-lg px-3 py-2 resize-none"
+              className="flex w-full h-24 focus:outline-(--color-brand-green) focus:outline-1 border border-(--color-border-default) rounded-lg px-3 py-2 resize-none text-[0.8rem]"
             />
           </div>
         </div>
@@ -131,7 +131,7 @@ export default function AddAccountModal({
         {/* Footer - button */}
         <div className="flex w-full pt-7">
           <button
-            className="flex bg-(--color-brand-green) text-white focus:outline-1 focus:outline-(--color-brand-green) rounded-lg shadow-md hover:bg-(--color-brand-green-accent) text-[0.9rem] active:bg-emerald-700 items-center justify-center px-5 py-1 w-full cursor-pointer"
+            className="flex bg-(--color-brand-green) text-white focus:outline-1 focus:outline-(--color-brand-green) rounded-lg shadow-md hover:bg-(--color-brand-green-accent) text-[0.8rem] active:bg-emerald-700 items-center justify-center px-5 py-1 w-full cursor-pointer"
             type="submit"
           >
             {loading ? <Spinner /> : "Add account"}

@@ -124,7 +124,7 @@ export default function AccountDetailsModal({
 
             {/* Body */}
             <div className="flex flex-col w-full h-full min-h-0">
-              <div className="hidden md:grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr] gap-x-3 md:gap-x-5 h-fit text-[0.9rem] px-5 pb-1 pt-4 border-b border-(--color-border-subtle)">
+              <div className="hidden md:grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr] gap-x-3 md:gap-x-5 h-fit text-[0.8rem] px-5 pb-1 pt-4 border-b border-(--color-border-subtle)">
                 <p className="linear-clamp-1">Date & time</p>
                 <p className="linear-clamp-1">Type</p>
                 <p className="linear-clamp-1">Description</p>
@@ -149,11 +149,11 @@ export default function AccountDetailsModal({
                     <div className="flex flex-col w-full h-full overflow-y-auto">
                       {accountTransactions?.map((item, key) => (
                         <div
-                          className="flex flex-col gap-1 md:grid md:grid-cols-[repeat(6,1fr)] md:gap-x-3 md:gap-x-5 md:items-center border-b border-(--color-border-subtle) text-[0.9rem] px-5 py-3 md:py-2"
+                          className="flex flex-col gap-1 md:grid md:grid-cols-[repeat(6,1fr)] md:gap-x-3 md:items-center border-b border-(--color-border-subtle) text-[0.8rem] px-5 py-3 md:py-2"
                           key={key}
                         >
                           <div className="flex items-center justify-between md:contents">
-                            <p className="line-clamp-1 text-(--color-text-secondary) text-xs md:text-[0.9rem] md:text-(--color-text-primary)">
+                            <p className="line-clamp-1 text-(--color-text-secondary) text-xs md:text-[0.8rem] md:text-(--color-text-primary)">
                               {ConvertTimestampToDateTime(item?.date_time)}
                             </p>
                             <p className="hidden md:block line-clamp-1 capitalize text-(--color-text-secondary)">

@@ -170,14 +170,14 @@ export default function OverviewPage() {
         {/* Left side */}
         <div className="flex flex-1 flex-col w-full h-full gap-5">
           <div className="flex w-full flex-col gap-1">
-            <p className="text-[0.8rem]">Total earnings</p>
+            <p className="text-[0.9rem]">Total earnings</p>
             {loading ? (
               <div className="flex gap-3 w-fit h-13">
                 <Skeleton className="flex w-10 h-full" />
                 <Skeleton className="flex w-50 h-full" />
               </div>
             ) : (
-              <p className="flex font-mono text-3xl py-1 md:py-0 lg:text-4xl xl:text-5xl tracking-tight">
+              <p className="flex font-sans text-3xl py-1 md:py-0 lg:text-4xl xl:text-5xl">
                 <span className="text-3xl self-end mr-2 font-display">₱</span>
                 {total?.toLocaleString("en-us", {
                   minimumFractionDigits: 2,
