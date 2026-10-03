@@ -196,7 +196,7 @@ export default function Accounts() {
                       onClick={() => setToggle("add-account-category")}
                     >
                       <Plus size={20} />
-                      <p className="text-[0.75rem] md:text-[0.9rem]">
+                      <p className="text-sm font-sans">
                         Add a category
                       </p>
                     </div>

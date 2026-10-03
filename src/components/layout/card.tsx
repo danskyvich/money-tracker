@@ -42,9 +42,9 @@ export default function CardComponent({
           <div className="hover:scale-105 transition-transform duration-300 ease-in-out inline-flex">
             <Link
               href={link}
-              className="flex px-3 py-2 rounded-2xl text-[0.7rem] font-semibold text-white items-center justify-center bg-(--color-brand-gold)"
+              className="flex px-3 py-2 rounded-2xl font-semibold text-white items-center justify-center bg-(--color-brand-gold)"
             >
-              <p className="hidden lg:block">{linkText}</p>
+              <p className="hidden lg:block text-sm">{linkText}</p>
               <ChevronRight size={20} />
             </Link>
           </div>

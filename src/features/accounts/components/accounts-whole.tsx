@@ -164,7 +164,9 @@ export default function WholeAccountsList() {
               </div>
             </div>
             {loading ? (
-              <Spinner />
+              <div className="ml-2">
+                <Spinner />
+              </div>
             ) : (
               <RotateCw
                 size={18}
@@ -206,7 +208,7 @@ export default function WholeAccountsList() {
                         key={id}
                       >
                         {/* Row 1 (mobile): name + balance */}
-                        <div className="flex items-center justify-between md:contents">
+                        <div className="flex items-center justify-between md:contents md:text-[0.8rem]">
                           <div className="line-clamp-1 font-medium md:font-normal">
                             {account.name}
                           </div>
@@ -216,7 +218,7 @@ export default function WholeAccountsList() {
                         </div>
 
                         {/* Row 2 (mobile): category · description */}
-                        <div className="flex items-center gap-2 text-xs text-(--color-text-secondary) md:contents md:text-[0.9rem]">
+                        <div className="flex items-center gap-2 text-xs text-(--color-text-secondary) md:contents md:text-[0.8rem]">
                           <div className="line-clamp-1">
                             {
                               (

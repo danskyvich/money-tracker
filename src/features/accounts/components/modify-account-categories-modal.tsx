@@ -58,7 +58,9 @@ export default function ModifyAccountCategoriesModal({
   return (
     <>
       {(updateState?.error || deleteState?.error) && (
-        <ErrorModal message={"Error: " + updateState?.error || deleteState?.error} />
+        <ErrorModal
+          message={"Error: " + updateState?.error || deleteState?.error}
+        />
       )}
       {open && (
         <div className="fixed flex z-50 inset-0 bg-black/50 w-full h-full items-center justify-center">
@@ -68,11 +70,7 @@ export default function ModifyAccountCategoriesModal({
               <p className="font-semibold text-xl whitespace-nowrap">
                 Edit Category Name
               </p>
-              <X
-                size={20}
-                className="cursor-pointer"
-                onClick={() => onClose}
-              />
+              <X size={20} className="cursor-pointer" onClick={() => onClose} />
             </div>
             <form className="flex flex-col w-full gap-2">
               <input
@@ -85,7 +83,7 @@ export default function ModifyAccountCategoriesModal({
               <button
                 formAction={updateFormAction}
                 type="submit"
-                className={`${deletePending || (updatePending && "pointer-events-none border-(--color-border-subtle) bg-(--color-border-subtle)")} flex px-5 py-1 border border-(--color-brand-green) bg-(--color-brand-green) rounded-lg shadow-md items-center justify-center text-[0.9rem] text-white cursor-pointer hover:bg-emerald-700 hover:border-emerald-700 active:bg-emerald-800 active:border-emerald-800 duration-100 transition-all`}
+                className={`${deletePending || (updatePending && "pointer-events-none border-(--color-border-subtle) bg-(--color-border-subtle)")} flex px-5 py-1 border border-(--color-brand-green) bg-(--color-brand-green) rounded-lg shadow-md items-center justify-center text-[0.9rem] text-white cursor-pointer hover:bg-emerald-700 hover:border-emerald-700 active:bg-emerald-800 active:border-emerald-800 duration-100 transition-all focus:outline-1 focus:outline-(--color-brand-green)`}
               >
                 {updatePending ? (
                   <p>Updating name...</p>
@@ -97,7 +95,7 @@ export default function ModifyAccountCategoriesModal({
               <button
                 formAction={deleteFormAction}
                 type="submit"
-                className={`${deletePending || (updatePending && "pointer-events-none border-(--color-border-subtle) bg-(--color-border-subtle)")} flex px-5 py-1 border border-(--color-brand-green) hover:text-white rounded-lg shadow-md items-center justify-center text-[0.9rem] cursor-pointer hover:bg-(--color-brand-green) active:bg-emerald-700 active:border-emerald-800 duration-100 transition-all`}
+                className={`${deletePending || (updatePending && "pointer-events-none border-(--color-border-subtle) bg-(--color-border-subtle)")} flex px-5 py-1 border border-(--color-brand-green) hover:text-white rounded-lg shadow-md items-center justify-center text-[0.9rem] cursor-pointer hover:bg-(--color-brand-green) active:bg-emerald-700 active:border-emerald-800 duration-100 transition-all focus:outline-1 focus:outline-(--color-brand-green)`}
               >
                 {deletePending ? (
                   <p>Deleting category...</p>

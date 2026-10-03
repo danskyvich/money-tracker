@@ -54,6 +54,7 @@ export default function Snippet({ type }: { type: "income" | "expense" }) {
               ? "..."
               : total.toLocaleString("en-PH", { minimumFractionDigits: 2 })}
           </p>
+          
           <div className="flex w-full items-center text-sm mt-1 text-(--color-text-secondary) justify-between">
             <p>{type === "income" ? "Monthly rate" : "Monthly rate"}</p>
 

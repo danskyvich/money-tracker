@@ -49,7 +49,9 @@ export default function AvatarBar() {
 
           <div className={`flex gap-5 ${navigation && "hidden"}`}>
             {/* Settings + Notification icons */}
+            {/*}
             <div className="flex border-(--color-border-default) border rounded-xl shadow-sm">
+              
               <div className="flex w-full h-full py-3 pl-3 pr-2 rounded-l-xl transition-all duration-200">
                 <Link href="./notifications/">
                   <Bell
@@ -58,7 +60,7 @@ export default function AvatarBar() {
                   />
                 </Link>
               </div>
-
+              
               <div className="flex w-full h-full py-3 pr-3 pl-2 rounded-r-xl transition-all duration-200">
                 <Link href="./settings/">
                   <Settings
@@ -68,11 +70,12 @@ export default function AvatarBar() {
                 </Link>
               </div>
             </div>
+            */} 
 
             <ThemeSwitcher />
           </div>
           {navigation && (
-            <div className="fixed w-full flex md:hidden top-16 bottom-0 left-0 right-0 z-50 bg-black/70 border-b border-(--color-border-default)/20 shadow-md">
+            <div className="fixed w-full flex md:hidden top-16 bottom-0 left-0 right-0 z-50 bg-black/30 border-b border-(--color-border-default)/20 shadow-md">
               <div className="flex flex-col bg-(--color-bg-secondary) w-full h-fit pt-3">
                 <p className="text-xl font-semibold px-5 py-3 border-b border-(--color-border-subtle)">
                   Navigation

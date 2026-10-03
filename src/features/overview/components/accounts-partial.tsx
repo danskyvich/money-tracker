@@ -46,11 +46,11 @@ export default function AccountsPartialList({
                 <div className="flex flex-col w-full h-full">
                   {accountsData?.map((item, key) => (
                     <div
-                      className="flex flex-col gap-1 md:grid md:grid-cols-[1fr_1fr_1fr_1fr] md:items-center w-full h-fit md:h-15 border-b border-(--color-border-subtle) px-5 py-2 md:py-1 text-[0.9rem] hover:bg-(--color-bg-subtle) cursor-pointer"
+                      className="flex flex-col gap-1 md:grid md:grid-cols-[1fr_1fr_1fr_1fr] md:items-center w-full h-fit md:h-15 border-b border-(--color-border-subtle) px-5 py-1 text-[0.9rem] hover:bg-(--color-bg-subtle) cursor-pointer"
                       key={key}
                     >
                       {/* Row 1 (mobile): name + balance */}
-                      <div className="flex items-center justify-between md:contents">
+                      <div className="flex items-center justify-between md:contents md:text-[0.8rem]">
                         <div className="line-clamp-1 font-medium md:font-normal">
                           {item.name}
                         </div>
@@ -60,7 +60,7 @@ export default function AccountsPartialList({
                       </div>
 
                       {/* Row 2 (mobile): category · description */}
-                      <div className="flex items-center gap-2 text-xs text-(--color-text-secondary) md:contents md:text-[0.9rem]">
+                      <div className="flex items-center gap-2 text-xs text-(--color-text-secondary) md:contents md:text-[0.8rem]">
                         <div className="line-clamp-1">
                           {item?.category_id?.name}
                         </div>

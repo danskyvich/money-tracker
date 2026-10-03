@@ -141,7 +141,7 @@ export default function EditAccountModal({
             <input
               id="name"
               name="name"
-              className="flex border border-(--color-border-strong) w-full h-fit py-1 px-3 rounded-lg"
+              className="flex border border-(--color-border-strong) w-full h-fit py-1 px-3 rounded-lg text-[0.8rem] focus:outline-(--color-brand-green) focus:outline-1"
               value={formValues?.name}
               onChange={handleChange}
             />
@@ -149,7 +149,7 @@ export default function EditAccountModal({
               Category<span className="text-red-500"> *</span>
             </label>
             <select
-              className="flex border border-(--color-border-strong) w-full h-fit py-1 px-2 rounded-lg"
+              className="flex border border-(--color-border-strong) w-full h-fit py-1 px-2 rounded-lg text-[0.8rem] focus:outline-(--color-brand-green) focus:outline-1"
               id="category_id"
               name="category"
               onChange={handleChange}
@@ -159,7 +159,7 @@ export default function EditAccountModal({
                 <option
                   key={id}
                   value={item.id}
-                  className="bg-(--color-bg-secondary) text-(--color-text-primary)"
+                  className="bg-(--color-bg-secondary) text-(--color-text-primary) text-[0.8rem]"
                 >
                   {item.name}
                 </option>
@@ -171,7 +171,7 @@ export default function EditAccountModal({
             <textarea
               id="description"
               name="description"
-              className="flex w-full h-full border border-(--color-border-strong) rounded-lg px-3 py-1"
+              className="flex w-full h-full border border-(--color-border-strong) rounded-lg px-3 py-1 text-[0.8rem] focus:outline-(--color-brand-green) focus:outline-1"
               value={formValues.description ?? ""}
               onChange={handleChange}
             />
@@ -180,13 +180,13 @@ export default function EditAccountModal({
           {/* Buttons */}
           <div className="grid grid-cols-[1fr_1fr] gap-x-3 mt-3 w-full h-fit">
             <button
-              className="flex w-full border border-(--color-border-default) rounded-lg hover:bg-(--color-brand-green) active:bg-emerald-600 items-center justify-center py-1 text-[0.9rem] cursor-pointer transition-all duration-100"
+              className="flex w-full border border-(--color-border-default) rounded-lg hover:bg-(--color-brand-green) active:bg-emerald-600 items-center justify-center py-1 text-[0.8rem] cursor-pointer transition-all duration-100 focus:outline-(--color-brand-green) focus:outline-1"
               onClick={() => onCancel()}
             >
               <p>No, go back</p>
             </button>
             <button
-              className={`${process && "bg-slate-500 hover:bg-slate-500 active:bg-slate-500"} flex w-full rounded-lg bg-(--color-brand-green) hover:bg-emerald-600 active:bg-emerald-700 items-center justify-center py-1 text-[0.9rem] cursor-pointer transition-all duration-100`}
+              className={`${process && "bg-slate-500 hover:bg-slate-500 active:bg-slate-500"} flex w-full rounded-lg bg-(--color-brand-green) hover:bg-emerald-600 active:bg-emerald-700 items-center justify-center py-1 text-[0.8rem] cursor-pointer transition-all duration-100 focus:outline-(--color-brand-green) focus:outline-1`}
               onClick={handleUpdateAccountChanges}
               disabled={process}
             >

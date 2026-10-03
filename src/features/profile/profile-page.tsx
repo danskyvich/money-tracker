@@ -99,9 +99,7 @@ export default function ProfilePage({
 
   return (
     <div className="relative flex flex-col w-full h-full">
-      {
-        mfaError && <ErrorModal message={mfaError}/>
-      }
+      {mfaError && <ErrorModal message={mfaError} />}
       {toggle === "sign-out" && (
         <div className="fixed z-50 inset-0 bg-black/50 flex items-center justify-center">
           <Modal
@@ -184,11 +182,11 @@ export default function ProfilePage({
                 className="grid grid-cols-[1fr_1fr] w-full h-fit text-[0.9rem]  py-2 items-center justify-between"
                 key={index}
               >
-                <p className="text-[0.9rem] md:text-[1rem]">{item.item}</p>
+                <p className="text-[0.9rem]">{item.item}</p>
 
                 {/* Buttons */}
                 <button
-                  className={`flex w-fit h-fit ring ring-inset ring-(--color-brand-green) text-[0.9rem] items-center justify-self-end gap-2 hover:bg-(--color-brand-green) whitespace-nowrap hover:text-white rounded-lg shadow-md px-4 md:px-5 py-2 md:py-1 transition-all duration-100 cursor-pointer`}
+                  className={`flex w-fit h-fit ring ring-inset ring-(--color-brand-green) text-[0.9rem] items-center justify-self-end gap-2 hover:bg-(--color-brand-green) whitespace-nowrap hover:text-white rounded-lg shadow-md px-4 md:px-5 py-2 transition-all duration-100 cursor-pointer`}
                   onClick={() => item.onClick()}
                 >
                   {item.icon === null ? null : item.icon}

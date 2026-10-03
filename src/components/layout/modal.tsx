@@ -23,7 +23,9 @@ export default function Modal({loading, children, onCancel, noButtonText, yesBut
         {/* Header */}
         <div className="flex w-full h-fit items-center justify-between mb-3">
           {icon}
-          <p className="font-semibold text-[0.9rem] px-2 md:px-0 md:text-xl">{header}</p>
+          <p className="font-semibold text-[0.9rem] px-2 md:px-0 md:text-xl">
+            {header}
+          </p>
           <X
             size={15}
             className="cursor-pointer"
@@ -43,7 +45,7 @@ export default function Modal({loading, children, onCancel, noButtonText, yesBut
         {/* Buttons */}
         <div className="grid grid-cols-[1fr_1fr] gap-x-3 mt-3 w-full h-fit">
           <button
-            className={`${!noButtonText && "hidden"} whitespace-nowrap py-1 flex w-full items-center justify-center hover:text-white border border-(--color-brand-green) rounded-lg text-[0.8rem] md:text-[0.9rem] hover:bg-(--color-brand-green) active:bg-emerald-600 cursor-pointer transition-all duration-100`}
+            className={`${!noButtonText && "hidden"} whitespace-nowrap py-1 flex w-full items-center justify-center hover:text-white border border-(--color-brand-green) rounded-lg text-[0.8rem] hover:bg-(--color-brand-green) active:bg-emerald-600 cursor-pointer transition-all duration-100 focus:outline-1 focus:outline-(--color-brand-green)`}
             onClick={() => {
               onOpen(false);
               onCancel();
@@ -53,15 +55,19 @@ export default function Modal({loading, children, onCancel, noButtonText, yesBut
           </button>
 
           <button
-            className={`${onConfirm === undefined && "hidden"} whitespace-nowrap text-white py-2 flex w-full items-center justify-center rounded-lg text-[0.8rem] md:text-[0.9rem] bg-(--color-brand-green) hover:bg-emerald-600 active:bg-emerald-700 transition-all duration-100 cursor-pointer`}
+            className={`${onConfirm === undefined && "hidden"} whitespace-nowrap text-white py-2 flex w-full items-center justify-center rounded-lg text-[0.8rem] bg-(--color-brand-green) hover:bg-emerald-600 active:bg-emerald-700 transition-all duration-100 cursor-pointer focus:outline-1 focus:outline-(--color-brand-green)`}
             onClick={() => {
               onConfirm === undefined ? null : onConfirm();
             }}
             disabled={loading}
           >
-            {
-              loading ? <div className="flex py-1"><Spinner/></div> : yesButtonText
-            }
+            {loading ? (
+              <div className="flex py-1">
+                <Spinner />
+              </div>
+            ) : (
+              yesButtonText
+            )}
           </button>
         </div>
       </div>
