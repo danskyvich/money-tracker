@@ -33,7 +33,6 @@ export default function RootLayout({
         className={`h-full ${sans.variable} ${mono.variable}`}
         suppressHydrationWarning
       >
-        <RecaptchaProvider>
           <Providers>
             <ThemeProvider
               attribute={"class"}
@@ -44,7 +43,6 @@ export default function RootLayout({
               {children}
             </ThemeProvider>
           </Providers>
-        </RecaptchaProvider>
       </body>
     </html>
   );
