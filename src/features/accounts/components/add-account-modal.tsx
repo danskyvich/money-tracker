@@ -115,8 +115,9 @@ export default function AddAccountModal({
               ))}
             </select>
 
-            <p>Description</p>
+            <label htmlFor="description">Description</label>
             <textarea
+              id="description"
               rows={4}
               name="description"
               value={formValues.description}

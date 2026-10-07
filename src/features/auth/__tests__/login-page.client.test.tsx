@@ -3,8 +3,9 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { generalSignIn } from "@/lib/supabase/actions/auth";
 
+// next/navigation
 jest.mock("next/navigation", () => ({
-    useRouter() {
+    useRouter: () => {
         return {
             prefetch: () => null,
             push: jest.fn(),
@@ -12,25 +13,8 @@ jest.mock("next/navigation", () => ({
             back: jest.fn(),
         };
     },
-    usePathname() {
-        return "/login"
-    },
-    useSearchParams() {
-        return new URLSearchParams();
-    }
-}));
-
-jest.mock("next/router", () => ({
-    useRouter() {
-        return {
-            route: "/",
-            pathname: '',
-            query: {},
-            asPath: "",
-            push: jest.fn(),
-            replace: jest.fn(),
-        };
-    },
+    usePathname: () => "/login",
+    useSearchParams: () => new URLSearchParams(),
 }));
 
 // recaptcha
@@ -55,7 +39,9 @@ beforeEach(() => {
     mockUseRecaptcha.mockReturnValue({
         executeRecaptcha: jest.fn().mockResolvedValue("fake-token"),
     });
-    (generalSignIn as jest.Mock).mockResolvedValue({ error: null})
+    (generalSignIn as jest.Mock).mockResolvedValue({ 
+        error: null,
+    });
 });
 
 describe("Test all possible inputs", () => {
@@ -93,7 +79,12 @@ describe("Test all possible inputs", () => {
         expect(email).toBeValid();
 
         // mock response here
-        await waitFor(() => expect(generalSignIn).toHaveBeenCalledWith("droidnautica@gmail.com", false, "fake-token"));
-
-    })
+        await waitFor(() => {
+            expect(generalSignIn).toHaveBeenCalledWith(
+                "droidnautica@gmail.com",
+                false,
+                "fake-token",
+            );
+        });
+    });
 })

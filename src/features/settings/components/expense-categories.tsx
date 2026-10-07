@@ -102,7 +102,7 @@ export default function ExpenseCategories({
     setProcess(false);
     setToggle("delete-category");
     return;
-  }
+  };
   const handleDeleteExpenseCategory = async () => {
     if (!id) {
       setFetchError("No chosen category");
@@ -125,51 +125,79 @@ export default function ExpenseCategories({
     fetchData();
   };
 
+  const CONTENT = [
+    {
+      toggle: "delete-category",
+      icon: <Trash size={18} className="min-w-3 h-auto" />,
+      noButtonText: "No",
+      yesButtonText: "Delete category",
+      header: "Delete expense category",
+      message: `Do you want to delete the category "${name}"? ${(affectedRows ?? 0) > 0 ? `Approximately ${affectedRows} transactions will be affected by the deletion of this category. Continue?` : `There are no transactions currently using this category.`}`,
+      onConfirm: handleDeleteExpenseCategory,
+      isContent: false,
+    },
+    {
+      toggle: "add-category",
+      icon: <Coins size={18} className="min-w-3 h-auto" />,
+      noButtonText: "Return",
+      yesButtonText: "Add category",
+      header: "Add expense category",
+      message: null,
+      onConfirm: handleAddExpenseCategory,
+      isContent: true,
+    },
+    {
+      toggle: "name-category",
+      icon: <Trash size={18} className="min-w-3 h-auto" />,
+      noButtonText: "Return",
+      yesButtonText: "Rename category",
+      header: "Rename expense category",
+      message: null,
+      onConfirm: handleAddExpenseCategory,
+      isContent: true,
+    },
+  ];
+
   if (!open) return null;
   return (
-    <div className="flex flex-col w-100 xl:w-125 h-150 bg-(--color-bg-secondary) border border-(--color-border-default) rounded-lg">
+    <div className="relative flex flex-col w-100 xl:w-125 h-150 bg-(--color-bg-secondary) border border-(--color-border-default) rounded-lg">
       {fetchError && <ErrorModal message={fetchError} />}
-      {toggle === "delete-category" && (
-        <div className="fixed z-50 inset-0 bg-black/50 flex w-full h-full items-center justify-center">
-          <Modal
-            open
-            onOpen={() => setToggle(null)}
-            loading={process}
-            onCancel={() => setToggle(null)}
-            icon={<Trash size={18} className="min-w-3 h-auto" />}
-            noButtonText="No"
-            yesButtonText="Delete category"
-            header="Delete expense category"
-            message={`Do you want to delete the category "${name}"? ${(affectedRows ?? 0) > 0 ? `Approximately ${affectedRows} transactions will be affected by the deletion of this category. Continue?`: `There are no transactions currently using this category.`}`}
-            onConfirm={handleDeleteExpenseCategory}
-          />
-        </div>
-      )}
-      {toggle === "name-category" && (
-        <div className="fixed z-50 inset-0 bg-black/50 flex w-full h-full items-center justify-center">
-          <Modal
-            open
-            onOpen={() => setToggle(null)}
-            loading={process}
-            header="Name the expense category"
-            icon={<Coins size={18} className="min-w-3 h-auto" />}
-            onConfirm={handleAddExpenseCategory}
-            noButtonText="Return"
-            yesButtonText="Add the category"
-            onCancel={() => setToggle(null)}
+      {CONTENT.map((item) =>
+        toggle === item.toggle ? (
+          <div
+            key={item.toggle}
+            className="absolute inset-0 z-50 flex items-center justify-center bg-black/50"
           >
-            <label className="text-[0.9rem]" htmlFor="name-input" />
-            <input
-              type="text"
-              id="name-input"
-              value={name ?? ""}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="eg. Entertainment"
-              className="flex w-full p-3 py-1 border border-(--color-border-default) rounded-lg focus:outline focus:outline-(--color-border-strong)"
-            />
-          </Modal>
-        </div>
+            <Modal
+              open
+              onOpen={() => setToggle(null)}
+              loading={process}
+              onCancel={() => setToggle(null)}
+              icon={item.icon}
+              noButtonText={item.noButtonText}
+              yesButtonText={item.yesButtonText}
+              header={item.header}
+              message={item.message}
+              onConfirm={item.onConfirm}
+            >
+              {item.isContent && (
+                <>
+                  <label className="text-[0.9rem]" htmlFor="name-input" />
+                  <input
+                    type="text"
+                    id="name-input"
+                    value={name ?? ""}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="eg. Entertainment"
+                    className="flex w-full p-3 py-1 border border-(--color-border-default) rounded-lg focus:outline focus:outline-(--color-border-strong)"
+                  />
+                </>
+              )}
+            </Modal>
+          </div>
+        ) : null,
       )}
+
       {/* header */}
       <div className="flex flex-0 w-full h-fit justify-between px-5 pt-5 pb-2">
         <Coins size={20} className="min-w-5" />
@@ -226,11 +254,13 @@ export default function ExpenseCategories({
         <div
           className="flex w-full border border-(--color-border-default) rounded-lg py-2 items-center justify-center gap-1 text-[0.9rem] hover:bg-(--color-brand-green) active:bg-emerald-700 transition-all duration-100 cursor-pointer hover:text-white active:text-white"
           onClick={() => {
-            setToggle("name-category");
+            setToggle("add-category");
           }}
         >
           {process ? (
-            <div className="flex py-1"><Spinner/></div>
+            <div className="flex py-1">
+              <Spinner />
+            </div>
           ) : (
             <>
               <Plus size={18} className="min-w-5 h-auto" />

@@ -87,7 +87,7 @@ export default function VerifyEmailPage({
   return (
     <div className="flex flex-col w-full h-full items-center justify-center">
       {resendError && <ErrorModal message={resendError} />}
-      {errors && <ErrorModal message={errors.root?.message} />}
+      {errors.otp && <ErrorModal message={errors.otp?.message} />}
       <div className="flex w-full gap-2 h-fit items-center justify-center">
         <Image src="/favicon.ico" alt="web_app_logo" width={25} height={12} />
         <p className="font-bold text-4xl text-white">

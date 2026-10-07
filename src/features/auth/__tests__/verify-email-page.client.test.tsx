@@ -1,9 +1,10 @@
 import userEvent from "@testing-library/user-event";
 import VerifyEmailPage from "../components/verify-email-page";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 
 const mockPush = jest.fn();
 const mockBack = jest.fn();
+const mockRedirect = jest.fn();
 
 jest.mock("next/navigation", () => ({
   useRouter() {
@@ -14,11 +15,19 @@ jest.mock("next/navigation", () => ({
       back: mockBack,
     };
   },
+  redirect: (...args: unknown[]) => mockRedirect(...args),
+}));
+
+
+// next/headers (cookies)
+const mockCookies = jest.fn();
+jest.mock("next/headers", () => ({
+    cookies: jest.fn(async () => ({ set: mockCookies })),
 }));
 
 beforeEach(() => {
     jest.clearAllMocks();
-})
+});
 
 // RememberMe is false until a hotfix update patches it up.
 describe("Verify email page", () => {
@@ -48,10 +57,17 @@ describe("Verify email page", () => {
         expect(mockBack).toHaveBeenCalledTimes(1);
     });
 
-    it("Verify if the OTP input is invalid", async () => {
-        const { user, input, submitButton } = setup();
+    it("Verify if the OTP input is less than 6-digits", async () => {
+        const { user, input } = setup();
 
         await user.type(input, "321");
-        
-    })
+        expect(await screen.findByText(/Enter a 6-digit code/i)).toBeVisible();
+    });
+
+    it("Verify if OTP input is more than 6-digits", async () => {
+        const { user, input } = setup();
+
+        await user.type(input, "123456789");
+        expect(await screen.findByText(/Enter a 6-digit code/i)).toBeVisible();
+    });
 });

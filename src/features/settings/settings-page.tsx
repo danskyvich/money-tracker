@@ -21,19 +21,21 @@ export default function SettingsPage() {
       value: "Modify",
       icon: <Eye size={15} />,
       link: () => setToggle("income-categories"),
+      id: "income-categories"
     },
     {
       item: "Modify expense categories",
       value: "Modify",
       icon: <Eye size={15} />,
       link: () => setToggle("expense-categories"),
+      id: "expense-categories"
     },
     {
       item: "Delete data",
       value: "Delete data",
       icon: <Trash size={15}/>,
       link: () => setToggle("data-deletion"),
-
+      id: "delete-data",
     }
   ];
 
@@ -102,9 +104,9 @@ export default function SettingsPage() {
               className="grid grid-cols-[1fr_1fr] w-full h-fit px-5 py-2 items-center"
               key={index}
             >
-              <p className="text-[0.9rem]">{item.item}</p>
+              <label className="text-[0.9rem]" htmlFor={item.id}>{item.item}</label>
 
-              <button className="flex w-fit h-fit ring ring-inset ring-(--color-brand-green) hover:text-white active:text-white active:bg-emerald-600 text-[0.9rem] rounded-lg shadow-md hover:bg-(--color-brand-green) px-4 md:x-5 py-2 items-center justify-center justify-self-end gap-1 duration-100 cursor-pointer transition-all" onClick={item.link}>
+              <button className="flex w-fit h-fit ring ring-inset ring-(--color-brand-green) hover:text-white active:text-white active:bg-emerald-600 text-[0.9rem] rounded-lg shadow-md hover:bg-(--color-brand-green) px-4 md:x-5 py-2 items-center justify-center justify-self-end gap-1 duration-100 cursor-pointer transition-all" onClick={item.link} id={item.id}>
                 {item.icon === null ? null : item.icon}
                 <p className="hidden md:block whitespace-nowrap">{item.value}</p>
               </button>

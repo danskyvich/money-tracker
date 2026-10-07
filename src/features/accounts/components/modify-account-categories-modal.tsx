@@ -59,7 +59,7 @@ export default function ModifyAccountCategoriesModal({
     <>
       {(updateState?.error || deleteState?.error) && (
         <ErrorModal
-          message={"Error: " + updateState?.error || deleteState?.error}
+          message={"Error: " + (updateState?.error ?? deleteState?.error)}
         />
       )}
       {open && (
@@ -70,10 +70,11 @@ export default function ModifyAccountCategoriesModal({
               <p className="font-semibold text-xl whitespace-nowrap">
                 Edit Category Name
               </p>
-              <X size={20} className="cursor-pointer" onClick={() => onClose} />
+              <X size={20} className="cursor-pointer" onClick={onClose} />
             </div>
             <form className="flex flex-col w-full gap-2">
               <input
+                id={"category_name"}
                 className="flex border rounded-md border-(--color-border-default) px-5 py-1 mb-5 placeholder:text-[0.9rem] text-[0.9rem] outline-none focus:border-(--color-border-strong)"
                 value={accountCategoryName}
                 onChange={(e) => setAccountCategoryName(e.target.value)}
