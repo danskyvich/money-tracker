@@ -222,6 +222,7 @@ export default function ExpenseCategories({
                   <Pencil
                     size={15}
                     className="min-w-3 h-auto cursor-pointer"
+                    aria-label={`Rename ${item.name}`}
                     onClick={() => {
                       setName(item.name);
                       setId(item.id);
@@ -231,6 +232,7 @@ export default function ExpenseCategories({
                   <Trash
                     size={18}
                     className="min-w-3 h-auto text-red-400 cursor-pointer"
+                    aria-label={`Delete ${item.name}`}
                     onClick={() => {
                       setId(item.id);
                       setName(item.name);

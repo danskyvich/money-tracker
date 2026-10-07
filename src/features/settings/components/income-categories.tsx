@@ -1,237 +1,273 @@
 import ErrorModal from "@/components/layout/error-modal";
 import Modal from "@/components/layout/modal";
 import Spinner from "@/components/layout/spinner";
-import { AddIncomeCategory, CountTransactionsWithCategory, DeleteCategory, FetchIncomeCategories } from "@/lib/supabase/actions/database";
+import {
+  AddIncomeCategory,
+  CountTransactionsWithCategory,
+  DeleteCategory,
+  FetchIncomeCategories,
+} from "@/lib/supabase/actions/database";
 import { Categories } from "@/lib/types/derived";
 import { Coins, Pencil, Plus, Trash, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface IncomeCategoriesProps {
-    open: boolean;
-    onOpen: () => void;
+  open: boolean;
+  onOpen: () => void;
 }
 
-export function IncomeCategories({open, onOpen}: IncomeCategoriesProps) {
+export function IncomeCategories({ open, onOpen }: IncomeCategoriesProps) {
+  const [fetchError, setFetchError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [process, setProcess] = useState<boolean>(false);
+  const [incomeCategoriesData, setIncomeCategoriesData] = useState<
+    Categories[] | undefined
+  >(undefined);
+  const [toggle, setToggle] = useState<string | null>(null);
 
-    const [fetchError, setFetchError] = useState<string | null>(null);
-    const [loading, setLoading] = useState<boolean>(false);
-    const [process, setProcess] = useState<boolean>(false);
-    const [incomeCategoriesData, setIncomeCategoriesData] = useState<Categories[] | undefined>(undefined);
-    const [toggle, setToggle] = useState<string | null>(null);
+  // for db modification
+  const [name, setName] = useState<string | null>(null);
+  const [id, setId] = useState<string | null>(null);
+  const [affectedRows, setAffectedRows] = useState<number>(0);
 
-    // for db modification
-    const [name, setName] = useState<string | null>(null);
-    const [id, setId] = useState<string | null>(null);
-    const [affectedRows, setAffectedRows] = useState<number>(0);
+  const fetchIncomeCategories = async () => {
+    setLoading(true);
 
-    const fetchIncomeCategories = async () => {
-        setLoading(true);
-
-        const result = await FetchIncomeCategories();
-        if (!result.success) {
-            setFetchError(result?.error ?? "Fetching income categories failed.");
-            setLoading(false);
-            return;
-        }
-        setIncomeCategoriesData(result?.data);
-        setLoading(false);
-        return;
+    const result = await FetchIncomeCategories();
+    if (!result.success) {
+      setFetchError(result?.error ?? "Fetching income categories failed.");
+      setLoading(false);
+      return;
     }
+    setIncomeCategoriesData(result?.data);
+    setLoading(false);
+    return;
+  };
 
-    // for adding and modifying categories
-    const handleAddUpdateIncomeCategory = async () => {
-        const trimmedName = name?.trim();
+  // for adding and modifying categories
+  const handleAddUpdateIncomeCategory = async () => {
+    const trimmedName = name?.trim();
 
-        if (!trimmedName) {
-          setFetchError("Field empty");
-          return;
-        }
-
-        setFetchError(null);
-        setProcess(true);
-
-        const result = id
-          ? await AddIncomeCategory(trimmedName, id)
-          : await AddIncomeCategory(trimmedName);
-
-        if (!result.success) {
-            setFetchError(result.error);
-            setProcess(false);
-            return;
-        }
-        setProcess(false)
-        setName("");
-        setId(null);
-        setToggle(null);
-        fetchIncomeCategories();
-    }
-
-    // for confirm deleting categories
-    const handleConfirmDeleteIncomeCategory = async (id: string) => {
-      setProcess(true);
-      if (!id) {
-        setFetchError("No fetched category");
-        setProcess(false);
-        return;
-      }
-      // get the count of all affected rows.
-      const result = await CountTransactionsWithCategory(id);
-      if (!result.success) {
-        setFetchError(result.error);
-        setProcess(false);
-        return;
-      }
-     
-      setAffectedRows(result.count);
-      setProcess(false);
-      setToggle("delete-category");
+    if (!trimmedName) {
+      setFetchError("Field empty");
       return;
     }
 
-    // for absolute deleting categories
-    const handleDeleteIncomeCategory = async () => {
-        if (!id) {
-            setFetchError("No chosen category");
-            return;
-        }
+    setFetchError(null);
+    setProcess(true);
 
-        setFetchError(null);
-        setProcess(true);
+    const result = id
+      ? await AddIncomeCategory(trimmedName, id)
+      : await AddIncomeCategory(trimmedName);
 
-        // delete category and its transactions
-        const result = await DeleteCategory(id);
-        if (!result.success) {
-            setFetchError(result.error);
-            setProcess(false);
-            return;
-        }
+    if (!result.success) {
+      setFetchError(result.error);
+      setProcess(false);
+      return;
+    }
+    setProcess(false);
+    setName("");
+    setId(null);
+    setToggle(null);
+    fetchIncomeCategories();
+  };
 
-        setProcess(false);
-        setName("");
-        setId(null);
-        setToggle(null);
-        fetchIncomeCategories();
+  // for confirm deleting categories
+  const handleConfirmDeleteIncomeCategory = async (id: string) => {
+    setProcess(true);
+    if (!id) {
+      setFetchError("No fetched category");
+      setProcess(false);
+      return;
+    }
+    // get the count of all affected rows.
+    const result = await CountTransactionsWithCategory(id);
+    if (!result.success) {
+      setFetchError(result.error);
+      setProcess(false);
+      return;
     }
 
-    useEffect(() => {
-        fetchIncomeCategories();
-    }, []);
+    setAffectedRows(result.count);
+    setProcess(false);
+    setToggle("delete-category");
+    return;
+  };
 
-    if (!open) return null;
-    return (
-      <>
-        {toggle === "name-category" && (
-          <div className="flex w-full h-full inset-0 z-50 fixed items-center justify-center bg-black/50">
+  // for absolute deleting categories
+  const handleDeleteIncomeCategory = async () => {
+    if (!id) {
+      setFetchError("No chosen category");
+      return;
+    }
+
+    setFetchError(null);
+    setProcess(true);
+
+    // delete category and its transactions
+    const result = await DeleteCategory(id);
+    if (!result.success) {
+      setFetchError(result.error);
+      setProcess(false);
+      return;
+    }
+
+    setProcess(false);
+    setName("");
+    setId(null);
+    setToggle(null);
+    fetchIncomeCategories();
+  };
+
+  useEffect(() => {
+    fetchIncomeCategories();
+  }, []);
+
+  const CONTENT = [
+    {
+      toggle: "add-category",
+      header: "Add income category",
+      icon: <Coins size={18} className="min-w-3 h-auto" />,
+      onConfirm: handleAddUpdateIncomeCategory,
+      noButtonText: "Return",
+      yesButtonText: "Add category",
+      isContent: true,
+      message: null,
+    },
+    {
+      toggle: "name-category",
+      header: "Rename income category",
+      icon: <Coins size={18} className="min-w-3 h-auto" />,
+      noButtonText: "Return",
+      yesButtonText: "Rename category",
+      onConfirm: handleAddUpdateIncomeCategory,
+      isContent: true,
+      message: null,
+    },
+    {
+      toggle: "delete-category",
+      header: "Delete income category",
+      icon: <Trash size={18} className="min-w-3 h-auto" />,
+      noButtonText: "Return",
+      yesButtonText: "Delete category",
+      onConfirm: handleDeleteIncomeCategory,
+      isContent: false,
+      message: `Do you want to delete the category "${name}"? ${(affectedRows ?? 0) > 0 ? `Approximately ${affectedRows} transactions will be affected by the deletion of this category. Continue?` : `There are no transactions currently using this category`}`,
+    },
+  ];
+
+  if (!open) return null;
+  return (
+    <>
+      {CONTENT.map((item, id) =>
+        toggle === item.toggle ? (
+          <div className="absolute z-50 inset-0 flex items-center justify-center bg-black/50" key={id}>
             <Modal
               open
               onOpen={() => setToggle(null)}
               loading={process}
-              header="Name the income category"
-              icon={<Coins size={18} className="min-w-3 h-auto" />}
-              onConfirm={handleAddUpdateIncomeCategory}
-              noButtonText="Return"
-              yesButtonText="Add the category"
+              header={item.header}
+              icon={item.icon}
               onCancel={() => setToggle(null)}
+              message={item.message}
+              onConfirm={item.onConfirm}
+              noButtonText={item.noButtonText}
+              yesButtonText={item.yesButtonText}
             >
-              <label className="text-[0.9rem]" htmlFor="name-input" />
-              <input
-                type="text"
-                id="name-input"
-                value={name ?? ""}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="eg. Savings"
-                className="flex w-full p-3 py-1 border border-(--color-border-default) rounded-lg focus:outline focus:outline-(--color-border-strong)"
-              />
+              {item.isContent && (
+                <>
+                  <label className="text-[0.9rem]" htmlFor="name-input" />
+                  <input
+                    type="text"
+                    id="name-input"
+                    value={name ?? ""}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="eg. Savings"
+                    className="flex w-full p-3 py-1 border border-(--color-border-default) rounded-lg focus:outline focus:outline-(--color-border-strong)"
+                  />
+                </>
+              )}
             </Modal>
           </div>
-        )}
-        {toggle === "delete-category" && (
-          <div className="flex w-full h-full inset-0 z-50 fixed items-center justify-center bg-black/50">
-            <Modal
-              open
-              onOpen={() => setToggle(null)}
-              loading={process}
-              header="Delete the category"
-              icon={<Trash size={18} className="min-w-3 h-auto" />}
-              onConfirm={handleDeleteIncomeCategory}
-              noButtonText="Return"
-              yesButtonText="Delete category"
-              message={`Do you want to delete the category "${name}"? ${(affectedRows ?? 0) > 0 ? `Approximately ${affectedRows} transactions will be affected by the deletion of this category. Continue?` : `There are no transactions currently using this category`}`}
-              onCancel={() => setToggle(null)}
-            />
-          </div>
-        )}
-        <div className="flex flex-col w-100 xl:w-125 h-150 bg-(--color-bg-secondary) border border-(--color-border-default) rounded-lg">
-          {fetchError && <ErrorModal message={fetchError} />}
-          {/* header */}
-          <div className="flex flex-0 w-full h-fit justify-between px-5 pt-5 pb-2">
-            <Coins size={20} className="min-w-5" />
-            <p className="text-xl font-semibold">Income categories</p>
-            <X onClick={() => onOpen()} className="cursor-pointer" />
-          </div>
+        ) : null,
+      )}
 
-          {/* content */}
-          <div className="flex flex-2 flex-col w-full h-full overflow-y-auto">
-            {loading ? (
-              <div className="flex w-full h-full items-center justify-center">
+      {/* Content */}
+      <div className="flex flex-col w-100 xl:w-125 h-150 bg-(--color-bg-secondary) border border-(--color-border-default) rounded-lg">
+        {fetchError && <ErrorModal message={fetchError} />}
+        {/* header */}
+        <div className="flex flex-0 w-full h-fit justify-between px-5 pt-5 pb-2">
+          <Coins size={20} className="min-w-5" />
+          <p className="text-xl font-semibold">Income categories</p>
+          <X onClick={() => onOpen()} className="cursor-pointer" />
+        </div>
+
+        {/* content */}
+        <div className="flex flex-2 flex-col w-full h-full overflow-y-auto">
+          {loading ? (
+            <div className="flex w-full h-full items-center justify-center">
+              <Spinner />
+            </div>
+          ) : (
+            <>
+              {incomeCategoriesData?.map((item, id) => (
+                <div
+                  className="flex flex-0 w-full h-full border-y border-(--color-border-subtle) px-5 py-3 items-start justify-between"
+                  key={id}
+                >
+                  <p className="text-[0.9rem] ">{item.name}</p>
+                  <div className="flex w-fit h-fit gap-2">
+                    <Pencil
+                      size={15}
+                      className="min-w-3 h-auto cursor-pointer"
+                      aria-label={`Rename ${item.name}`}
+                      onClick={() => {
+                        setName(item.name);
+                        setId(item.id);
+                        setToggle("name-category");
+                      }}
+                    />
+                    <Trash
+                      size={18}
+                      className="min-w-3 h-auto text-red-400 cursor-pointer"
+                      aria-label={`Delete ${item.name}`}
+                      onClick={() => {
+                        setId(item.id);
+                        setName(item.name);
+                        handleConfirmDeleteIncomeCategory(item.id);
+                      }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </>
+          )}
+          {incomeCategoriesData?.length === 0 && (
+            <div className="flex w-full h-full items-center font-mono justify-center text-[0.9rem]">
+              <p>You don't have any income categories</p>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="flex flex-0 w-full h-fit px-5 py-3">
+          <div
+            className="flex w-full border border-(--color-border-default) rounded-lg py-2 items-center justify-center gap-1 text-[0.9rem] hover:bg-(--color-brand-green) active:bg-emerald-700 transition-all hover:text-white active:text-white duration-100 cursor-pointer"
+            onClick={() => setToggle("add-category")}
+          >
+            {process ? (
+              <div className="flex py-1">
                 <Spinner />
               </div>
             ) : (
               <>
-                {incomeCategoriesData?.map((item, id) => (
-                  <div
-                    className="flex flex-0 w-full h-full border-y border-(--color-border-subtle) px-5 py-3 items-start justify-between"
-                    key={id}
-                  >
-                    <p className="text-[0.9rem] ">{item.name}</p>
-                    <div className="flex w-fit h-fit gap-2">
-                      <Pencil
-                        size={15}
-                        className="min-w-3 h-auto cursor-pointer"
-                        onClick={() => {
-                          setName(item.name);
-                          setId(item.id);
-                          setToggle("name-category");
-                        }}
-                      />
-                      <Trash
-                        size={18}
-                        className="min-w-3 h-auto text-red-400 cursor-pointer"
-                        onClick={() => {
-                          setId(item.id);
-                          setName(item.name);
-                          handleConfirmDeleteIncomeCategory(item.id);
-                        }}
-                      />
-                    </div>
-                  </div>
-                ))}
+                <Plus size={18} className="min-w-5 h-auto" />
+                <p>Add an income category</p>
               </>
             )}
-            {incomeCategoriesData?.length === 0 && (
-              <div className="flex w-full h-full items-center font-mono justify-center text-[0.9rem]">
-                <p>You don't have any income categories</p>
-              </div>
-            )}
-          </div>
-
-          {/* Footer */}
-          <div className="flex flex-0 w-full h-fit px-5 py-3">
-            <div
-              className="flex w-full border border-(--color-border-default) rounded-lg py-2 items-center justify-center gap-1 text-[0.9rem] hover:bg-(--color-brand-green) active:bg-emerald-700 transition-all hover:text-white active:text-white duration-100 cursor-pointer"
-              onClick={() => setToggle("name-category")}
-            >
-              {process ? (
-                <div className="flex py-1"><Spinner/></div>
-              ) : (
-                <>
-                  <Plus size={18} className="min-w-5 h-auto" />
-                  <p>Add an income category</p>
-                </>
-              )}
-            </div>
           </div>
         </div>
-      </>
-    );
+      </div>
+    </>
+  );
 }
