@@ -2,7 +2,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import TransactionModal from "../components/transaction-modal";
 import UserAgent from "@testing-library/user-event"
 import { createClient } from "@/lib/supabase/clients/client";
-import { DeleteTransaction, InsertTransaction } from "@/lib/supabase/actions/database";
+import { InsertTransaction } from "@/lib/supabase/actions/database";
 import { getUser } from "@/lib/supabase/actions/auth";
 
 const mockAccounts = [
