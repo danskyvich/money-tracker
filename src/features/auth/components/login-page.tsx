@@ -62,7 +62,6 @@ export default function LoginPage() {
 
       const result = await generalSignIn(
         formData.get("email") as string,
-        formData.get("rememberMe") === "on",
         recaptchaToken,
       );
       return result;
@@ -115,17 +114,6 @@ export default function LoginPage() {
             required
           />
 
-          {/* Remember me? */}
-          <div className="flex w-full px-2 items-center justify-start h-fit">
-            <input
-              type="checkbox"
-              name="rememberMe"
-              checked={rememberMe}
-              onChange={(e) => setRememberMe(e.target.checked)}
-              className="mr-2"
-            />
-            <label className="text-[0.9rem]">Remember me?</label>
-          </div>
 
           {/* Error */}
           {state?.error && (

@@ -20,12 +20,12 @@ async function verifyRecaptcha(token: string): Promise<boolean> {
 }
 
 // Passwordless Sign In
-export async function generalSignIn(email: string, rememberMe: boolean, recaptchaToken: string): Promise<{ error?: string | null}> {
+export async function generalSignIn(email: string, recaptchaToken: string): Promise<{ error?: string | null}> {
     const result = await sendOtp(email, recaptchaToken)
     if (result.error) return result
     
     const cookieStore = await cookies();
-    cookieStore.set("pending_verification", JSON.stringify({ email, rememberMe}), {
+    cookieStore.set("pending_verification", JSON.stringify({ email}), {
         httpOnly: true,
         secure: true,
         sameSite: "lax",
