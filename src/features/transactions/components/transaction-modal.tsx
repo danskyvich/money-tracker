@@ -243,6 +243,7 @@ export default function TransactionModal({
               <div
                 className={`flex ${isActive ? typeStyles[item] : "hover:bg-(--color-border-subtle)"} flex-1 w-full h-fit border border-(--color-border-default) rounded-lg items-center justify-center py-1 hover:bg-(--color-border-subtle) cursor-pointer active:bg-(--color-brand-green-accent)`}
                 key={key}
+                role="button"
                 onClick={(e) => setFormValues({ type: item })}
               >
                 <p className="line-clamp-1 text-[0.9rem] font-mono">{item}</p>
