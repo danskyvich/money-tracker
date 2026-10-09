@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import EditAccountModal from "../components/edit-account-modal";
 import UserAgent from "@testing-library/user-event"
-import { FetchAccountCategories } from "@/lib/supabase/actions/database";
+import { FetchAccountCategories, UpdateAccount, FetchAccounts } from "@/lib/supabase/actions/database";
 
 const chosenAccount = 
     {
@@ -20,25 +20,35 @@ jest.mock("@/lib/supabase/actions/database", () => ({
     }),
     FetchAccounts: jest.fn(),
     UpdateAccount: jest.fn(),
-}))
+}));
 
 beforeEach(() => {
     jest.clearAllMocks();
     (FetchAccountCategories as jest.Mock).mockResolvedValue({
         success: true,
         data: mockCategories,
+    });
+    (UpdateAccount as jest.Mock).mockResolvedValue({
+        success: true,
+        data: { id: "1" }
     })
 })
 
 describe("Test account editing feature", () => {
     const setup = async () => {
         const user = UserAgent.setup();
-        render(<EditAccountModal icon={""} onOpen={jest.fn()} onCancel={jest.fn()} chosenAccount={chosenAccount}/>);
+        const onOpen = jest.fn();
+        const onCancel = jest.fn();
+        render(<EditAccountModal icon={""} onOpen={onOpen} onCancel={onCancel} chosenAccount={chosenAccount}/>);
         return {
             user,
+            onOpen,
+            onCancel,
             description: await screen.findByLabelText(/description/i),
             name: await screen.findByLabelText(/name/i),
             category: await screen.findByRole("combobox", { name: /category/i }),
+            getBackButton: () => screen.getByLabelText("close"),
+            getEditAccountButton: () => screen.getByRole("button", { name: "edit-account"}),
         }
     }
 
@@ -74,5 +84,35 @@ describe("Test account editing feature", () => {
         expect(category).toHaveValue("1");
         await user.selectOptions(category, "Savings");
         expect(category).toHaveValue("2");
-    })
+    });
+
+    it("Test if user can edit an existing account", async () => {
+        const { user, getEditAccountButton, name, description, category, onCancel } = await setup();
+
+        await user.clear(name);
+        await user.type(name, "BPI - Sample edit");
+        await user.clear(description);
+        await user.type(description, "Edited description to savings");
+        await user.selectOptions(category, "2");
+
+        await user.click(getEditAccountButton());
+
+        await waitFor(() => {
+            expect(UpdateAccount).toHaveBeenCalledWith("1", {
+                name: "BPI - Sample edit",
+                description: "Edited description to savings",
+                category_id: "2",
+                id: "1",
+            });
+            expect(onCancel).toHaveBeenCalled();
+        });
+    });
+
+    it("Test if user can go back from the modal", async () => {
+        const { user, getBackButton } = await  setup();
+
+        expect(getBackButton()).toBeInTheDocument();
+        await user.click(getBackButton());
+        expect(UpdateAccount).not.toHaveBeenCalled();
+    });
 })

@@ -75,7 +75,7 @@ export default function AddAccountModal({
           <p className="font-semibold text-xl whitespace-nowrap">
             Add an account
           </p>
-          <X size={20} onClick={() => onOpen()} className="cursor-pointer" />
+          <X role="button" aria-label="close" size={20} onClick={() => onOpen()} className="cursor-pointer" />
         </div>
 
         {/* Content */}
@@ -134,6 +134,7 @@ export default function AddAccountModal({
           <button
             className="flex bg-(--color-brand-green) text-white focus:outline-1 focus:outline-(--color-brand-green) rounded-lg shadow-md hover:bg-(--color-brand-green-accent) text-[0.8rem] active:bg-emerald-700 items-center justify-center px-5 py-1 w-full cursor-pointer"
             type="submit"
+            aria-label="add-account"
           >
             {loading ? <Spinner /> : "Add account"}
           </button>

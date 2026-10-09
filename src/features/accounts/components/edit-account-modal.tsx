@@ -128,6 +128,7 @@ export default function EditAccountModal({
             </p>
             <X
               size={15}
+              aria-label="close"
               className="cursor-pointer"
               onClick={() => onCancel()}
             />
@@ -189,6 +190,7 @@ export default function EditAccountModal({
               className={`${process && "bg-slate-500 hover:bg-slate-500 active:bg-slate-500"} flex w-full rounded-lg bg-(--color-brand-green) hover:bg-emerald-600 active:bg-emerald-700 items-center justify-center py-1 text-[0.8rem] cursor-pointer transition-all duration-100 focus:outline-(--color-brand-green) focus:outline-1`}
               onClick={handleUpdateAccountChanges}
               disabled={process}
+              aria-label="edit-account"
             >
               {process ? <Spinner /> : <p>Save changes</p>}
             </button>

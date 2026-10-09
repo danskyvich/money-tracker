@@ -32,7 +32,7 @@ export default function BackupPage() {
       },
       {
         item: "Export data to Excel",
-        value: "Export data as a CSV file",
+        value: "Export as a CSV file",
         icon: <MoveUpRight size={15} />,
         onClick: () => setActiveItem("csv"),
       },
@@ -324,6 +324,7 @@ export default function BackupPage() {
 
                 <button
                   className="flex w-fit h-fit cursor-pointer ring ring-inset ring-(--color-brand-green) items-center justify-center active:bg-emerald-600 active:text-white whitespace-nowrap rounded-lg gap-1 justify-self-end shadow-md px-4 md:px-5 py-2 hover:bg-(--color-brand-green) hover:text-white text-[0.9rem]"
+                  aria-label={`${item.value} button`}
                   onClick={item.onClick}
                 >
                   {item.icon}

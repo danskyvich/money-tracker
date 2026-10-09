@@ -82,7 +82,6 @@ describe("Test all possible inputs", () => {
         await waitFor(() => {
             expect(generalSignIn).toHaveBeenCalledWith(
                 "droidnautica@gmail.com",
-                false,
                 "fake-token",
             );
         });
