@@ -36,6 +36,7 @@ export default function VerifyEmailPage({
   const router = useRouter();
   const [timer, setTimer] = useState(120);
   const [resendDisabled, setResendDisabled] = useState(true);
+  const [message, setMessage] = useState<string | null>(null);
   const [resendPending, setResendPending] = useState(false);
   const [resendError, setResendError] = useState<string | null>(null);
   const { executeRecaptcha } = useGoogleReCaptcha();
@@ -80,6 +81,7 @@ export default function VerifyEmailPage({
       return;
     }
 
+
     setTimer(120);
     setResendDisabled(true);
   };
@@ -107,9 +109,9 @@ export default function VerifyEmailPage({
               Confirm your email
             </p>
           </div>
-          <p className="font-display text-[0.9rem]/5">
+          <p className="font-display text-[0.9rem]/5 font-light">
             We have sent you a verification email to
-            <span className="font-semibold ml-1 inline-block">{email}</span>.
+            <span className="font-semibold inline-block">{email}</span>.
             Enter the One-time PIN (OTP) code that was sent to your email in the
             input box below.{" "}
           </p>
@@ -124,11 +126,14 @@ export default function VerifyEmailPage({
               register={register}
               icon={<Lock size={15} />}
             />
+            {
+              message && <p className="text-[0.875rem] font-light text-(--color-brand-green)">We have sent you a new verification email</p>
+            }
 
             <div className="w-full h-fit flex gap-2 items-center justify-center">
               <p className="self-center">
                 <button
-                  className={`text-[0.9rem] font-mono text-(--color-text-primary) hover:underline items-center justify-center active:font-semibold ${(resendDisabled || resendPending) && "text-(--color-text-secondary) pointer-events-none cursor-default"}`}
+                  className={`text-[0.9rem] cursor-pointer font-mono text-(--color-text-primary) hover:underline items-center justify-center active:font-semibold ${(resendDisabled || resendPending) && "text-(--color-text-secondary) pointer-events-none cursor-default"}`}
                   onClick={handleResend}
                   disabled={resendDisabled || resendPending}
                   aria-disabled={resendDisabled || resendPending}
