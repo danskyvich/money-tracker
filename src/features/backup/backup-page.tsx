@@ -96,6 +96,7 @@ export default function BackupPage() {
       }
     }
 
+    // Import from JSON
     const handleImportFromJSON = async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (!file) return;
@@ -111,6 +112,7 @@ export default function BackupPage() {
         await ImportFromJSON(parsed);
         setActiveItem(null);
       } catch (err) {
+        console.log("Import failed: ", err);
         setExportError(String(err));
         setLoading(false);
       } finally {
@@ -118,6 +120,7 @@ export default function BackupPage() {
       }
     }
 
+    // Import from CSV
     const handleImportFromCSV = async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (!file) return;
@@ -148,6 +151,7 @@ export default function BackupPage() {
         {exportError && <ErrorModal message={exportError} />}
         {activeItem && (
           <div className="fixed inset-0 z-50 bg-black/50 flex w-full h-full items-center justify-center">
+            
             {/* Export to CSV */}
             {activeItem === "csv" && (
               <Modal
@@ -170,6 +174,7 @@ export default function BackupPage() {
                   <div className="flex w-full items-center gap-2">
                     <input
                       type="date"
+                      aria-label="from-date"
                       value={dates.startDate || dateNow}
                       disabled={exportAllData}
                       onChange={(e) =>
@@ -183,6 +188,7 @@ export default function BackupPage() {
                     <ArrowRight size={15} />
                     <input
                       type="date"
+                      aria-label="to-date"
                       value={dates.endDate || dateNow}
                       onChange={(e) =>
                         setDates((prev) => ({
@@ -199,6 +205,7 @@ export default function BackupPage() {
                     <input
                       id="allData"
                       type="checkbox"
+                      aria-label="export-all"
                       checked={exportAllData}
                       onChange={(e) => setExportAllData((prev) => !prev)}
                       className="border border-(--color-border-default) rounded-md cursor-pointer"
@@ -230,6 +237,7 @@ export default function BackupPage() {
                   <div className="flex w-full items-center gap-2">
                     <input
                       type="date"
+                      aria-label="from-date"
                       value={dates.startDate || dateNow}
                       disabled={exportAllData}
                       onChange={(e) =>
@@ -243,6 +251,7 @@ export default function BackupPage() {
                     <ArrowRight size={15} />
                     <input
                       type="date"
+                      aria-label="to-date"
                       value={dates.endDate || dateNow}
                       onChange={(e) =>
                         setDates((prev) => ({
@@ -259,6 +268,7 @@ export default function BackupPage() {
                     <input
                       id="allData"
                       type="checkbox"
+                      aria-label="export-all"
                       checked={exportAllData}
                       onChange={(e) => setExportAllData((prev) => !prev)}
                       className="border border-(--color-border-default) rounded-md cursor-pointer"
@@ -285,6 +295,7 @@ export default function BackupPage() {
                   onChange={handleImportFromJSON}
                   accept=".json"
                   type="file"
+                  aria-label="json-import"
                   className="flex w-full h-fit border border-(--color-border-subtle) cursor-pointer hover:bg-(--color-bg-subtle) rounded-lg px-3 py-1"
                 />
               </Modal>
@@ -305,6 +316,7 @@ export default function BackupPage() {
                 <input
                   onChange={handleImportFromCSV}
                   type="file"
+                  aria-label="csv-import"
                   accept=".zip"
                   className="flex w-full h-fit border border-(--color-border-subtle) cursor-pointer hover:bg-(--color-bg-subtle) rounded-lg px-3 py-1"
                   />

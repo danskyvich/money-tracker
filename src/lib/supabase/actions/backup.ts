@@ -115,8 +115,7 @@ export async function parseZipToTables(file: File): Promise<Record<string, any[]
         const result = Papa.parse(csvText, {
             header: true,
             skipEmptyLines: true,
-        }); // since dynamicTyping is removed, columns are now non-coerced.
-        // be careful on comparisons for non-numeric columns.
+        });
 
         // this section resolves null columns
         const rows = (result.data as Record<string, any>[]).map((row) => {
