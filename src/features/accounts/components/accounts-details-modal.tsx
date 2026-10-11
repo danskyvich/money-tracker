@@ -99,17 +99,20 @@ export default function AccountDetailsModal({
             <div className="flex w-full h-fit items-center justify-between px-5 py-2">
               <PiggyBank size={20} />
               <p className="text-2xl font-semibold">{accountData?.name}</p>
-              <X
-                onClick={() => onOpen()}
-                size={20}
-                className="cursor-pointer"
-              />
+              <button data-cy="x-button">
+                <X
+                  onClick={() => onOpen()}
+                  size={20}
+                  className="cursor-pointer"
+                />
+              </button>
             </div>
 
             {/* Filter bar */}
             <div className="flex w-full h-fit px-5 pt-3 pb-1">
               <div
                 className="flex border border-(--color-border-default) hover:text-white active:text-white rounded-lg px-3 py-2 gap-2 w-fit h-full cursor-pointer hover:bg-(--color-brand-green) duration-100 transition-all active:bg-emerald-700"
+                data-cy="open-info"
                 onClick={(e) => {
                   e.stopPropagation();
                   openInfo();
@@ -187,7 +190,9 @@ export default function AccountDetailsModal({
                                   : item.account_from_name}
                               </span>
                             </div>
-                            <p className={`line-clamp-1 font-mono ${item.type === "income" ? "text-emerald-400" : item.type === "expense" ? "text-red-500" : "text-white"}`}>
+                            <p
+                              className={`line-clamp-1 font-mono ${item.type === "income" ? "text-emerald-400" : item.type === "expense" ? "text-red-500" : "text-white"}`}
+                            >
                               {item?.amount}
                             </p>
                           </div>
@@ -253,6 +258,7 @@ export default function AccountDetailsModal({
             <div className="flex flex-col w-full h-fit px-5 pb-5 pt-2">
               <button
                 type="button"
+                data-cy="delete-account"
                 className="flex cursor-pointer border border-(--color-border-default) rounded-lg bg-transparent text-[0.9rem] hover:bg-(--color-brand-green) active:bg-emerald-600 w-full items-center justify-center py-1 duration-100 transition-all"
                 onClick={() => handleAccountDeletion(accountData?.id)}
               >

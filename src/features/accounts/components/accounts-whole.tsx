@@ -205,7 +205,8 @@ export default function WholeAccountsList() {
                           setToggle("account-details");
                           setChosenAccount(account);
                         }}
-                        key={id}
+                        key={account.id}
+                        data-cy={"account-row"}
                       >
                         {/* Row 1 (mobile): name + balance */}
                         <div className="flex items-center justify-between md:contents md:text-[0.8rem]">

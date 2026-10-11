@@ -87,6 +87,7 @@ export default function AddAccountModal({
             <input
               id="nameInput"
               name="accountName"
+              data-cy="name-input"
               value={formValues.accountName}
               onChange={handleChange}
               className="flex w-full focus:outline-(--color-brand-green) focus:outline-1 border border-(--color-border-default) rounded-lg px-3 py-1 text-[0.8rem]"
@@ -100,6 +101,7 @@ export default function AddAccountModal({
             <select
               id="accountType"
               name="accountType"
+              data-cy="account-type"
               value={formValues.accountType}
               onChange={handleChange}
               className="flex focus:outline-(--color-brand-green) focus:outline-1 w-full border border-(--color-border-default) rounded-lg px-3 py-1 text-[0.8rem]"
@@ -120,6 +122,7 @@ export default function AddAccountModal({
               id="description"
               rows={4}
               name="description"
+              data-cy="description"
               value={formValues.description}
               onChange={handleChange}
               placeholder="Write something about your account."
@@ -134,6 +137,7 @@ export default function AddAccountModal({
           <button
             className="flex bg-(--color-brand-green) text-white focus:outline-1 focus:outline-(--color-brand-green) rounded-lg shadow-md hover:bg-(--color-brand-green-accent) text-[0.8rem] active:bg-emerald-700 items-center justify-center px-5 py-1 w-full cursor-pointer"
             type="submit"
+            data-cy="submit-button"
             aria-label="add-account"
           >
             {loading ? <Spinner /> : "Add account"}

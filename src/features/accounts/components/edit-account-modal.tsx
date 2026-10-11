@@ -142,6 +142,7 @@ export default function EditAccountModal({
             <input
               id="name"
               name="name"
+              data-cy="name-input"
               className="flex border border-(--color-border-strong) w-full h-fit py-1 px-3 rounded-lg text-[0.8rem] focus:outline-(--color-brand-green) focus:outline-1"
               value={formValues?.name}
               onChange={handleChange}
@@ -153,6 +154,7 @@ export default function EditAccountModal({
               className="flex border border-(--color-border-strong) w-full h-fit py-1 px-2 rounded-lg text-[0.8rem] focus:outline-(--color-brand-green) focus:outline-1"
               id="category_id"
               name="category"
+              data-cy="account-type"
               onChange={handleChange}
               value={formValues.category ?? ""}
             >
@@ -172,6 +174,7 @@ export default function EditAccountModal({
             <textarea
               id="description"
               name="description"
+              data-cy="description"
               className="flex w-full h-full border border-(--color-border-strong) rounded-lg px-3 py-1 text-[0.8rem] focus:outline-(--color-brand-green) focus:outline-1"
               value={formValues.description ?? ""}
               onChange={handleChange}
@@ -191,6 +194,7 @@ export default function EditAccountModal({
               onClick={handleUpdateAccountChanges}
               disabled={process}
               aria-label="edit-account"
+              data-cy="edit-account"
             >
               {process ? <Spinner /> : <p>Save changes</p>}
             </button>
