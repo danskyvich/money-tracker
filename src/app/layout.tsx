@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { DM_Mono, Instrument_Sans } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "../components/theme-provider";
-import { RecaptchaProvider } from "@/components/recaptcha-provider";
 
 const sans = Instrument_Sans({ subsets: ["latin"], variable: "--font-body" });
 const mono = DM_Mono({
@@ -26,7 +25,6 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <title>Money Tracker</title>
-        <link rel="stylesheet" href="./globals.css" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </head>
       <body

@@ -106,6 +106,7 @@ export default function LoginPage() {
           <Input
             register={register}
             label="Email"
+            data-cy="email-input"
             placeholder="Enter your email address"
             id="email"
             icon={<MailIcon size={13} />}
@@ -123,6 +124,7 @@ export default function LoginPage() {
           <div className="flex w-full flex-col h-fit gap-4">
             <button
               disabled={pending}
+              data-cy="login-button"
               className={`${pending && "cursor-none active:emerald-800 bg-gray-500 py-2"} flex items-center justify-center text-center w-full text-white text-[0.9rem] mt-10 bg-(--color-brand-green) rounded-xl py-2 cursor-pointer hover:bg-emerald-700 active:bg-emerald-800 transition-all duration-100`}
             >
               {pending ? (

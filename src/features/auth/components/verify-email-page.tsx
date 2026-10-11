@@ -15,10 +15,8 @@ import Spinner from "@/components/layout/spinner";
 
 export default function VerifyEmailPage({
   email,
-  rememberMe,
 }: {
   email: string;
-  rememberMe: boolean;
 }) {
   useEffect(() => {
     document.title = "Verify your email";
@@ -57,6 +55,7 @@ export default function VerifyEmailPage({
     return () => clearInterval(seconds);
   }, []);
 
+  // form action
   const [state, formAction, pending] = useActionState(
     async (prev: any, formData: FormData) => {
       const result = await verifyOtp(email, formData.get("otp") as string);
@@ -65,6 +64,7 @@ export default function VerifyEmailPage({
     null,
   );
 
+  // resend code
   const handleResend = async () => {
     if (!executeRecaptcha || resendDisabled || resendPending) return;
 
@@ -122,9 +122,11 @@ export default function VerifyEmailPage({
             <InputComponent
               id="otp"
               name="otp"
+              type="text"
               placeholder="000000"
               register={register}
               icon={<Lock size={15} />}
+              data-cy="otp-input"
             />
             {
               message && <p className="text-[0.875rem] font-light text-(--color-brand-green)">We have sent you a new verification email</p>
@@ -137,6 +139,7 @@ export default function VerifyEmailPage({
                   onClick={handleResend}
                   disabled={resendDisabled || resendPending}
                   aria-disabled={resendDisabled || resendPending}
+                  data-cy="resend-link"
                 >
                   {resendPending ? <Spinner /> : "Resend code"}
                 </button>
@@ -150,6 +153,7 @@ export default function VerifyEmailPage({
               disabled={pending}
               className="flex bg-(--color-brand-green) py-2 text-white text-center items-center justify-center w-full h-fit rounded-xl mt-5 text-[0.9rem] hover:bg-emerald-600 active:bg-emerald-700 cursor-pointer"
               type="submit"
+              data-cy="verify-code"
             >
               {pending ? (
                 <div className="flex py-1">

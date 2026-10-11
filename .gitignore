@@ -13,6 +13,22 @@
 # testing
 /coverage
 
+# Cypress test artifacts
+cypress/videos/
+cypress/screenshots/
+cypress/downloads/
+
+# Cypress environment variables & secrets
+cypress.env.json
+
+# Node dependencies & logs
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+
+
 # next.js
 /.next/
 /out/

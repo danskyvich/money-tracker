@@ -22,6 +22,7 @@ export default function InputComponent<T extends FieldValues>({
   register,
   name,
   className,
+  ...props
 }: InputProps<T>) {
 
   return (
@@ -44,6 +45,7 @@ export default function InputComponent<T extends FieldValues>({
           placeholder={placeholder}
           id={id}
           type={type}
+          {...props}
           {...register(name)}
         />
         {leadingIcon && (
