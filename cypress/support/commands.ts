@@ -75,14 +75,26 @@ Cypress.Commands.add("loginWithGoogle", () => {
                 );
             });
         });
+    }, {
+        cacheAcrossSpecs: true,
     });
 });
+
+Cypress.Commands.add("loginWithFacebook", () => {
+    cy.log("Log in using Facebook");
+
+    cy.request({
+        method: "POST",
+        url: ""
+    })
+})
 
 declare global {
     namespace Cypress {
         interface Chainable {
             loginUsingGoogleApi(): Chainable<string>;
             loginWithGoogle(): Chainable<string>;
+            loginWithFacebook(): Chainable<string>;
         }   
     }
 }

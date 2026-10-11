@@ -1,6 +1,6 @@
 import Link from "next/link"
 
-interface SidebarItemProps {
+interface SidebarItemProps extends Omit<React.ComponentProps<typeof Link>, "href" | "className"> {
   icon: React.ReactNode,
   label: string,
   className?: string,
@@ -8,7 +8,7 @@ interface SidebarItemProps {
   isActive: boolean,
 }
 
-export const SidebarItem = ({icon, label, className, path, isActive}: SidebarItemProps) => {
+export const SidebarItem = ({icon, label, className, path, isActive, ...props}: SidebarItemProps) => {
   return (
     <Link
       href={path}
@@ -17,6 +17,7 @@ export const SidebarItem = ({icon, label, className, path, isActive}: SidebarIte
           ? "rounded-2xl ring-inset bg-emerald-800/80 duration-200 transition-all"
           : "hover:bg-emerald-800/40 hover:cursor-pointer"
       }`}
+      {...props}
     >
       <div>{icon}</div>
       <p className="hidden xl:block">{label}</p>

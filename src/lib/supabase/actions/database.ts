@@ -164,7 +164,7 @@ export async function FetchTransaction(currentPage: number, numberOfItems: numbe
 interface InsertTransactionParams {
     account_id: string,
     amount: number,
-    category_id: string,
+    category_id: string | null,
     description: string | null,
     user_id: string,
     to_account_id: string | null,

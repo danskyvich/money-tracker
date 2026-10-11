@@ -166,7 +166,7 @@ export default function TransactionModal({
         type: formValues.type,
         date_time: formValues.date_time,
         amount: formValues.amount,
-        category_id: formValues.category_id,
+        category_id: formValues.type === "transfer" ? null : formValues.category_id,
         account_id: formValues.account_id,
         to_account_id:
           formValues.type === "transfer" ? formValues.to_account_id : null,
@@ -182,9 +182,11 @@ export default function TransactionModal({
           payload.category_id === null ||
           payload.date_time === null ||
           (payload.type === null && setTransactionError("Missing fields"));
-        payload.type === "transfer" &&
-          payload.to_account_id === "" &&
-          setTransactionError("Missing fields");
+          if (payload.type === "transfer" && !payload.to_account_id) {
+            setTransactionError("Destination account is missing");
+            setProcess(false);
+            return;
+          }
       }
 
       // update/insert based on action
@@ -209,7 +211,6 @@ export default function TransactionModal({
       return;
     } finally {
       setProcess(false);
-      return;
     }
   };
 
@@ -240,15 +241,16 @@ export default function TransactionModal({
             {transactionTypes.map((item, key) => {
               const isActive = formValues.type === item;
               return (
-              <div
-                className={`flex ${isActive ? typeStyles[item] : "hover:bg-(--color-border-subtle)"} flex-1 w-full h-fit border border-(--color-border-default) rounded-lg items-center justify-center py-1 hover:bg-(--color-border-subtle) cursor-pointer active:bg-(--color-brand-green-accent)`}
-                key={key}
-                role="button"
-                onClick={(e) => setFormValues({ type: item })}
-              >
-                <p className="line-clamp-1 text-[0.9rem] font-mono">{item}</p>
-              </div>
-              )
+                <button
+                  className={`flex ${isActive ? typeStyles[item] : "hover:bg-(--color-border-subtle)"} flex-1 w-full h-fit border border-(--color-border-default) rounded-lg items-center justify-center py-1 hover:bg-(--color-border-subtle) cursor-pointer active:bg-(--color-brand-green-accent)`}
+                  key={key}
+                  data-cy={`${item}-button`}
+                  role="button"
+                  onClick={(e) => setFormValues({ type: item })}
+                >
+                  <p className="line-clamp-1 text-[0.9rem] font-mono">{item}</p>
+                </button>
+              );
             })}
           </div>
           <div className="grid grid-cols-[1fr_1fr] w-full h-full gap-y-3 items-center py-1">
@@ -258,6 +260,7 @@ export default function TransactionModal({
               value={formValues.date_time}
               name="date_time"
               type="datetime-local"
+              data-cy="date-time"
               className="border border-(--color-border-default) rounded-lg px-3 py-1"
               onChange={handleChange}
             />
@@ -267,6 +270,7 @@ export default function TransactionModal({
               name="amount"
               value={formValues.amount}
               type="text"
+              data-cy="amount"
               onChange={handleChange}
               className="border border-(--color-border-default) rounded-lg px-3 py-1"
               placeholder="50.00"
@@ -280,6 +284,7 @@ export default function TransactionModal({
             <select
               id="category"
               name="category_id"
+              data-cy="category_id"
               value={formValues.category_id}
               onChange={handleChange}
               className={`${formValues?.type === "transfer" ? "hidden" : "block"} border border-(--color-border-default) rounded-lg px-3 py-1`}
@@ -298,10 +303,12 @@ export default function TransactionModal({
             <select
               id="account-from"
               name="account_id"
+              data-cy="from-account"
               value={formValues.account_id ?? ""}
               onChange={handleChange}
               className="border border-(--color-border-default) rounded-lg px-3 py-1"
             >
+              <option className="bg-(--color-bg-secondary)" value="">Select account</option>
               {accounts?.map((a, id) => (
                 <option
                   key={id}
@@ -318,10 +325,14 @@ export default function TransactionModal({
                 <select
                   id="account-to"
                   name="to_account_id"
+                  data-cy="to-account"
                   value={formValues.to_account_id ?? ""}
                   onChange={handleChange}
                   className="border border-(--color-border-default) rounded-lg px-3 py-1"
                 >
+                  <option className="bg-(--color-bg-secondary)" value="">
+                    Select account
+                  </option>
                   {accounts?.map((a) => (
                     <option
                       key={a.id}
@@ -338,6 +349,7 @@ export default function TransactionModal({
             <textarea
               id="description"
               name="description"
+              data-cy="description"
               value={formValues.description}
               onChange={handleChange}
               className="border border-(--color-border-default) rounded-lg px-3 py-1 resize-none"

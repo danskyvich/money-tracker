@@ -1,4 +1,7 @@
-import { FetchTransaction, SearchTransactions } from "@/lib/supabase/actions/database";
+import {
+  FetchTransaction,
+  SearchTransactions,
+} from "@/lib/supabase/actions/database";
 import ConvertTimestampToDateTime from "@/utils/convertToDateTime";
 import {
   ArrowRight,
@@ -19,7 +22,6 @@ import Spinner from "@/components/layout/spinner";
 import DeleteTransactionModal from "./delete-transaction-modal";
 
 export default function WholeTransactionList() {
-
   // fetch data & error
   const [transactionsError, setTransactionsError] = useState<string | null>("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -43,7 +45,7 @@ export default function WholeTransactionList() {
     ? changedTransactionsData
     : transactionsData;
   const isSearching = debouncedSearch.trim().length > 0;
-  
+
   // pagination --> edit # of items calculations on lib/data/overview.ts
   // calculation here is purely for pagination purposes
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -80,9 +82,9 @@ export default function WholeTransactionList() {
 
   // get the transaction to be modified
   const handleGetTransactionToBeModified = (transaction: any) => {
-    setToggle("modify-transaction")
+    setToggle("modify-transaction");
     setChosenTransaction(transaction);
-  }
+  };
 
   // handle search feature
   const handleSearch = async (term: string) => {
@@ -104,7 +106,7 @@ export default function WholeTransactionList() {
     setChangedTransactionData(result.data);
     setLoading(false);
     return;
-  }
+  };
 
   return (
     <>
@@ -221,16 +223,8 @@ export default function WholeTransactionList() {
                           </p>
 
                           <div className="flex items-center gap-3 md:contents text-[0.8rem]">
-                            <p
-                              className={`line-clamp-1 font-mono ${
-                                transaction.type === "income"
-                                  ? "text-emerald-500"
-                                  : transaction.type === "expense"
-                                    ? "text-red-500"
-                                    : "text-(--color-text-primary)"
-                              }`}
-                            >
-                              {transaction.amount}
+                            <p className={"line-clamp-1 font-mono text-white"}>
+                              {transaction.type}
                             </p>
 
                             <div className="flex items-center justify-center rounded-lg md:order-last">
@@ -256,15 +250,11 @@ export default function WholeTransactionList() {
                         {/* Row 3 (mobile): type + category + account, small/secondary */}
                         <div className="flex items-center gap-3 text-xs text-(--color-text-secondary) md:contents md:text-[0.8rem]">
                           <p className="capitalize line-clamp-1">
-                            {transaction.type}
-                          </p>
-                          <span className="md:hidden">·</span>
-                          <p className="line-clamp-1">
                             {transaction.category_id?.name ?? "--"}
                           </p>
                           <span className="md:hidden">·</span>
                           <div className="flex items-center">
-                            <p className="line-clamp-1">
+                            <p className="line-clamp-1 text-white">
                               {transaction?.account_id?.name}
                             </p>
                             {transaction.to_account_id?.name && (
@@ -277,6 +267,18 @@ export default function WholeTransactionList() {
                               </>
                             )}
                           </div>
+                          <span className="md:hidden">·</span>
+                          <p
+                            className={`line-clamp-1 font-semibold text-sm ${
+                              transaction.type === "income"
+                                ? "text-emerald-500"
+                                : transaction.type === "expense"
+                                  ? "text-red-500"
+                                  : "text-(--color-text-primary)"
+                            }`}
+                          >
+                            {transaction.amount}
+                          </p>
                         </div>
                       </div>
                     ))}

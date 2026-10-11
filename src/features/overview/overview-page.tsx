@@ -197,26 +197,30 @@ export default function OverviewPage() {
               <p className="text-xl font-semibold">Quick Actions</p>
               <div className="flex w-full h-full gap-5 flex-col md:flex-row">
                 {/* Add transaction */}
-                <div
+                <button
                   className="flex flex-1 bg-(--color-brand-green) px-2 text-white rounded-lg shadow-md items-center justify-center text-[0.9rem] gap-1 py-2 cursor-pointer hover:bg-(--color-brand-green-accent) duration-100 transition-all active:bg-emerald-600"
                   onClick={() => setToggle("add-transaction")}
+                  data-cy="add-transaction"
+                  role="button"
                 >
                   <Plus size={18} className="min-w-3 h-auto" />
                   <p className="hidden text-[0.7rem] md:text-[0.8rem] lg:block whitespace-nowrap">
                     Add transaction
                   </p>
-                </div>
+                </button>
 
                 {/* Add account */}
-                <div
+                <button
                   className="flex flex-1 px-2 ring ring-inset ring-(--color-brand-green) hover:bg-(--color-brand-green) hover:text-white rounded-lg shadow-md items-center justify-center text-[0.9rem] gap-1 py-2 cursor-pointer duration-100 transition-all active:bg-emerald-600"
                   onClick={() => setToggle("add-account")}
+                  data-cy="add-account"
+                  role="button"
                 >
                   <PiggyBank size={18} className="min-w-3 h-auto" />
                   <p className="hidden text-[0.7rem] md:text-[0.8rem] lg:block whitespace-nowrap">
                     Add account
                   </p>
-                </div>
+                </button>
               </div>
             </div>
           </div>

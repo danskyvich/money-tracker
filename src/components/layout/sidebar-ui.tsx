@@ -14,23 +14,26 @@ export default function Sidebar({className, email, lastLogIn}:{className?: strin
         icon: <LayoutDashboardIcon size={20} />,
         label: "Dashboard",
         path: "/overview",
+        data_cy: "dashboard-item",
       },
       {
         icon: <Wallet2Icon size={20} />,
         label: "Transactions",
         path: "/transactions",
+        data_cy: "transaction-item",
       },
       {
         icon: <BaggageClaimIcon size={20} />,
         label: "Accounts",
         path: "/accounts",
+        data_cy: "accounts-item",
       },
     ];
 
     const OthersItems = [
-      { icon: <User size={20} />, label: "Profile", path: "/profile", otherData: {email}},
-      { icon: <Database size={20} />, label: "Backup", path: "/backup", otherData: "" },
-      { icon: <Settings size={20} />, label: "Settings", path: "/settings", otherData: "" },
+      { icon: <User size={20} />, label: "Profile", path: "/profile", otherData: {email}, data_cy: "profile-item"},
+      { icon: <Database size={20} />, label: "Backup", path: "/backup", otherData: "", data_cy: "backup-item" },
+      { icon: <Settings size={20} />, label: "Settings", path: "/settings", otherData: "", data_cy: "settings-item" },
     ];
 
     return (
@@ -50,6 +53,7 @@ export default function Sidebar({className, email, lastLogIn}:{className?: strin
         {/* Sidebar list */}
         <div className="flex flex-0 flex-col gap-1">
           <>
+          {/* Overview */}
             <p className="hidden md:block text-white/50 text-[0.9rem] font-light mb-2">
               Overview
             </p>
@@ -59,6 +63,7 @@ export default function Sidebar({className, email, lastLogIn}:{className?: strin
                 icon={overviewItem.icon}
                 label={overviewItem.label}
                 path={overviewItem.path}
+                data-cy={overviewItem.data_cy}
                 isActive={path === overviewItem.path}
               />
             ))}
@@ -73,6 +78,7 @@ export default function Sidebar({className, email, lastLogIn}:{className?: strin
                   label={otherItem.label}
                   path={otherItem.path}
                   key={otherItem.path}
+                  data-cy={otherItem.data_cy}
                   isActive={path === otherItem.path}
                 />
               ))}

@@ -60,6 +60,7 @@ export default function Modal({loading, children, onCancel, noButtonText, yesBut
               onConfirm === undefined ? null : onConfirm();
             }}
             disabled={loading}
+            data-cy="yes-button"
           >
             {loading ? (
               <div className="flex py-1">
