@@ -1,9 +1,21 @@
 import { defineConfig } from "cypress";
+import JSZip, { loadAsync } from "jszip";
+import fs from "fs";
 
 export default defineConfig({
   e2e: {
     setupNodeEvents(on, config) {
       // implement node event listeners here
+      on("task", {
+        async readZip(path: string) {
+          const zip = await JSZip.loadAsync(fs.readFileSync(path));
+          const tobeFilledUp: Record<string, string> = {};
+          for ( const [name, file] of Object.entries(zip.files)) {
+            if (!file.dir) tobeFilledUp[name] = await file.async("string");
+          }
+          return tobeFilledUp;
+        }
+      });
       return config;
     },
     baseUrl: 'http://localhost:3000',
