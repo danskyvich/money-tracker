@@ -29,24 +29,28 @@ export default function BackupPage() {
         value: "Export as a JSON file",
         icon: <MoveUpRight size={15} />,
         onClick: () => setActiveItem("json"),
+        context: "export-json"
       },
       {
         item: "Export data to Excel",
         value: "Export as a CSV file",
         icon: <MoveUpRight size={15} />,
         onClick: () => setActiveItem("csv"),
+        context: "export-csv"
       },
       {
         item: "Import from an Excel file",
         value: "Import a CSV file",
         icon: <MoveDownLeft size={15} />,
         onClick: () => setActiveItem("csv-import"),
+        context: "import-csv"
       },
       {
         item: "Import from a JSON file",
         value: "Import a JSON file",
         icon: <MoveDownLeft size={15} />,
         onClick: () => setActiveItem("json-import"),
+        context: "import-json"
       },
     ];
 
@@ -175,6 +179,7 @@ export default function BackupPage() {
                     <input
                       type="date"
                       aria-label="from-date"
+                      data-cy="from-date"
                       value={dates.startDate || dateNow}
                       disabled={exportAllData}
                       onChange={(e) =>
@@ -189,6 +194,7 @@ export default function BackupPage() {
                     <input
                       type="date"
                       aria-label="to-date"
+                      data-cy="to-date"
                       value={dates.endDate || dateNow}
                       onChange={(e) =>
                         setDates((prev) => ({
@@ -205,6 +211,7 @@ export default function BackupPage() {
                     <input
                       id="allData"
                       type="checkbox"
+                      data-cy="all-dates"
                       aria-label="export-all"
                       checked={exportAllData}
                       onChange={(e) => setExportAllData((prev) => !prev)}
@@ -238,6 +245,7 @@ export default function BackupPage() {
                     <input
                       type="date"
                       aria-label="from-date"
+                      data-cy="from-date"
                       value={dates.startDate || dateNow}
                       disabled={exportAllData}
                       onChange={(e) =>
@@ -252,6 +260,7 @@ export default function BackupPage() {
                     <input
                       type="date"
                       aria-label="to-date"
+                      data-cy="to-date"
                       value={dates.endDate || dateNow}
                       onChange={(e) =>
                         setDates((prev) => ({
@@ -268,6 +277,7 @@ export default function BackupPage() {
                     <input
                       id="allData"
                       type="checkbox"
+                      data-cy="all-dates"
                       aria-label="export-all"
                       checked={exportAllData}
                       onChange={(e) => setExportAllData((prev) => !prev)}
@@ -294,6 +304,7 @@ export default function BackupPage() {
                 <input
                   onChange={handleImportFromJSON}
                   accept=".json"
+                  data-cy="file-input"
                   type="file"
                   aria-label="json-import"
                   className="flex w-full h-fit border border-(--color-border-subtle) cursor-pointer hover:bg-(--color-bg-subtle) rounded-lg px-3 py-1"
@@ -316,6 +327,7 @@ export default function BackupPage() {
                 <input
                   onChange={handleImportFromCSV}
                   type="file"
+                  data-cy="file-input"
                   aria-label="csv-import"
                   accept=".zip"
                   className="flex w-full h-fit border border-(--color-border-subtle) cursor-pointer hover:bg-(--color-bg-subtle) rounded-lg px-3 py-1"
@@ -338,6 +350,7 @@ export default function BackupPage() {
                   className="flex w-fit h-fit cursor-pointer ring ring-inset ring-(--color-brand-green) items-center justify-center active:bg-emerald-600 active:text-white whitespace-nowrap rounded-lg gap-1 justify-self-end shadow-md px-4 md:px-5 py-2 hover:bg-(--color-brand-green) hover:text-white text-[0.9rem]"
                   aria-label={`${item.value} button`}
                   onClick={item.onClick}
+                  data-cy={`${item.context}`}
                 >
                   {item.icon}
                   <p className="hidden md:block text-[0.65rem] md:text-sm">{item.value}</p>

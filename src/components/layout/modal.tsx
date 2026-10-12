@@ -50,6 +50,7 @@ export default function Modal({loading, children, onCancel, noButtonText, yesBut
               onOpen(false);
               onCancel();
             }}
+            data-cy="no-button"
           >
             <p>{noButtonText}</p>
           </button>

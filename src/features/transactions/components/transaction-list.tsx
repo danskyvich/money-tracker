@@ -213,6 +213,7 @@ export default function WholeTransactionList() {
                         onClick={() =>
                           handleGetTransactionToBeModified(transaction)
                         }
+                        data-cy="transaction-row"
                       >
                         {/* Row 1 (mobile): date + amount + delete */}
                         <div className="flex items-center justify-between md:contents">

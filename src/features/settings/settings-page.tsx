@@ -21,14 +21,16 @@ export default function SettingsPage() {
       value: "Modify",
       icon: <Eye size={15} />,
       link: () => setToggle("income-categories"),
-      id: "income-categories"
+      id: "income-categories",
+      context: "income-categories",
     },
     {
       item: "Modify expense categories",
       value: "Modify",
       icon: <Eye size={15} />,
       link: () => setToggle("expense-categories"),
-      id: "expense-categories"
+      id: "expense-categories",
+      context: "expense-categories",
     },
     {
       item: "Delete data",
@@ -36,6 +38,7 @@ export default function SettingsPage() {
       icon: <Trash size={15}/>,
       link: () => setToggle("data-deletion"),
       id: "delete-data",
+      context: "delete-data",
     }
   ];
 
@@ -106,7 +109,7 @@ export default function SettingsPage() {
             >
               <label className="text-[0.9rem]" htmlFor={item.id}>{item.item}</label>
 
-              <button className="flex w-fit h-fit ring ring-inset ring-(--color-brand-green) hover:text-white active:text-white active:bg-emerald-600 text-[0.9rem] rounded-lg shadow-md hover:bg-(--color-brand-green) px-4 md:x-5 py-2 items-center justify-center justify-self-end gap-1 duration-100 cursor-pointer transition-all" onClick={item.link} id={item.id}>
+              <button className="flex w-fit h-fit ring ring-inset ring-(--color-brand-green) hover:text-white active:text-white active:bg-emerald-600 text-[0.9rem] rounded-lg shadow-md hover:bg-(--color-brand-green) px-4 md:x-5 py-2 items-center justify-center justify-self-end gap-1 duration-100 cursor-pointer transition-all" onClick={item.link} id={item.id} data-cy={item.context}>
                 {item.icon === null ? null : item.icon}
                 <p className="hidden md:block whitespace-nowrap">{item.value}</p>
               </button>
