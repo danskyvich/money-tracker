@@ -3,16 +3,16 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 export default async function VerifyEmail() {
-    const cookieStore = await cookies()
+    const cookieStore = await cookies();
     const raw = cookieStore.get("pending_verification")?.value;
 
     if (!raw) redirect("/login");
 
-    const { email, rememberMe } = JSON.parse(raw);
+    const { email } = JSON.parse(raw);
     
     return(
         <div>
-            <VerifyEmailPage email={email} rememberMe={rememberMe}/>
+            <VerifyEmailPage email={email}/>
         </div>
     )
 }
