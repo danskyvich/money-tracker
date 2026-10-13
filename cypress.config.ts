@@ -1,6 +1,7 @@
 import { defineConfig } from "cypress";
 import JSZip, { loadAsync } from "jszip";
 import fs from "fs";
+import { generate } from "otplib";
 
 export default defineConfig({
   e2e: {
@@ -16,6 +17,13 @@ export default defineConfig({
           return tobeFilledUp;
         }
       });
+
+      on("task", {
+        async totp(secret: string) {
+          return await generate({ secret });
+        },
+      });
+      
       return config;
     },
     baseUrl: 'http://localhost:3000',

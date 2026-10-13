@@ -71,6 +71,7 @@ export default function VerifyQRPage({challengeId, factorId, mode}:VerifyQRPage)
                 id="otp"
                 name="otp"
                 placeholder="000000"
+                data-cy='code-input'
                 value={code}
                 maxLength={6}
                 onChange={(e) =>
@@ -83,6 +84,7 @@ export default function VerifyQRPage({challengeId, factorId, mode}:VerifyQRPage)
               <div className="flex px-3 gap-2 mt-1">
                 <input
                   id="trustDeviceForThirtyDays"
+                  data-cy='trust-device'
                   type="checkbox"
                   onChange={(e) => setTrustDeviceChecked(e.target.checked)}
                   checked={trustDeviceChecked}
@@ -107,6 +109,7 @@ export default function VerifyQRPage({challengeId, factorId, mode}:VerifyQRPage)
               <button
                 className="flex cursor-pointer items-center justify-center w-full text-white py-2 bg-(--color-brand-green) hover:bg-emerald-600 active:bg-emerald-700 rounded-lg duration-100 transition-all"
                 type="submit"
+                data-cy="submit-code"
                 disabled={loading}
               >
                 {loading ? (

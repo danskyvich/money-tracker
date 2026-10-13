@@ -127,7 +127,7 @@ export default function QR() {
 
             {/* Code */}
             <div className="flex w-full h-fit px-5 py-3 rounded-xl text-white shadow-md border border-(--color-border-strong) bg-cyan-950 justify-center items-center">
-              <p className="font-semibold text-[0.9rem]">{secret}</p>
+              <p className="font-semibold text-[0.9rem]" data-cy="otp-secret">{secret}</p>
             </div>
 
             <div className="flex w-full h-fit gap-5 mt-5">
@@ -140,6 +140,7 @@ export default function QR() {
               </button>
               <button
                 type="button"
+                data-cy="proceed-to-verify"
                 className="flex flex-1 cursor-pointer transition-all duration-100 w-full bg-(--color-brand-green) text-white items-center justify-center rounded-xl hover:bg-emerald-600 active:bg-emerald-700 px-5 py-2"
                 onClick={handleVerify}
               >

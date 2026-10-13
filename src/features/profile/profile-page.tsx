@@ -168,6 +168,7 @@ export default function ProfilePage({
                 onEnable={() => {
                   setEnable(false);
                 }}
+                data-cy="toggle-mfa"
                 onClick={
                   enable
                     ? () => setToggle("disable-mfa")
