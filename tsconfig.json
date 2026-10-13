@@ -37,6 +37,10 @@
     "**/*.mts"
 , "src/lib/auth/server-client.ts"  ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "cypress",
+    "**/__tests__/**",
+    "**/*.test.ts",
+    "**/*.test.tsx"
   ]
 }
