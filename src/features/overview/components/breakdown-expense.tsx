@@ -29,7 +29,7 @@ export default function ExpenseBreakdownPage() {
   if (chartData.length === 0) {
     return (
       <div className="flex w-full h-full items-center justify-center">
-        <p className="text-[0.9rem] font-mono">Data unavailable.</p>
+        <p className="font-sans text-sm">Data unavailable.</p>
       </div>
     );
   }

@@ -223,7 +223,7 @@ export default function Accounts() {
                       ))
                     ) : (
                       <div className="flex w-full h-full items-center justify-center">
-                        <p className="text-[0.9rem] font-mono">
+                        <p className="text-[0.9rem] font-sans text-sm">
                           You have no categories.
                         </p>
                       </div>

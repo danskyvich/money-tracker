@@ -5,12 +5,13 @@ import Input from "@/components/layout/Input";
 import { LoginFormData, loginSchema } from "../../../lib/schemas/LoginSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { MailIcon } from "lucide-react";
-import { useActionState, useEffect, useState } from "react";
+import { startTransition, useActionState, useEffect, useState } from "react";
 import {generalSignIn, signInWithFacebook, signInWithGoogle} from "@/lib/supabase/actions/auth";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import ErrorModal from "@/components/layout/error-modal";
 import Spinner from "@/components/layout/spinner";
+import { signInDemo } from "../actions";
 
 const GoogleIcon = (
   props: React.SVGProps<SVGSVGElement>,
@@ -45,10 +46,10 @@ const FacebookIcon = (
 export default function LoginPage() {
 
   // states
-  const [rememberMe, setRememberMe] = useState(false);
   const router = useRouter();
   const { executeRecaptcha } = useGoogleReCaptcha();
   const error = useSearchParams().get("error");
+  const [demoError, setDemoError] = useState<string>("");
 
   // loginAction from lib/auth/actions.ts
   const [state, formAction, pending] = useActionState(
@@ -115,7 +116,6 @@ export default function LoginPage() {
             required
           />
 
-
           {/* Error */}
           {state?.error && (
             <p className="text-[0.9rem] px-2 text-red-500">{state.error}</p>
@@ -137,6 +137,25 @@ export default function LoginPage() {
             </button>
           </div>
         </form>
+
+        {/* Try demo */}
+        <div className="flex flex-col w-full gap-2 mb-5">
+          <button
+            className={`${pending && ""} border border-(--color-brand-green) text-sm font-sans py-2 rounded-lg hover:bg-(--color-brand-green)/50 cursor-pointer active:bg-(--color-brand-green)`}
+            onClick={() =>
+              startTransition(async () => {
+                
+                const res = await signInDemo();
+                if (res && !res.success) setDemoError(res.error);
+              })
+            }
+            type="button"
+            disabled={pending}
+          >
+            {pending ? <Spinner /> : "Try demo"}
+          </button>
+          { demoError && <p className="text-red-400 font-sans text-sm">{demoError}</p>}
+        </div>
 
         {/* --- or --- */}
         <div className="relative flex text-center items-center ">
