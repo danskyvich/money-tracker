@@ -47,7 +47,7 @@ export default function TransactionPartialList({
               ))}
             </div>
           ) : (
-            <div className="flex flex-col w-full h-full font-mono text-[0.9rem] items-center justify-center gap-1">
+            <div className="flex flex-col w-full h-full font-sans text-sm items-center justify-center gap-1">
               <p>You don't have any transactions.</p>
             </div>
           )}
