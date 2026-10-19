@@ -18,9 +18,11 @@ import ErrorModal from "@/components/layout/error-modal";
 export default function ProfilePage({
   user,
   mfaActive,
+  isDemo
 }: {
   user?: User | null;
   mfaActive: boolean;
+  isDemo: boolean;
 }) {
 
   // states
@@ -161,21 +163,23 @@ export default function ProfilePage({
           <div className="flex flex-col w-full h-full p-5">
             <ProfileHeader user={user} mfaActive={mfaActive} />
 
-            <div className="flex w-full h-fit items-center justify-between my-2">
-              <p className="text-[0.9rem]">Enable MFA</p>
-              <Toggle
-                enable={enable}
-                onEnable={() => {
-                  setEnable(false);
-                }}
-                data-cy="toggle-mfa"
-                onClick={
-                  enable
-                    ? () => setToggle("disable-mfa")
-                    : () => router.push("/mfa")
-                }
-              />
-            </div>
+            {!isDemo && (
+              <div className="flex w-full h-fit items-center justify-between my-2">
+                <p className="text-[0.9rem]">Enable MFA</p>
+                <Toggle
+                  enable={enable}
+                  onEnable={() => {
+                    setEnable(false);
+                  }}
+                  data-cy="toggle-mfa"
+                  onClick={
+                    enable
+                      ? () => setToggle("disable-mfa")
+                      : () => router.push("/mfa")
+                  }
+                />
+              </div>
+            )}
 
             {/* Content */}
             {profile.map((item, index) => (

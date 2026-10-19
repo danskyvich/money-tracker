@@ -44,14 +44,22 @@ export default function ExpenseCategoriesCard () {
           <CategoriesSkeleton />
         ) : (
           <>
-            {expenseCategories?.map((item, id) => (
-              <div
-                className="flex w-full h-fit px-5 py-2 border-b border-(--color-border-subtle) hover:bg-(--color-bg-subtle) text-[0.8rem] cursor-pointer"
-                key={id}
-              >
-                {item.name}
+            {expenseCategories?.length === 0 ? (
+              <div className="flex w-full h-full items-center justify-center ">
+                <p className="text-sm font-sans">You have no expense categories</p>
               </div>
-            ))}
+            ) : (
+              <>
+                {expenseCategories?.map((item, id) => (
+                  <div
+                    className="flex w-full h-fit px-5 py-2 border-b border-(--color-border-subtle) hover:bg-(--color-bg-subtle) text-[0.8rem] cursor-pointer"
+                    key={id}
+                  >
+                    {item.name}
+                  </div>
+                ))}
+              </>
+            )}
           </>
         )}
       </CardComponent>

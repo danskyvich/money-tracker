@@ -10,5 +10,5 @@ export async function signInDemo(): Promise<{success: false, error: string}> {
         password: process.env.DEMO_PASSWORD!,
     });
     if (error) return { success: false, error: error.message }
-    redirect("/dashboard");
+    redirect("/overview");
 }
