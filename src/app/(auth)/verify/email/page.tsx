@@ -12,7 +12,7 @@ export default async function VerifyEmail() {
     
     return(
         <div>
-            <VerifyEmailPage email={email} rememberMe={rememberMe}/>
+            <VerifyEmailPage email={email}/>
         </div>
     )
 }
